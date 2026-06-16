@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal SPPG JATIAN</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>🏛️ Menu Utama</h3>
+            <button class="sidebar-close" onclick="toggleMenu()">✕</button>
+        </div>
+        <div class="sidebar-nav">
+            <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">🏠</span> Beranda</button>
+            <button class="sidebar-menu-btn" onclick="showSection('info-pengumuman')"><span class="menu-icon">📢</span> Info & Pengumuman</button>
+            <button class="sidebar-menu-btn" onclick="showSection('memo-catatan')"><span class="menu-icon">📝</span> Memo & Catatan</button>
+            <button class="sidebar-menu-btn rute-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
+            <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">🍱</span> Menu Mingguan</button>
+            <button class="sidebar-menu-btn" onclick="showSection('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</button>
+            <button class="sidebar-menu-btn" onclick="showSection('staff')"><span class="menu-icon">👥</span> Daftar Staff</button>
+            <button class="sidebar-menu-btn warning" onclick="showSection('darurat')"><span class="menu-icon">☎️</span> Kontak Darurat</button>
+        </div>
+        <div class="sidebar-footer">
+            © <span id="footerYear"></span> SPPG JATIAN
+        </div should be removed or kept minimal>
+    </div>
+
+    <!-- Sticky Header -->
+    <div class="sticky-header">
+        <div class="header-top">
+            <button class="hamburger-btn" onclick="toggleMenu()">
+                <span class="hamburger-icon">☰</span> Menu
+            </button>
+            <div class="header-title">
+                <h1>🏛️ PORTAL SPPG JATIAN</h1>
+                <p>Satuan Pelayanan Pemenuhan Gizi Jatian</p>
+            </div>
+            <div class="clock-container">
+                <div class="analog-clock">
+                    <div class="clock-face">
+                        <div class="hour-hand" id="hourHand"></div>
+                        <div class="minute-hand" id="minuteHand"></div>
+                        <div class="second-hand" id="secondHand"></div>
+                        <div class="clock-center"></div>
+                    </div>
+                </div>
+                <div class="digital-clock">
+                    <div class="timezone-badge">WIB</div>
+                    <div class="time-display"><span id="digitalTime">00:00:00</span><span class="ms-display" id="msDisplay">000</span></div>
+                    <div class="date-display" id="dateDisplay">Memuat...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Running Text -->
+        <div class="running-text-container">
+            <div class="running-text-label">📢 INFO</div>
+            <div class="running-text-wrapper">
+                <div class="running-text" id="runningText">Memuat pengumuman...</div>
+            </div>
+        </div>
+
+        <!-- SECTION: BERANDA -->
+        <div id="section-home" class="content-section home-section">
+            <div class="welcome-card">
+                <div class="welcome-icon">👋</div>
+                <div class="welcome-content">
+                    <h2>Selamat Datang di Portal SPPG JATIAN</h2>
+                    <p>Sistem informasi terpadu untuk koordinasi, distribusi, dan manajemen data SPPG Jatian. Gunakan menu di kiri atas untuk mengakses fitur.</p>
+                </div>
+            </div>
+            
+            <div class="quote-card">
+                <span class="quote-icon">❝</span>
+                <p id="quoteText">Memuat quote...</p>
+                <span class="quote-icon right">❞</span>
+            </div>
+
+            <div class="birthday-card" id="birthdayCard" style="display: none;">
+                <div class="birthday-icon">🎂</div>
+                <div class="birthday-content">
+                    <h3>🎉 Hari ini Ulang Tahun!</h3>
+                    <p id="birthdayText">-</p>
+                    <a id="birthdayWaLink" href="#" target="_blank" class="birthday-btn"><i class="fab fa-whatsapp"></i> Kirim Ucapan</a>
+                </div>
+            </div>
+
+            <div class="agenda-card">
+                <h2>📅 Agenda Mendatang</h2>
+                <div class="agenda-list" id="agendaList">Memuat agenda...</div>
+            </div>
+        </div>
+
+        <!-- SECTION: INFO & PENGUMUMAN -->
+        <div id="section-info-pengumuman" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>📢 Info & Pengumuman</h2>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInfoPengumuman" placeholder="🔍 Cari pengumuman...">
+            </div>
+            <div class="info-board" id="infoPengumumanBoard">⏳ Memuat informasi...</div>
+        </div>
+
+        <!-- SECTION: MEMO & CATATAN -->
+        <div id="section-memo-catatan" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>📝 Memo & Catatan</h2>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchMemoCatatan" placeholder="🔍 Cari memo atau catatan...">
+            </div>
+            <div class="info-board" id="memoCatatanBoard">⏳ Memuat informasi...</div>
+        </div>
+
+        <!-- SECTION: RUTE DISTRIBUSI -->
+        <div id="section-rute" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>🚚 Rute Distribusi MBG</h2>
+            </div>
+            <div id="ruteContent">⏳ Memuat data rute...</div>
+        </div>
+
+        <!-- SECTION: MENU MINGGUAN -->
+        <div id="section-menu" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>🍱 Menu Mingguan</h2>
+            </div>
+            <div class="menu-weekly-nav">
+                <button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
+            </div>
+            <div class="menu-weekly-container" id="menuWeeklyContainer">⏳ Memuat menu mingguan...</div>
+        </div>
+
+        <!-- SECTION: PUSAT DOKUMEN -->
+        <div id="section-dokumen" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>📚 Pusat Dokumen</h2>
+            </div>
+            <div class="doc-categories">
+                <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
+                <button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
+                <button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
+                <button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
+                <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
+                <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen...">
+            </div>
+            <div class="doc-grid" id="docGrid">⏳ Memuat dokumen...</div>
+        </div>
+
+        <!-- SECTION: DAFTAR STAFF -->
+        <div id="section-staff" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>👥 Daftar Staff</h2>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchStaff" placeholder="🔍 Cari nama staff...">
+            </div>
+            <div class="table-container">
+                <table id="tableStaff">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Nomor WA</th>
+                            <th>Email</th>
+                            <th>Posisi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="5" style="text-align:center;">⏳ Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: KONTAK DARURAT (BARU) -->
+        <div id="section-darurat" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>☎️ Kontak Darurat</h2>
+            </div>
+            <div class="card-grid" id="daruratContent">⏳ Memuat kontak darurat...</div>
+        </div>
+
+    </div>
+
+    <!-- Mascot -->
+    <div class="mascot-container" id="mascot" onclick="handleMascotClick()">
+        <div class="mascot-counter" id="mascotCounter">0</div>
+        <div class="mascot-speech" id="mascotSpeech">Halo! 👋</div>
+        <div class="mascot-body">
+            <div class="mascot-head">
+                <div class="mascot-eye left"></div>
+                <div class="mascot-eye right"></div>
+                <div class="mascot-mouth"></div>
+            </div>
+            <div class="mascot-tail"></div>
+            <div class="mascot-leg left"></div>
+            <div class="mascot-leg right"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
