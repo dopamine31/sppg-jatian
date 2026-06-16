@@ -9,59 +9,39 @@ const SHEET_URLS = {
     menu: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1196527440&single=true&output=csv',
     rute: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=96960366&single=true&output=csv'
 };
-
 let globalData = { relawan: [], info: [] };
 let sidebarOpen = false;
 let currentFilter = 'all';
 let currentMenuFilter = 'all';
-const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job! 👍", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
-const easterEggPhrases = ["🎉 Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇮🇩", "Kamu luar biasa! 💖"];
 
 // ===== SIDEBAR TOGGLE =====
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     sidebarOpen = !sidebarOpen;
-    if (sidebarOpen) { sidebar.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-    else { sidebar.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
-}
-
-// ===== MASCOT =====
-let mascotClickCount = 0;
-function showMascotSpeech(customText = null) {
-    const speech = document.getElementById('mascotSpeech');
-    speech.textContent = customText || mascotPhrases[Math.floor(Math.random() * mascotPhrases.length)];
-    speech.classList.add('show');
-    setTimeout(() => speech.classList.remove('show'), 2500);
-}
-function animateMascot() {
-    const mascot = document.getElementById('mascot');
-    mascot.style.transform = 'scale(1.2) rotate(5deg)';
-    setTimeout(() => { mascot.style.transform = 'scale(1) rotate(0deg)'; }, 300);
-}
-function handleMascotClick() {
-    mascotClickCount++;
-    const counter = document.getElementById('mascotCounter');
-    counter.textContent = mascotClickCount;
-    counter.classList.add('show');
-    animateMascot();
-    if (mascotClickCount % 10 === 0) { showMascotSpeech(`🎁 ${easterEggPhrases[Math.floor(Math.random() * easterEggPhrases.length)]}`); }
-    else { showMascotSpeech(); }
-    setTimeout(() => counter.classList.remove('show'), 3000);
+    if (sidebarOpen) { 
+        sidebar.classList.add('active'); 
+        overlay.classList.add('active'); 
+        document.body.style.overflow = 'hidden'; 
+    } else { 
+        sidebar.classList.remove('active'); 
+        overlay.classList.remove('active'); 
+        document.body.style.overflow = ''; 
+    }
 }
 
 // ===== NAVIGATION =====
 function showHome() {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const home = document.getElementById('section-home');
-    if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); animateMascot(); showMascotSpeech("Selamat datang! 👋"); }
+    if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
 }
 function showSection(sectionName) {
     document.getElementById('section-home').style.display = 'none';
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const section = document.getElementById('section-' + sectionName);
-    if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); animateMascot(); showMascotSpeech(); }
+    if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
 }
 
@@ -105,11 +85,11 @@ function isValidLink(link) { if (!link) return false; const trimmed = link.trim(
 function filterTable(e, tbody) { const q = e.target.value.toLowerCase(); tbody.querySelectorAll('tr').forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
 
 // ===== PUSAT DOKUMEN =====
-function filterDokumen(category, btn) { 
-    currentFilter = category; 
-    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active')); 
-    if (btn) btn.classList.add('active'); 
-    loadDokumen(); 
+function filterDokumen(category, btn) {
+    currentFilter = category;
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    loadDokumen();
 }
 function getDocIcon(category) { const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '📖', internal: '📁' }; return icons[category] || '📄'; }
 async function loadDokumen() {
@@ -117,11 +97,9 @@ async function loadDokumen() {
     grid.innerHTML = '<p style="text-align:center;padding:40px;grid-column:1/-1;">⏳ Memuat dokumen...</p>';
     const data = await fetchSheetData(SHEET_URLS.dokumen);
     if (data.length === 0) { grid.innerHTML = '<div class="doc-empty"><div class="doc-empty-icon">📚</div><h3>Belum ada dokumen</h3></div>'; return; }
-    
     const filteredData = currentFilter === 'all' ? data : data.filter(doc => doc['Kategori']?.toLowerCase() === currentFilter);
     const searchTerm = document.getElementById('searchDokumen')?.value.toLowerCase() || '';
     const searchedData = filteredData.filter(doc => doc['Judul']?.toLowerCase().includes(searchTerm) || doc['Deskripsi']?.toLowerCase().includes(searchTerm));
-    
     grid.innerHTML = searchedData.map((doc) => {
         const category = doc['Kategori']?.toLowerCase() || 'internal'; 
         const icon = getDocIcon(category); 
@@ -131,23 +109,23 @@ async function loadDokumen() {
         if (doc['Tanggal Update']) { const date = new Date(doc['Tanggal Update']); tanggalUpdate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
         
         return `<div class="doc-item" data-category="${category}">
-            <div class="doc-header"><div class="doc-icon">${icon}</div><div class="doc-info"><div class="doc-title">${escapeHtml(doc['Judul'])}</div><span class="doc-category">${category}</span></div></div>
-            <div class="doc-meta">
-                <div class="doc-meta-item"><span>📅</span><span>Update: ${tanggalUpdate}</span></div>
+              <div class="doc-header"><div class="doc-icon">${icon}</div><div class="doc-info"><div class="doc-title">${escapeHtml(doc['Judul'])}</div><span class="doc-category">${category}</span></div></div>
+              <div class="doc-meta">
+                  <div class="doc-meta-item"><span>📅</span><span>Update: ${tanggalUpdate}</span></div>
                 ${doc['Ukuran'] ? `<div class="doc-meta-item"><span>💾</span><span>${doc['Ukuran']}</span></div>` : ''}
-            </div>
+              </div>
             ${doc['Deskripsi'] ? `<p style="font-size:13px;color:#666;margin:10px 0;">${escapeHtml(doc['Deskripsi'])}</p>` : ''}
-            <div class="doc-actions-grid">
+              <div class="doc-actions-grid">
                 ${linkView ? `<a href="${linkView}" target="_blank" class="btn-doc-action btn-view"><i class="fas fa-eye"></i> Lihat</a>` : ''}
                 ${linkDownload ? `<a href="${linkDownload}" download class="btn-doc-action btn-download-doc"><i class="fas fa-download"></i> Download</a>` : ''}
-            </div>
-        </div>`;
+              </div>
+          </div>`;
     }).join('');
     const searchInput = document.getElementById('searchDokumen'); 
     if (searchInput) searchInput.addEventListener('input', () => loadDokumen());
 }
 
-// ===== INFO & MEMO (DIPISAH) =====
+// ===== INFO & MEMO =====
 function formatInfoContent(text) {
     if (!text) return ''; let formatted = escapeHtml(text);
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -160,10 +138,8 @@ function renderInfoBoard(containerId, allowedCategories, searchId) {
     if (allowedCategories !== 'all') { data = data.filter(item => allowedCategories.includes((item['Kategori'] || '').toLowerCase())); }
     const searchTerm = document.getElementById(searchId)?.value.toLowerCase() || '';
     if (searchTerm) { data = data.filter(item => item['Judul']?.toLowerCase().includes(searchTerm) || item['Isi']?.toLowerCase().includes(searchTerm)); }
-    
     if (data.length === 0) { board.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada informasi</h3></div>'; return; }
     data.sort((a, b) => { const dateA = new Date(a['Tanggal'] || 0); const dateB = new Date(b['Tanggal'] || 0); return dateB - dateA; });
-    
     board.innerHTML = data.map((item, idx) => {
         const judul = escapeHtml(item['Judul'] || 'Tanpa Judul'); const isi = item['Isi'] || '';
         const kategori = (item['Kategori'] || 'pengumuman').toLowerCase(); const prioritas = (item['Prioritas'] || 'normal').toLowerCase();
@@ -176,13 +152,13 @@ function renderInfoBoard(containerId, allowedCategories, searchId) {
         const shareText = encodeURIComponent(`*${item['Judul']}*\n\n${isi}\n\n— ${penulis} (${tanggal})\n_Dari Portal SPPG JATIAN_`);
         
         return `<div class="info-item priority-${prioritas}">
-            <div class="info-item-header"><div class="info-item-title">${judul}</div>
-            <div class="info-item-badges"><span class="info-badge kategori-${kategori}">${kategoriLabel}</span><span class="info-badge priority-${prioritas}">${prioritasLabel}</span></div></div>
-            <div class="info-item-meta"><div class="info-meta-item">👤 <strong>${escapeHtml(penulis)}</strong></div><div class="info-meta-item">📅 ${tanggal}</div></div>
-            <div class="info-item-content ${isLong ? 'collapsed' : ''}" id="${itemId}">${contentFormatted}</div>
+              <div class="info-item-header"><div class="info-item-title">${judul}</div>
+              <div class="info-item-badges"><span class="info-badge kategori-${kategori}">${kategoriLabel}</span><span class="info-badge priority-${prioritas}">${prioritasLabel}</span></div></div>
+              <div class="info-item-meta"><div class="info-meta-item">👤 <strong>${escapeHtml(penulis)}</strong></div><div class="info-meta-item">📅 ${tanggal}</div></div>
+              <div class="info-item-content ${isLong ? 'collapsed' : ''}" id="${itemId}">${contentFormatted}</div>
             ${isLong ? `<button class="info-toggle-btn" onclick="toggleInfoContent('${itemId}', this)">📖 Baca Selengkapnya</button>` : ''}
-            <div class="info-item-footer"><a href="https://wa.me/?text=${shareText}" target="_blank" class="info-share-btn"><i class="fab fa-whatsapp"></i> Bagikan via WA</a></div>
-        </div>`;
+              <div class="info-item-footer"><a href="https://wa.me/?text=${shareText}" target="_blank" class="info-share-btn"><i class="fab fa-whatsapp"></i> Bagikan via WA</a></div>
+          </div>`;
     }).join('');
 }
 function toggleInfoContent(id, btn) {
@@ -191,13 +167,10 @@ function toggleInfoContent(id, btn) {
     else { el.classList.add('collapsed'); btn.innerHTML = '📖 Baca Selengkapnya'; el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 }
 async function loadInfoData() {
-    const data = await fetchSheetData(SHEET_URLS.info); 
+    const data = await fetchSheetData(SHEET_URLS.info);
     globalData.info = data;
-    // Render Info & Pengumuman (Kategori: pengumuman, update, penting)
     renderInfoBoard('infoPengumumanBoard', ['pengumuman', 'update', 'penting'], 'searchInfoPengumuman');
-    // Render Memo & Catatan (Kategori: memo, catatan)
     renderInfoBoard('memoCatatanBoard', ['memo', 'catatan'], 'searchMemoCatatan');
-    
     const searchInfo = document.getElementById('searchInfoPengumuman'); if (searchInfo) searchInfo.addEventListener('input', () => renderInfoBoard('infoPengumumanBoard', ['pengumuman', 'update', 'penting'], 'searchInfoPengumuman'));
     const searchMemo = document.getElementById('searchMemoCatatan'); if (searchMemo) searchMemo.addEventListener('input', () => renderInfoBoard('memoCatatanBoard', ['memo', 'catatan'], 'searchMemoCatatan'));
 }
@@ -223,14 +196,22 @@ async function loadMenuWeekly() {
         if (currentMenuFilter !== 'all') { displayDates = displayDates.filter(date => getDayNameFromTanggal(date) === currentMenuFilter); }
         if (displayDates.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada menu</h3></div>'; return; }
         displayDates.sort((a, b) => new Date(a) - new Date(b));
-        
         container.innerHTML = displayDates.map(date => {
             const info = menuByDate[date];
             const menuItems = info.menu ? info.menu.split('+').map(m => m.trim()).filter(m => m) : [];
             const dayName = new Date(date).toLocaleDateString('id-ID', { weekday: 'long' });
             return `<div class="menu-day-card">
-                <div class="menu-day-header"><div class="menu-day-icon">${getDayIcon(dayName)}</div><div class="menu-day-title"><h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3><div class="menu-day-date">${formatDateIndo(date)}</div></div></div>
-                <div class="menu-items"><h4>🍽️ Menu Hari Ini</h4><div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div></div>
+                <div class="menu-day-header">
+                    <div class="menu-day-icon">${getDayIcon(dayName)}</div>
+                    <div class="menu-day-title">
+                        <h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3>
+                        <div class="menu-day-date">${formatDateIndo(date)}</div>
+                    </div>
+                </div>
+                <div class="menu-items">
+                    <h4>🍽️ Menu Hari Ini</h4>
+                    <div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div>
+                </div>
                 <div class="menu-published">👨‍🍳 Dipublikasi oleh: <strong>${escapeHtml(info.publishedBy)}</strong></div>
             </div>`;
         }).join('');
@@ -251,16 +232,50 @@ async function loadRuteDistribusi() {
         const totalUtara = { sekolah: utara.length, pk: utara.reduce((sum, row) => sum + (parseInt(row['PK']) || 0), 0), pb: utara.reduce((sum, row) => sum + (parseInt(row['PB']) || 0), 0), total: utara.reduce((sum, row) => sum + (parseInt(row['Total']) || 0), 0) };
         const grandTotal = { pk: totalSelatan.pk + totalUtara.pk, pb: totalSelatan.pb + totalUtara.pb, total: totalSelatan.total + totalUtara.total };
         const renderTable = (rows) => rows.map(row => `<tr><td><strong>${escapeHtml(row['Sekolah'])}</strong></td><td class="center">${row['PK'] || 0}</td><td class="center">${row['PB'] || 0}</td><td class="center"><strong>${row['Total'] || 0}</strong></td></tr>`).join('');
-        
         container.innerHTML = `<div class="rute-summary-grid">
-            <div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div>
-            <div class="rute-summary-card north"><h3>🚐 Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div>
+            <div class="rute-summary-card south">
+                <h3>🚌 Jalur Selatan</h3>
+                <div class="rute-summary-stats">
+                    <div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div>
+                    <div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div>
+                    <div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div>
+                </div>
+                <div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div>
+            </div>
+            <div class="rute-summary-card north">
+                <h3>🚐 Jalur Utara</h3>
+                <div class="rute-summary-stats">
+                    <div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div>
+                    <div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div>
+                    <div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div>
+                </div>
+                <div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div>
+            </div>
         </div>
         <div class="rute-tables-grid">
-            <div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div>
-            <div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div>
+            <div class="rute-table-wrapper south">
+                <table class="rute-table">
+                    <thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead>
+                    <tbody>${renderTable(selatan)}</tbody>
+                    <tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot>
+                </table>
+            </div>
+            <div class="rute-table-wrapper north">
+                <table class="rute-table">
+                    <thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead>
+                    <tbody>${renderTable(utara)}</tbody>
+                    <tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot>
+                </table>
+            </div>
         </div>
-        <div class="rute-total-box"><h3>📊 TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
+        <div class="rute-total-box">
+            <h3>📊 TOTAL KESELURUHAN</h3>
+            <div class="rute-total-stats">
+                <div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div>
+                <div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div>
+                <div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div>
+            </div>
+        </div>`;
     } catch (error) { console.error('Error loading rute:', error); container.innerHTML = '<p style="text-align:center;padding:40px;color:#dc3545;">⚠️ Gagal memuat data rute</p>'; }
 }
 
@@ -284,7 +299,7 @@ async function loadBirthday() {
     }
 }
 
-// ===== DAFTAR STAFF (MODIFIKASI: TANPA NIK) =====
+// ===== DAFTAR STAFF =====
 async function loadStaff() {
     const tbody = document.querySelector('#tableStaff tbody'); if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
@@ -293,29 +308,22 @@ async function loadStaff() {
     tbody.innerHTML = data.map((row, i) => {
         const waNumber = cleanWA(row['Nomor WA']);
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
-        // NIK dihilangkan dari tampilan, hanya Nama, WA, Email, Posisi
         return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama'])}</strong></td><td>${waCell}</td><td>${escapeHtml(row['Email'])}</td><td>${escapeHtml(row['Posisi'])}</td></tr>`;
     }).join('');
     document.getElementById('searchStaff').addEventListener('input', (e) => filterTable(e, tbody));
-    loadBirthday(); // Panggil cek ulang tahun setelah data staff dimuat
+    loadBirthday();
 }
 
-// ===== KONTAK DARURAT (BARU) =====
+// ===== KONTAK DARURAT =====
 async function loadKontakDarurat() {
     const container = document.getElementById('daruratContent'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat kontak darurat...</p>';
-    const data = await fetchSheetData(SHEET_URLS.kontak); 
+    const data = await fetchSheetData(SHEET_URLS.kontak);
     if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">☎️</div><h3>Belum ada data kontak</h3><p>Silakan tambahkan data di Spreadsheet "Kontak"</p></div>'; return; }
-    
     container.innerHTML = data.map(row => {
-        const waNumber = cleanWA(row['Nomor WA']); 
+        const waNumber = cleanWA(row['Nomor WA']);
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" class="birthday-btn" style="margin-top:10px;"><i class="fab fa-whatsapp"></i> Hubungi via WA</a>` : '';
-        return `<div class="info-card">
-            <h3>☎️ ${escapeHtml(row['Nama'])}</h3>
-            <p><strong>${escapeHtml(row['Jabatan'])}</strong></p>
-            <p>💬 ${waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank">${escapeHtml(row['Nomor WA'])}</a>` : 'Tidak ada'}</p>
-            ${waCell}
-        </div>`;
+        return `<div class="info-card"><h3>☎️ ${escapeHtml(row['Nama'])}</h3><p><strong>${escapeHtml(row['Jabatan'])}</strong></p><p>💬 ${waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank">${escapeHtml(row['Nomor WA'])}</a>` : 'Tidak ada'}</p>${waCell}</div>`;
     }).join('');
 }
 
@@ -323,8 +331,6 @@ async function loadKontakDarurat() {
 window.addEventListener('DOMContentLoaded', async () => {
     const currentYear = new Date().getFullYear();
     document.getElementById('footerYear').textContent = currentYear;
-    
-    // Load data yang masih digunakan
     await loadStaff(); 
     await loadKontakDarurat(); 
     loadDokumen(); 
@@ -335,7 +341,42 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadPengumuman(); 
     loadAgenda(); 
     updateClock();
-    
-    document.getElementById('mascot').addEventListener('click', handleMascotClick);
+
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sidebarOpen) toggleMenu(); });
+
+    // ===== DOWNLOAD PNG FEATURE =====
+    const btnDownload = document.getElementById('btnDownloadRute');
+    if (btnDownload) {
+        btnDownload.addEventListener('click', async () => {
+            const element = document.getElementById('ruteContent');
+            if (!element) return;
+
+            const originalText = btnDownload.innerHTML;
+            btnDownload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btnDownload.disabled = true;
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 3,
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
+                });
+
+                const link = document.createElement('a');
+                link.download = 'Rute-Distribusi-SPPG-Jatian.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Gagal mengunduh gambar:', error);
+                alert('Gagal mengunduh gambar. Silakan coba lagi.');
+            } finally {
+                btnDownload.innerHTML = originalText;
+                btnDownload.disabled = false;
+            }
+        });
+    }
 });
