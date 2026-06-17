@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PORTAL SPPG JATIAN</title>
+    <title>Portal ASLAP SPPG JATIAN</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -23,7 +27,6 @@
                 <button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
                 <button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
             </div>
-            <p class="pin-hint">💡 Masukkan <strong>PIN</strong></p>
         </div>
     </div>
 
@@ -39,7 +42,7 @@
             
             <div class="accordion-group">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title"><span class="menu-icon"></span> Operasional & Logistik</span>
+                    <span class="accordion-title"><span class="menu-icon">📦</span> Operasional & Logistik</span>
                     <span class="accordion-icon">▼</span>
                 </button>
                 <div class="accordion-content">
@@ -56,13 +59,11 @@
                 </button>
                 <div class="accordion-content">
                     <button class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon">👥</span> Daftar Relawan</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon"></span> Koordinator</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon">👔</span> Koordinator</button>
                     <button class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">📞</span> Kontak Staff</button>
                 </div>
             </div>
 
-            <button class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</button>
-            
             <div class="accordion-group">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-title"><span class="menu-icon">ℹ️</span> Informasi & Dokumen</span>
@@ -80,6 +81,9 @@
             <button class="sidebar-menu-btn special external-link" data-url="https://rido31.github.io/insentif-pic/">
                 <span class="menu-icon">💰</span> Summary Insentif PIC <span class="external-badge"><i class="fas fa-external-link-alt"></i></span>
             </button>
+
+            <!-- SURAT PERINGATAN DI PALING BAWAH -->
+            <button class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</button>
         </div>
         <div class="sidebar-footer">
             © <span id="footerYear"></span> ASLAP SPPG JATIAN
@@ -93,8 +97,8 @@
                 <span class="hamburger-icon">☰</span> Menu
             </button>
             <div class="header-title">
-                <h1>🏛️ PORTAL SPPG JATIAN</h1>
-                <p>Satuan Pelayanan Pemenuhan Gizi</p>
+                <h1>🏛️ PORTAL ASLAP SPPG JATIAN</h1>
+                <p>Satuan Pelayanan Pemenuhan Gizi Jatian</p>
             </div>
             <div class="clock-container">
                 <div class="analog-clock">
@@ -120,7 +124,7 @@
         <!-- SECTION: HOME -->
         <div id="section-home" class="content-section home-section">
             <div class="running-text-container">
-                <div class="running-text-label"> INFO</div>
+                <div class="running-text-label">📢 INFO</div>
                 <div class="running-text-wrapper">
                     <div class="running-text" id="runningText">Memuat pengumuman...</div>
                 </div>
@@ -165,7 +169,7 @@
             <div class="table-container">
                 <table id="tableSekolah">
                     <thead>
-                        <tr><th>No</th><th>Nama Sekolah</th><th> PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th></tr>
+                        <tr><th>No</th><th>Nama Sekolah</th><th>👤 PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -184,7 +188,7 @@
             <div class="table-container">
                 <table id="tableRelawan">
                     <thead>
-                        <tr><th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th> Email</th><th>📌 Posisi</th></tr>
+                        <tr><th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>📧 Email</th><th>📌 Posisi</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -207,18 +211,6 @@
                 <h2>📞 Kontak Staff Internal</h2>
             </div>
             <div class="card-grid" id="cardKontak"></div>
-        </div>
-
-        <!-- SECTION: SURAT PERINGATAN (LOCKED) -->
-        <div id="section-surat" class="content-section" style="display: none;">
-            <div class="section-header">
-                <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>⚠️ Surat Peringatan</h2>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchSurat" placeholder="🔍 Cari nama relawan...">
-            </div>
-            <div class="card-grid" id="cardSurat"></div>
         </div>
 
         <!-- SECTION: DOKUMEN (LOCKED) -->
@@ -245,23 +237,23 @@
         <div id="section-info" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2> Papan Informasi & Memo</h2>
+                <h2>📢 Papan Informasi & Memo</h2>
             </div>
             <div class="info-stats">
                 <div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
-                <div class="info-stat-item"><span class="info-stat-icon"></span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
+                <div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
                 <div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
             </div>
             <div class="info-categories">
                 <button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
-                <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)"> Pengumuman</button>
+                <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
                 <button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
                 <button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
                 <button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
-                <button class="info-cat-btn" onclick="filterInfo('update', this)"> Update</button>
+                <button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
             </div>
             <div class="search-box">
-                <input type="text" id="searchInfo" placeholder=" Cari judul, isi, atau penulis...">
+                <input type="text" id="searchInfo" placeholder="🔍 Cari judul, isi, atau penulis...">
             </div>
             <div class="info-board" id="infoBoard"></div>
         </div>
@@ -289,10 +281,22 @@
         <div id="section-rute" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2> Rute Distribusi MBG</h2>
+                <h2>🚚 Rute Distribusi MBG</h2>
             </div>
             <button id="btnDownloadRute" class="btn-download-rute"><i class="fas fa-download"></i> Download PNG</button>
-            <div id="ruteContent"> Memuat data rute...</div>
+            <div id="ruteContent">⏳ Memuat data rute...</div>
+        </div>
+
+        <!-- SECTION: SURAT PERINGATAN (LOCKED) - PALING BAWAH -->
+        <div id="section-surat" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>⚠️ Surat Peringatan</h2>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchSurat" placeholder="🔍 Cari nama relawan...">
+            </div>
+            <div class="card-grid" id="cardSurat"></div>
         </div>
 
     </div>
@@ -324,8 +328,14 @@
         <div class="chat-window" id="chatWindow" style="display: none;">
             <div class="chat-header">
                 <div class="chat-header-info">
-                    <h3>💬 Live Chat</h3>
-                    <span class="chat-user-label" id="chatUserLabel">Guest</span>
+                    <h3>💬 Room Chat</h3>
+                    <div class="chat-header-meta">
+                        <span class="online-indicator">
+                            <span class="online-dot"></span>
+                            <span id="onlineCount">0</span> Online
+                        </span>
+                        <span class="chat-user-label" id="chatUserLabel">Guest</span>
+                    </div>
                 </div>
                 <button class="chat-close-btn" onclick="toggleChat()">✕</button>
             </div>
@@ -336,26 +346,26 @@
                     <div class="chat-welcome-icon">👋</div>
                     <h4>Selamat Datang!</h4>
                     <p>Masukkan nama Anda untuk mulai mengobrol</p>
-                    <input type="text" id="chatNameInput" placeholder="Nama Anda" maxlength="20">
-                    <button class="chat-start-btn" onclick="startChat()">Mulai Chat</button>
-                    <p class="chat-hint">💡 Masukkan kode khusus jika Anda adalah admin</p>
+                    <input type="text" id="chatNameInput" placeholder="Nama Anda" maxlength="20" onkeypress="if(event.key==='Enter') startChat()">
+                    <button class="chat-start-btn" onclick="startChat()">Masuk ke Room Chat</button>
+                    <p class="chat-hint">💡 Setiap nama memiliki warna unik</p>
                 </div>
             </div>
 
             <!-- Chat Room -->
             <div class="chat-room" id="chatRoom" style="display: none;">
                 <div class="chat-messages" id="chatMessages">
-                    <div class="chat-loading">⏳ Memuat pesan...</div>
+                    <div class="chat-loading">⏳ Menghubungkan ke room chat...</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') sendMessage()" maxlength="500">
                     <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
         <button class="chat-toggle-btn" onclick="toggleChat()">
             <i class="fas fa-comment-dots"></i>
-            <span class="chat-badge"></span>
+            <span class="chat-badge" id="chatBadge"></span>
         </button>
     </div>
 
