@@ -57,13 +57,10 @@
                     <button class="sidebar-menu-btn" onclick="showSection('info')">📢 Papan Informasi</button>
                 </div>
             </div>
+            <!-- TOMBOL SUMMARY INSENTIF DI SIDEBAR -->
+            <a href="http://portalsppgjatian.my.id/" target="_blank" rel="noopener noreferrer" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
         </div>
-        <div class="sidebar-footer">
-    <a href="http://portalsppgjatian.my.id/" target="_blank" rel="noopener noreferrer" class="sidebar-insentif-btn">
-        💰 Summary Insentif PIC
-    </a>
-    <div class="sidebar-copyright">© <span id="year"></span> ASLAP SPPG JATIAN</div>
-</div>
+        <div class="sidebar-footer">© <span id="year"></span> ASLAP SPPG JATIAN</div>
     </div>
 
     <!-- Sticky Header -->
@@ -181,13 +178,6 @@
 
     <div class="footer"><p>© <span id="footerYear"></span> ASLAP SPPG JATIAN - Badan Gizi Nasional</p><p class="footer-small">Made with 🖤 by DIAH AYU UMAMI</p></div>
 
-    <!-- Mascot -->
-    <div class="mascot-container" id="mascot">
-        <div class="mascot-body"><div class="mascot-head"><div class="mascot-eye left"></div><div class="mascot-eye right"></div><div class="mascot-mouth"></div></div><div class="mascot-tail"></div><div class="mascot-leg left"></div><div class="mascot-leg right"></div></div>
-        <div class="mascot-speech" id="mascotSpeech">Halo! 👋</div>
-        <div class="mascot-counter" id="mascotCounter">0</div>
-    </div>
-
     <!-- REDZONE CHAT WIDGET -->
     <div class="chat-widget" id="chatWidget">
         <button class="chat-toggle-btn" id="chatToggleBtn" onclick="window.toggleRedzoneChat()">
@@ -257,8 +247,14 @@
             appId: "1:536843661380:web:4eae78f035d0d21eb4cc11"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        let app, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            console.log("✅ Firebase berhasil diinisialisasi");
+        } catch (error) {
+            console.error("❌ Error inisialisasi Firebase:", error);
+        }
 
         let currentUser = { uid: null, name: '', isAdmin: false };
         let onlineUsers = [];
@@ -281,67 +277,88 @@
             return { valid: true };
         }
         async function isNameOnline(name) {
-            const q = query(collection(db, "users_online"), where("name", "==", name));
-            const snapshot = await getDocs(q);
-            let isOnline = false;
-            const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.lastSeen && data.lastSeen.toDate() > fiveMinsAgo) isOnline = true;
-            });
-            return isOnline;
+            if (!db) return false;
+            try {
+                const q = query(collection(db, "users_online"), where("name", "==", name));
+                const snapshot = await getDocs(q);
+                let isOnline = false;
+                const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.lastSeen && data.lastSeen.toDate && data.lastSeen.toDate() > fiveMinsAgo) isOnline = true;
+                });
+                return isOnline;
+            } catch (error) {
+                console.error("Error cek nama online:", error);
+                return false;
+            }
         }
 
         window.joinRedzone = async function() {
-    const nameInput = document.getElementById('chatNameInput');
-    let name = nameInput.value.trim();
-    if (!name) { alert('Silakan masukkan nama Anda.'); return; }
-    const validation = validateName(name);
-    if (!validation.valid) { alert(validation.msg); return; }
+            if (!db) { alert("❌ Firebase belum terhubung. Periksa koneksi internet Anda."); return; }
+            const nameInput = document.getElementById('chatNameInput');
+            let name = nameInput.value.trim();
+            if (!name) { alert('Silakan masukkan nama Anda.'); return; }
+            
+            const validation = validateName(name);
+            if (!validation.valid) { alert(validation.msg); return; }
 
-    if (name === '31') {
-        const isAdminOnline = await isNameOnline('ADMIN');
-        if (isAdminOnline) { alert("ADMIN sedang aktif."); return; }
-        currentUser = { uid: generateUID(), name: 'ADMIN', isAdmin: true };
-    } else {
-        const isOnline = await isNameOnline(name);
-        if (isOnline) { alert("Nama tersebut sedang digunakan oleh pengguna lain. Silakan gunakan nama yang berbeda."); return; }
-        currentUser = { uid: generateUID(), name: name, isAdmin: false };
-    }
+            try {
+                if (name === '31') {
+                    const isAdminOnline = await isNameOnline('ADMIN');
+                    if (isAdminOnline) { alert("ADMIN sedang aktif."); return; }
+                    currentUser = { uid: generateUID(), name: 'ADMIN', isAdmin: true };
+                } else {
+                    const isOnline = await isNameOnline(name);
+                    if (isOnline) { alert("Nama tersebut sedang digunakan oleh pengguna lain. Silakan gunakan nama yang berbeda."); return; }
+                    currentUser = { uid: generateUID(), name: name, isAdmin: false };
+                }
 
-    localStorage.setItem('redzone_user', JSON.stringify(currentUser));
-    document.getElementById('chatNameForm').style.display = 'none';
-    document.getElementById('chatRoom').style.display = 'flex';
-    document.getElementById('currentUserName').textContent = currentUser.name;
-    await registerOnline();
-    startListeners();
-}
+                localStorage.setItem('redzone_user', JSON.stringify(currentUser));
+                document.getElementById('chatNameForm').style.display = 'none';
+                document.getElementById('chatRoom').style.display = 'flex';
+                document.getElementById('currentUserName').textContent = currentUser.name;
+                await registerOnline();
+                startListeners();
+            } catch (error) {
+                console.error("Error saat join:", error);
+                alert("❌ Gagal masuk room. Periksa koneksi internet dan Firebase Rules Anda.");
+            }
+        }
 
         async function registerOnline() {
-            const userDoc = doc(db, "users_online", currentUser.uid);
-            await setDoc(userDoc, { uid: currentUser.uid, name: currentUser.name, isAdmin: currentUser.isAdmin, lastSeen: serverTimestamp() });
-            if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
-            window.heartbeatInterval = setInterval(async () => {
-                try { await updateDoc(userDoc, { lastSeen: serverTimestamp() }); } catch(e) { console.error("Heartbeat failed", e); }
-            }, 30000);
+            if (!db || !currentUser.uid) return;
+            try {
+                const userDoc = doc(db, "users_online", currentUser.uid);
+                await setDoc(userDoc, { uid: currentUser.uid, name: currentUser.name, isAdmin: currentUser.isAdmin, lastSeen: serverTimestamp() });
+                if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
+                window.heartbeatInterval = setInterval(async () => {
+                    try { await updateDoc(userDoc, { lastSeen: serverTimestamp() }); } catch(e) { console.error("Heartbeat failed", e); }
+                }, 30000);
+            } catch (error) {
+                console.error("Error register online:", error);
+            }
         }
 
         window.addEventListener('beforeunload', async () => {
-            if (currentUser.uid) { try { await deleteDoc(doc(db, "users_online", currentUser.uid)); } catch(e) {} }
+            if (currentUser.uid && db) { try { await deleteDoc(doc(db, "users_online", currentUser.uid)); } catch(e) {} }
         });
 
         function startListeners() {
+            if (!db) return;
             unsubscribers.forEach(unsub => unsub());
             unsubscribers = [];
+            
             unsubscribers.push(onSnapshot(collection(db, "users_online"), (snapshot) => {
                 const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
                 onlineUsers = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.lastSeen && data.lastSeen.toDate() > fiveMinsAgo) onlineUsers.push(data);
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.lastSeen && data.lastSeen.toDate && data.lastSeen.toDate() > fiveMinsAgo) onlineUsers.push(data);
                 });
                 document.getElementById('onlineCount').textContent = onlineUsers.length;
-            }));
+            }, (error) => console.error("Error users_online listener:", error)));
+            
             unsubscribers.push(onSnapshot(collection(db, "announcements"), (snapshot) => {
                 const box = document.getElementById('announcementBox');
                 const text = document.getElementById('announcementText');
@@ -356,16 +373,20 @@
                     box.style.display = 'none';
                     currentAnnouncementId = null;
                 }
-            }));
+            }, (error) => console.error("Error announcements listener:", error)));
+            
             const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(100));
             unsubscribers.push(onSnapshot(q, (snapshot) => {
                 const isAtBottom = isScrolledToBottom();
                 allMessages = [];
-                snapshot.forEach(doc => allMessages.push({ id: doc.id, ...doc.data() }));
+                snapshot.forEach(docSnap => allMessages.push({ id: docSnap.id, ...docSnap.data() }));
                 allMessages.reverse();
                 renderMessages();
                 if (isAtBottom) scrollToBottom();
                 else if (!isChatOpen) { unreadCount++; updateBadge(); }
+            }, (error) => {
+                console.error("Error messages listener:", error);
+                document.getElementById('chatMessages').innerHTML = '<div class="chat-loading" style="color:#f87171;">❌ Gagal memuat pesan. Periksa Firebase Rules.</div>';
             }));
         }
 
@@ -391,9 +412,13 @@
             let filtered = allMessages;
             if (searchTerm) filtered = allMessages.filter(m => m.message.toLowerCase().includes(searchTerm) || m.name.toLowerCase().includes(searchTerm));
             container.innerHTML = '';
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="chat-loading">Belum ada pesan. Jadilah yang pertama!</div>';
+                return;
+            }
             filtered.forEach(msg => {
                 const isSelf = msg.name === currentUser.name;
-                const time = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
+                const time = msg.timestamp && msg.timestamp.toDate ? msg.timestamp.toDate().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
                 const color = getUserColor(msg.name);
                 let replyHtml = msg.replyTo ? `<div class="chat-message-reply">${sanitize(msg.replyTo)}</div>` : '';
                 const msgDiv = document.createElement('div');
@@ -408,9 +433,9 @@
             });
         }
 
-        window.deleteMessage = async function(id) { if (!currentUser.isAdmin) return; if (confirm("Hapus pesan ini?")) await deleteDoc(doc(db, "messages", id)); };
+        window.deleteMessage = async function(id) { if (!currentUser.isAdmin || !db) return; if (confirm("Hapus pesan ini?")) await deleteDoc(doc(db, "messages", id)); };
         window.pinMessage = async function(id) {
-            if (!currentUser.isAdmin) return;
+            if (!currentUser.isAdmin || !db) return;
             const msg = allMessages.find(m => m.id === id);
             if (!msg) return;
             const annSnap = await getDocs(collection(db, "announcements"));
@@ -419,7 +444,7 @@
             await Promise.all(batch);
             await addDoc(collection(db, "announcements"), { message: msg.message, timestamp: serverTimestamp() });
         };
-        window.unpinAnnouncement = async function() { if (!currentUser.isAdmin || !currentAnnouncementId) return; await deleteDoc(doc(db, "announcements", currentAnnouncementId)); };
+        window.unpinAnnouncement = async function() { if (!currentUser.isAdmin || !currentAnnouncementId || !db) return; await deleteDoc(doc(db, "announcements", currentAnnouncementId)); };
         window.setReply = function(id) {
             const msg = allMessages.find(m => m.id === id);
             if (!msg) return;
@@ -430,6 +455,7 @@
         };
         window.cancelReply = function() { replyTo = null; document.getElementById('replyPreview').style.display = 'none'; };
         window.sendMessage = async function() {
+            if (!db) return;
             const input = document.getElementById('chatMessageInput');
             const text = input.value.trim();
             if (!text) return;
@@ -451,7 +477,7 @@
                 unreadCount = 0;
                 updateBadge();
                 scrollToBottom();
-                if (loadLocalUser()) {
+                if (loadLocalUser() && db) {
                     document.getElementById('chatNameForm').style.display = 'none';
                     document.getElementById('chatRoom').style.display = 'flex';
                     document.getElementById('currentUserName').textContent = currentUser.name;
@@ -465,8 +491,8 @@
         };
         window.changeName = function() {
             if (confirm("Keluar dan ganti nama? Status online Anda akan dihapus.")) {
-                if (currentUser.uid) deleteDoc(doc(db, "users_online", currentUser.uid));
-                clearInterval(window.heartbeatInterval);
+                if (currentUser.uid && db) deleteDoc(doc(db, "users_online", currentUser.uid));
+                if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
                 localStorage.removeItem('redzone_user');
                 currentUser = { uid: null, name: '', isAdmin: false };
                 document.getElementById('chatNameForm').style.display = 'flex';
