@@ -14,14 +14,10 @@ const SHEET_URLS = {
 };
 
 let globalData = { relawan: [], sekolah: [], info: [] };
-let mascotClickCount = 0;
 let sidebarOpen = false;
 let currentFilter = 'all';
 let currentInfoFilter = 'all';
 let currentMenuFilter = 'all';
-
-const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job!", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
-const easterEggPhrases = ["Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇩", "Kamu luar biasa!", "Rahasia: Dino suka nasi padang 🍛"];
 
 // ===== PIN & SECURITY SYSTEM =====
 function checkAuth() { return sessionStorage.getItem('isAuthenticated') === 'true'; }
@@ -60,38 +56,18 @@ function toggleAccordion(header) {
     if (!isOpen) { group.classList.add('active'); content.style.maxHeight = content.scrollHeight + 50 + 'px'; icon.style.transform = 'rotate(180deg)'; }
 }
 
-// ===== MASCOT =====
-function showMascotSpeech(customText = null) {
-    const speech = document.getElementById('mascotSpeech');
-    const phrase = customText || mascotPhrases[Math.floor(Math.random() * mascotPhrases.length)];
-    speech.textContent = phrase;
-    speech.classList.add('show');
-    setTimeout(() => speech.classList.remove('show'), 2500);
-}
-function animateMascot() { const mascot = document.getElementById('mascot'); mascot.style.transform = 'scale(1.2) rotate(5deg)'; setTimeout(() => { mascot.style.transform = 'scale(1) rotate(0deg)'; }, 300); }
-function handleMascotClick() {
-    mascotClickCount++;
-    const counter = document.getElementById('mascotCounter');
-    counter.textContent = mascotClickCount;
-    counter.classList.add('show');
-    animateMascot();
-    if (mascotClickCount % 10 === 0) showMascotSpeech(`🎁 ${easterEggPhrases[Math.floor(Math.random() * easterEggPhrases.length)]}`);
-    else showMascotSpeech();
-    setTimeout(() => counter.classList.remove('show'), 3000);
-}
-
 // ===== NAVIGATION =====
 function showHome() {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const home = document.getElementById('section-home');
-    if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); animateMascot(); showMascotSpeech("Selamat datang! 👋"); }
+    if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
 }
 function showSection(sectionName) {
     document.getElementById('section-home').style.display = 'none';
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const section = document.getElementById('section-' + sectionName);
-    if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); animateMascot(); showMascotSpeech(); }
+    if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
 }
 
@@ -177,7 +153,7 @@ async function loadKontak() {
     const container = document.getElementById('cardKontak'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
     const data = await fetchSheetData(SHEET_URLS.kontak);
-    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">️ Data tidak tersedia</p>'; return; }
+    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
         const waNumber = cleanWA(row['Nomor WA']);
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">Tidak ada</span>';
@@ -234,9 +210,6 @@ async function loadInfo() {
     document.getElementById('totalMemo').textContent = data.length;
     document.getElementById('totalBaru').textContent = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
     document.getElementById('totalMendesak').textContent = data.filter(d => d['Prioritas']?.toLowerCase() === 'mendesak').length;
-    const badge = document.getElementById('badgeInfo');
-    const baruCount = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
-    if (badge) { badge.textContent = baruCount; badge.style.display = baruCount > 0 ? 'flex' : 'none'; }
     renderInfoBoard();
     const searchInput = document.getElementById('searchInfo'); if (searchInput) searchInput.addEventListener('input', () => renderInfoBoard());
 }
@@ -292,8 +265,7 @@ async function loadMenuWeekly() {
         }).join('');
     } catch (error) { console.error('Error loading menu:', error); container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">⚠️</div><h3>Gagal memuat menu</h3></div>'; }
 }
-function filterMenuWeek(day, btn) { currentMenuFilter = day; document.querySelectorAll('.menu-week-btn').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); renderMenuWeekly(); }
-function renderMenuWeekly() { loadMenuWeekly(); }
+function filterMenuWeek(day, btn) { currentMenuFilter = day; document.querySelectorAll('.menu-week-btn').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); loadMenuWeekly(); }
 async function loadRuteDistribusi() {
     const container = document.getElementById('ruteContent'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">Memuat data rute...</p>';
@@ -335,10 +307,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('footerYear').textContent = currentYear;
     await loadSekolah(); await loadRelawan(); await loadKoordinator(); await loadKontak();
     loadSurat(); loadDokumen(); loadInfo(); loadMenuWeekly(); loadRuteDistribusi(); loadQuote(); loadPengumuman(); loadAgenda(); updateClock();
-    document.getElementById('mascot').addEventListener('click', handleMascotClick);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (sidebarOpen) toggleMenu(); if (document.getElementById('pinModal').classList.contains('active')) hidePINModal(); } });
     const firstAccordion = document.querySelector('.accordion-header'); if (firstAccordion) toggleAccordion(firstAccordion);
-    document.querySelectorAll('.external-link').forEach(link => { link.addEventListener('click', (e) => { if (!checkAuth()) { e.preventDefault(); showPINModal(); } }); });
     document.getElementById('pinInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyPIN(); });
     const btnDownload = document.getElementById('btnDownloadRute');
     if (btnDownload) {
