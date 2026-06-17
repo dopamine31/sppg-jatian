@@ -1,20 +1,81 @@
 const SHEET_URLS = {
+    sekolah: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=0&single=true&output=csv',
     relawan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1957179512&single=true&output=csv',
+    koordinator: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1219362365&single=true&output=csv',
     kontak: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=176617983&single=true&output=csv',
     quote: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1582688414&single=true&output=csv',
     pengumuman: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=429943974&single=true&output=csv',
     agenda: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=761655212&single=true&output=csv',
+    surat: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1677810962&single=true&output=csv',
     dokumen: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1144895464&single=true&output=csv',
     info: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=515718382&single=true&output=csv',
     menu: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1196527440&single=true&output=csv',
     rute: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=96960366&single=true&output=csv'
 };
-let globalData = { relawan: [], info: [] };
+
+let globalData = { relawan: [], sekolah: [], info: [] };
+let mascotClickCount = 0;
 let sidebarOpen = false;
 let currentFilter = 'all';
+let currentInfoFilter = 'all';
 let currentMenuFilter = 'all';
 
-// ===== SIDEBAR TOGGLE =====
+const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job! 👍", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
+const easterEggPhrases = ["🎉 Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇮🇩", "Kamu luar biasa! 💖", "Rahasia: Dino suka nasi padang 🍛"];
+
+// ===== PIN & SECURITY SYSTEM =====
+function checkAuth() {
+    return sessionStorage.getItem('isAuthenticated') === 'true';
+}
+
+function showPINModal() {
+    document.getElementById('pinModal').classList.add('active');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+}
+
+function hidePINModal() {
+    document.getElementById('pinModal').classList.remove('active');
+}
+
+function verifyPIN() {
+    const input = document.getElementById('pinInput').value;
+    if (input === '2024') {
+        sessionStorage.setItem('isAuthenticated', 'true');
+        hidePINModal();
+        alert('✅ Akses diberikan! Fitur terkunci telah dibuka.');
+        // Reload data untuk menampilkan NIK asli
+        loadRelawan();
+        loadSekolah();
+    } else {
+        alert('❌ PIN salah! Silakan coba lagi.');
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinInput').focus();
+    }
+}
+
+function maskNIK(nik) {
+    if (!nik) return '-';
+    if (!checkAuth()) {
+        const str = String(nik).trim();
+        if (str.length > 4) {
+            return str.substring(0, 4) + '*'.repeat(str.length - 4);
+        }
+        return '*'.repeat(str.length);
+    }
+    return nik;
+}
+
+function checkAndShow(sectionName) {
+    const lockedSections = ['surat', 'dokumen'];
+    if (lockedSections.includes(sectionName) && !checkAuth()) {
+        showPINModal();
+        return;
+    }
+    showSection(sectionName);
+}
+
+// ===== SIDEBAR & ACCORDION =====
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
@@ -30,18 +91,80 @@ function toggleMenu() {
     }
 }
 
+function toggleAccordion(header) {
+    const group = header.parentElement;
+    const content = group.querySelector('.accordion-content');
+    const icon = header.querySelector('.accordion-icon');
+    const isOpen = group.classList.contains('active');
+    
+    document.querySelectorAll('.accordion-group').forEach(g => {
+        g.classList.remove('active');
+        const c = g.querySelector('.accordion-content');
+        const i = g.querySelector('.accordion-icon');
+        if (c) c.style.maxHeight = null;
+        if (i) i.style.transform = 'rotate(0deg)';
+    });
+
+    if (!isOpen) {
+        group.classList.add('active');
+        content.style.maxHeight = content.scrollHeight + 50 + 'px';
+        icon.style.transform = 'rotate(180deg)';
+    }
+}
+
+// ===== MASCOT =====
+function showMascotSpeech(customText = null) {
+    const speech = document.getElementById('mascotSpeech');
+    const phrase = customText || mascotPhrases[Math.floor(Math.random() * mascotPhrases.length)];
+    speech.textContent = phrase;
+    speech.classList.add('show');
+    setTimeout(() => speech.classList.remove('show'), 2500);
+}
+
+function animateMascot() {
+    const mascot = document.getElementById('mascot');
+    mascot.style.transform = 'scale(1.2) rotate(5deg)';
+    setTimeout(() => { mascot.style.transform = 'scale(1) rotate(0deg)'; }, 300);
+}
+
+function handleMascotClick() {
+    mascotClickCount++;
+    const counter = document.getElementById('mascotCounter');
+    counter.textContent = mascotClickCount;
+    counter.classList.add('show');
+    animateMascot();
+    if (mascotClickCount % 10 === 0) { 
+        const msg = easterEggPhrases[Math.floor(Math.random() * easterEggPhrases.length)]; 
+        showMascotSpeech(`🎁 ${msg}`); 
+    } else { 
+        showMascotSpeech(); 
+    }
+    setTimeout(() => counter.classList.remove('show'), 3000);
+}
+
 // ===== NAVIGATION =====
 function showHome() {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const home = document.getElementById('section-home');
-    if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (home) {
+        home.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        animateMascot();
+        showMascotSpeech("Selamat datang! 👋");
+    }
     if (sidebarOpen) toggleMenu();
 }
+
 function showSection(sectionName) {
     document.getElementById('section-home').style.display = 'none';
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const section = document.getElementById('section-' + sectionName);
-    if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (section) {
+        section.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        animateMascot();
+        showMascotSpeech();
+    }
     if (sidebarOpen) toggleMenu();
 }
 
@@ -75,23 +198,102 @@ function parseCSV(text) {
     for (let i = 1; i < rows.length; i++) { const row = {}; headers.forEach((h, idx) => { row[h] = rows[i][idx] || ''; }); data.push(row); }
     return data;
 }
+
 async function fetchSheetData(url) {
     try { const response = await fetch(url); if (!response.ok) throw new Error('Network error'); return parseCSV(await response.text()); }
     catch (error) { console.error('Error loading sheet:', error); return []; }
 }
+
 function escapeHtml(text) { if (!text) return '-'; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 function cleanWA(number) { if (!number) return ''; let clean = String(number).replace(/\D/g, ''); if (clean.startsWith('0')) clean = '62' + clean.substring(1); return clean; }
 function isValidLink(link) { if (!link) return false; const trimmed = link.trim().toLowerCase(); return trimmed !== '' && trimmed !== '-' && trimmed !== 'null'; }
 function filterTable(e, tbody) { const q = e.target.value.toLowerCase(); tbody.querySelectorAll('tr').forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
 
-// ===== PUSAT DOKUMEN =====
-function filterDokumen(category, btn) {
-    currentFilter = category;
-    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    loadDokumen();
+// ===== DATA LOADERS =====
+async function loadSekolah() {
+    const tbody = document.querySelector('#tableSekolah tbody'); if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+    const data = await fetchSheetData(SHEET_URLS.sekolah); globalData.sekolah = data;
+    if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
+    tbody.innerHTML = data.map((row, i) => {
+        const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null; 
+        const waNumber = cleanWA(row['WA PIC']);
+        const mapsCell = mapsLink ? `<a href="${mapsLink}" target="_blank" rel="noopener noreferrer">📍 Maps</a>` : '<span style="color:#999;">-</span>';
+        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">💬 ${escapeHtml(row['WA PIC'])}</a>` : '<span style="color:#999;">-</span>';
+        return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama Sekolah'])}</strong></td><td>${escapeHtml(row['Nama PIC'])}</td><td>${waCell}</td><td>${escapeHtml(row['Kepala Sekolah'])}</td><td>${escapeHtml(row['Rekening Insentif'])}</td><td>${mapsCell}</td><td>${escapeHtml(row['Jumlah Siswa'])}</td></tr>`;
+    }).join('');
+    document.getElementById('searchSekolah').addEventListener('input', (e) => filterTable(e, tbody));
 }
-function getDocIcon(category) { const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '📖', internal: '📁' }; return icons[category] || '📄'; }
+
+async function loadRelawan() {
+    const tbody = document.querySelector('#tableRelawan tbody'); if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+    const data = await fetchSheetData(SHEET_URLS.relawan); globalData.relawan = data;
+    if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
+    tbody.innerHTML = data.map((row, i) => {
+        const waNumber = cleanWA(row['Nomor WA']);
+        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
+        // SENSOR NIK LOGIC HERE
+        const nikDisplay = maskNIK(row['NIK']);
+        const nikClass = !checkAuth() ? 'masked-nik' : '';
+        
+        return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama'])}</strong></td><td class="${nikClass}">${nikDisplay}</td><td>${waCell}</td><td>${escapeHtml(row['Email'])}</td><td>${escapeHtml(row['Posisi'])}</td></tr>`;
+    }).join('');
+    document.getElementById('searchRelawan').addEventListener('input', (e) => filterTable(e, tbody)); 
+    loadBirthday();
+}
+
+async function loadKoordinator() {
+    const container = document.getElementById('cardKoordinator'); if (!container) return; 
+    container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
+    const data = await fetchSheetData(SHEET_URLS.koordinator); 
+    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
+    container.innerHTML = data.map(row => {
+        const waNumber = cleanWA(row['Nomor WA']); 
+        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">Tidak ada</span>';
+        const emailCell = row['Email'] ? `<p>📧 <a href="mailto:${row['Email']}">${escapeHtml(row['Email'])}</a></p>` : '';
+        return `<div class="info-card"><h3>👔 ${escapeHtml(row['Nama'])}</h3><p><strong>${escapeHtml(row['Jabatan'])}</strong></p><p>💬 ${waCell}</p>${emailCell}</div>`;
+    }).join('');
+}
+
+async function loadKontak() {
+    const container = document.getElementById('cardKontak'); if (!container) return; 
+    container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
+    const data = await fetchSheetData(SHEET_URLS.kontak); 
+    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
+    container.innerHTML = data.map(row => {
+        const waNumber = cleanWA(row['Nomor WA']); 
+        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">Tidak ada</span>';
+        return `<div class="info-card"><h3>📞 ${escapeHtml(row['Nama'])}</h3><p><strong>${escapeHtml(row['Jabatan'])}</strong></p><p>💬 ${waCell}</p></div>`;
+    }).join('');
+}
+
+async function loadSurat() {
+    const container = document.getElementById('cardSurat'); if (!container) return; 
+    container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
+    const dataSP = await fetchSheetData(SHEET_URLS.surat); 
+    if (dataSP.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Belum ada surat peringatan</p>'; return; }
+    container.innerHTML = dataSP.map(row => {
+        const namaRelawan = escapeHtml(row['Nama Relawan']); 
+        const linkDokumen = isValidLink(row['Link Dokumen']) ? row['Link Dokumen'].trim() : null;
+        const tanggalSP = escapeHtml(row['Tanggal SP']); 
+        const status = escapeHtml(row['Status']);
+        const relawan = globalData.relawan.find(r => r['Nama'] && r['Nama'].toLowerCase() === row['Nama Relawan'].toLowerCase());
+        const email = relawan ? escapeHtml(relawan['Email']) : ''; 
+        const waNumber = relawan ? cleanWA(relawan['Nomor WA']) : '';
+        const posisi = relawan ? escapeHtml(relawan['Posisi']) : '-'; 
+        const filename = `Surat Peringatan - ${row['Nama Relawan']}`;
+        const downloadBtns = linkDokumen ? `<div class="doc-download"><a href="${linkDokumen}" target="_blank" class="btn-download pdf" download="${filename}.pdf"><i class="fas fa-file-pdf"></i> PDF</a><a href="${linkDokumen}" target="_blank" class="btn-download doc" download="${filename}.docx"><i class="fas fa-file-word"></i> DOC</a></div>` : '<span style="color:#999;">Tidak ada dokumen</span>';
+        const shareMessage = encodeURIComponent(`Berikut Surat Peringatan untuk ${row['Nama Relawan']}. File terlampir.`);
+        const shareBtns = `<div class="btn-share">${waNumber ? `<a href="https://wa.me/${waNumber}?text=${shareMessage}" target="_blank" class="btn-share-btn wa"><i class="fab fa-whatsapp"></i> WA</a>` : ''}${email ? `<a href="mailto:${email}?subject=${encodeURIComponent('Surat Peringatan - ' + row['Nama Relawan'])}&body=${shareMessage}" class="btn-share-btn email"><i class="fas fa-envelope"></i> Email</a>` : ''}</div>`;
+        return `<div class="info-card warning-card"><h3>⚠️ ${namaRelawan} <span class="sp-badge">${status || 'SP'}</span></h3><div class="info-row"><div class="info-label">Posisi:</div><div class="info-value">${posisi}</div></div><div class="info-row"><div class="info-label">Tanggal SP:</div><div class="info-value">${tanggalSP}</div></div>${email ? `<div class="info-row"><div class="info-label">Email:</div><div class="info-value">${email}</div></div>` : ''}<div class="doc-actions"><div class="info-label">📥 Download Dokumen:</div>${downloadBtns}<div class="info-label" style="margin-top:10px;">📤 Bagikan:</div>${shareBtns}</div></div>`;
+    }).join('');
+    document.getElementById('searchSurat').addEventListener('input', (e) => { 
+        const q = e.target.value.toLowerCase(); 
+        container.querySelectorAll('.info-card').forEach(card => { card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none'; }); 
+    });
+}
+
 async function loadDokumen() {
     const grid = document.getElementById('docGrid'); if (!grid) return;
     grid.innerHTML = '<p style="text-align:center;padding:40px;grid-column:1/-1;">⏳ Memuat dokumen...</p>';
@@ -100,86 +302,107 @@ async function loadDokumen() {
     const filteredData = currentFilter === 'all' ? data : data.filter(doc => doc['Kategori']?.toLowerCase() === currentFilter);
     const searchTerm = document.getElementById('searchDokumen')?.value.toLowerCase() || '';
     const searchedData = filteredData.filter(doc => doc['Judul']?.toLowerCase().includes(searchTerm) || doc['Deskripsi']?.toLowerCase().includes(searchTerm));
+    
+    const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '📖', internal: '📁' };
+    
     grid.innerHTML = searchedData.map((doc) => {
-        const category = doc['Kategori']?.toLowerCase() || 'internal'; 
-        const icon = getDocIcon(category); 
+        const category = doc['Kategori']?.toLowerCase() || 'internal';
+        const icon = icons[category] || '📄';
         const linkView = isValidLink(doc['Link View']) ? doc['Link View'].trim() : (isValidLink(doc['Link Download']) ? doc['Link Download'].trim() : null);
         const linkDownload = isValidLink(doc['Link Download']) ? doc['Link Download'].trim() : null;
-        let tanggalUpdate = '-'; 
+        let tanggalUpdate = '-';
         if (doc['Tanggal Update']) { const date = new Date(doc['Tanggal Update']); tanggalUpdate = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
-        
         return `<div class="doc-item" data-category="${category}">
-              <div class="doc-header"><div class="doc-icon">${icon}</div><div class="doc-info"><div class="doc-title">${escapeHtml(doc['Judul'])}</div><span class="doc-category">${category}</span></div></div>
-              <div class="doc-meta">
-                  <div class="doc-meta-item"><span>📅</span><span>Update: ${tanggalUpdate}</span></div>
-                ${doc['Ukuran'] ? `<div class="doc-meta-item"><span>💾</span><span>${doc['Ukuran']}</span></div>` : ''}
-              </div>
-            ${doc['Deskripsi'] ? `<p style="font-size:13px;color:#666;margin:10px 0;">${escapeHtml(doc['Deskripsi'])}</p>` : ''}
-              <div class="doc-actions-grid">
-                ${linkView ? `<a href="${linkView}" target="_blank" class="btn-doc-action btn-view"><i class="fas fa-eye"></i> Lihat</a>` : ''}
-                ${linkDownload ? `<a href="${linkDownload}" download class="btn-doc-action btn-download-doc"><i class="fas fa-download"></i> Download</a>` : ''}
-              </div>
-          </div>`;
+           <div class="doc-header"><div class="doc-icon">${icon}</div><div class="doc-info"><div class="doc-title">${escapeHtml(doc['Judul'])}</div><span class="doc-category">${category}</span></div></div>
+           <div class="doc-meta">
+               <div class="doc-meta-item"><span>📅</span><span>Update: ${tanggalUpdate}</span></div>
+               ${doc['Ukuran'] ? `<div class="doc-meta-item"><span>💾</span><span>${doc['Ukuran']}</span></div>` : ''}
+           </div>
+           ${doc['Deskripsi'] ? `<p style="font-size:13px;color:#f9a8d4;margin:10px 0;">${escapeHtml(doc['Deskripsi'])}</p>` : ''}
+           <div class="doc-actions-grid">
+               ${linkView ? `<a href="${linkView}" target="_blank" class="btn-doc-action btn-view"><i class="fas fa-eye"></i> Lihat</a>` : ''}
+               ${linkDownload ? `<a href="${linkDownload}" download class="btn-doc-action btn-download-doc"><i class="fas fa-download"></i> Download</a>` : ''}
+           </div>
+       </div>`;
     }).join('');
     const searchInput = document.getElementById('searchDokumen'); 
     if (searchInput) searchInput.addEventListener('input', () => loadDokumen());
 }
 
-// ===== INFO & MEMO =====
+function filterDokumen(category, btn) { 
+    currentFilter = category; 
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active')); 
+    if (btn) btn.classList.add('active'); 
+    loadDokumen(); 
+}
+
+async function loadInfo() {
+    const board = document.getElementById('infoBoard'); if (!board) return;
+    board.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat informasi...</p>';
+    const data = await fetchSheetData(SHEET_URLS.info); globalData.info = data;
+    document.getElementById('totalMemo').textContent = data.length;
+    document.getElementById('totalBaru').textContent = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
+    document.getElementById('totalMendesak').textContent = data.filter(d => d['Prioritas']?.toLowerCase() === 'mendesak').length;
+    const badge = document.getElementById('badgeInfo'); 
+    const baruCount = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
+    if (badge) { badge.textContent = baruCount; badge.style.display = baruCount > 0 ? 'flex' : 'none'; }
+    renderInfoBoard();
+    const searchInput = document.getElementById('searchInfo'); 
+    if (searchInput) searchInput.addEventListener('input', () => renderInfoBoard());
+}
+
+function filterInfo(category, btn) { 
+    currentInfoFilter = category; 
+    document.querySelectorAll('.info-cat-btn').forEach(b => b.classList.remove('active')); 
+    if (btn) btn.classList.add('active'); 
+    renderInfoBoard(); 
+}
+
 function formatInfoContent(text) {
-    if (!text) return ''; let formatted = escapeHtml(text);
+    if (!text) return ''; 
+    let formatted = escapeHtml(text);
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/\n/g, '<br>');
     return formatted;
 }
-function renderInfoBoard(containerId, allowedCategories, searchId) {
-    const board = document.getElementById(containerId); if (!board) return;
+
+function renderInfoBoard() {
+    const board = document.getElementById('infoBoard'); if (!board) return;
     let data = globalData.info || [];
-    if (allowedCategories !== 'all') { data = data.filter(item => allowedCategories.includes((item['Kategori'] || '').toLowerCase())); }
-    const searchTerm = document.getElementById(searchId)?.value.toLowerCase() || '';
+    if (currentInfoFilter !== 'all') { data = data.filter(item => item['Kategori']?.toLowerCase() === currentInfoFilter); }
+    const searchTerm = document.getElementById('searchInfo')?.value.toLowerCase() || '';
     if (searchTerm) { data = data.filter(item => item['Judul']?.toLowerCase().includes(searchTerm) || item['Isi']?.toLowerCase().includes(searchTerm)); }
     if (data.length === 0) { board.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada informasi</h3></div>'; return; }
     data.sort((a, b) => { const dateA = new Date(a['Tanggal'] || 0); const dateB = new Date(b['Tanggal'] || 0); return dateB - dateA; });
+    
     board.innerHTML = data.map((item, idx) => {
         const judul = escapeHtml(item['Judul'] || 'Tanpa Judul'); const isi = item['Isi'] || '';
         const kategori = (item['Kategori'] || 'pengumuman').toLowerCase(); const prioritas = (item['Prioritas'] || 'normal').toLowerCase();
         const penulis = item['Penulis'] || 'Admin';
         const tanggal = item['Tanggal'] ? new Date(item['Tanggal']).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
-        const itemId = `info-content-${containerId}-${idx}`;
-        const kategoriLabel = { pengumuman: '📢 Pengumuman', memo: '📝 Memo', catatan: '📒 Catatan', penting: '⚠️ Penting', update: '🔄 Update' }[kategori] || kategori;
+        const isNew = item['Baru']?.toLowerCase() === 'ya' || item['New']?.toLowerCase() === 'yes';
+        const itemId = `info-content-${idx}`;
+        const kategoriLabel = { pengumuman: '📢 Pengumuman', memo: '📝 Memo', catatan: '📒 Catatan', penting: '⚠️ Info Penting', update: '🔄 Update' }[kategori] || kategori;
         const prioritasLabel = { mendesak: '🔥 Mendesak', penting: '⚡ Penting', normal: '✅ Normal' }[prioritas] || '✅ Normal';
         const contentFormatted = formatInfoContent(isi); const isLong = isi.length > 400;
-        const shareText = encodeURIComponent(`*${item['Judul']}*\n\n${isi}\n\n— ${penulis} (${tanggal})\n_Dari Portal SPPG JATIAN_`);
-        
+        const shareText = encodeURIComponent(`*${item['Judul']}*\n\n${isi}\n\n— ${penulis} (${tanggal})\n_Dari Portal ASLAP SPPG JATIAN_`);
         return `<div class="info-item priority-${prioritas}">
-              <div class="info-item-header"><div class="info-item-title">${judul}</div>
-              <div class="info-item-badges"><span class="info-badge kategori-${kategori}">${kategoriLabel}</span><span class="info-badge priority-${prioritas}">${prioritasLabel}</span></div></div>
-              <div class="info-item-meta"><div class="info-meta-item">👤 <strong>${escapeHtml(penulis)}</strong></div><div class="info-meta-item">📅 ${tanggal}</div></div>
-              <div class="info-item-content ${isLong ? 'collapsed' : ''}" id="${itemId}">${contentFormatted}</div>
-            ${isLong ? `<button class="info-toggle-btn" onclick="toggleInfoContent('${itemId}', this)">📖 Baca Selengkapnya</button>` : ''}
-              <div class="info-item-footer"><a href="https://wa.me/?text=${shareText}" target="_blank" class="info-share-btn"><i class="fab fa-whatsapp"></i> Bagikan via WA</a></div>
-          </div>`;
+           <div class="info-item-header"><div class="info-item-title">${judul}</div>
+           <div class="info-item-badges"><span class="info-badge kategori-${kategori}">${kategoriLabel}</span><span class="info-badge priority-${prioritas}">${prioritasLabel}</span>${isNew ? '<span class="info-badge info-badge-new">🆕 BARU</span>' : ''}</div></div>
+           <div class="info-item-meta"><div class="info-meta-item">👤 <strong>${escapeHtml(penulis)}</strong></div><div class="info-meta-item">📅 ${tanggal}</div></div>
+           <div class="info-item-content ${isLong ? 'collapsed' : ''}" id="${itemId}">${contentFormatted}</div>
+           ${isLong ? `<button class="info-toggle-btn" onclick="toggleInfoContent('${itemId}', this)">📖 Baca Selengkapnya</button>` : ''}
+           <div class="info-item-footer"><a href="https://wa.me/?text=${shareText}" target="_blank" class="info-share-btn"><i class="fab fa-whatsapp"></i> Bagikan via WA</a></div>
+       </div>`;
     }).join('');
 }
+
 function toggleInfoContent(id, btn) {
     const el = document.getElementById(id);
     if (el.classList.contains('collapsed')) { el.classList.remove('collapsed'); btn.innerHTML = '📕 Tutup'; }
     else { el.classList.add('collapsed'); btn.innerHTML = '📖 Baca Selengkapnya'; el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 }
-async function loadInfoData() {
-    const data = await fetchSheetData(SHEET_URLS.info);
-    globalData.info = data;
-    renderInfoBoard('infoPengumumanBoard', ['pengumuman', 'update', 'penting'], 'searchInfoPengumuman');
-    renderInfoBoard('memoCatatanBoard', ['memo', 'catatan'], 'searchMemoCatatan');
-    const searchInfo = document.getElementById('searchInfoPengumuman'); if (searchInfo) searchInfo.addEventListener('input', () => renderInfoBoard('infoPengumumanBoard', ['pengumuman', 'update', 'penting'], 'searchInfoPengumuman'));
-    const searchMemo = document.getElementById('searchMemoCatatan'); if (searchMemo) searchMemo.addEventListener('input', () => renderInfoBoard('memoCatatanBoard', ['memo', 'catatan'], 'searchMemoCatatan'));
-}
 
-// ===== MENU MINGGUAN =====
-function filterMenuWeek(day, btn) { currentMenuFilter = day; document.querySelectorAll('.menu-week-btn').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); renderMenuWeekly(); }
-function getDayIcon(dayName) { const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '🌈', 'minggu': '☀️' }; return icons[dayName.toLowerCase()] || '📅'; }
-function formatDateIndo(dateStr) { if (!dateStr) return '-'; const date = new Date(dateStr); if (isNaN(date.getTime())) return dateStr; return date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
-function getDayNameFromTanggal(dateStr) { if (!dateStr) return ''; const date = new Date(dateStr); if (isNaN(date.getTime())) return ''; return date.toLocaleDateString('id-ID', { weekday: 'long' }).toLowerCase(); }
 async function loadMenuWeekly() {
     const container = document.getElementById('menuWeeklyContainer'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat menu mingguan...</p>';
@@ -193,33 +416,29 @@ async function loadMenuWeekly() {
             if (tanggal && menu && !menuByDate[tanggal]) { menuByDate[tanggal] = { menu: menu, publishedBy: publishedBy }; }
         });
         let displayDates = Object.keys(menuByDate);
-        if (currentMenuFilter !== 'all') { displayDates = displayDates.filter(date => getDayNameFromTanggal(date) === currentMenuFilter); }
+        if (currentMenuFilter !== 'all') { displayDates = displayDates.filter(date => {
+            const d = new Date(date);
+            const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+            return days[d.getDay()] === currentMenuFilter;
+        }); }
         if (displayDates.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada menu</h3></div>'; return; }
         displayDates.sort((a, b) => new Date(a) - new Date(b));
+        const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '🌈', 'minggu': '☀️' };
+        
         container.innerHTML = displayDates.map(date => {
             const info = menuByDate[date];
             const menuItems = info.menu ? info.menu.split('+').map(m => m.trim()).filter(m => m) : [];
-            const dayName = new Date(date).toLocaleDateString('id-ID', { weekday: 'long' });
-            return `<div class="menu-day-card">
-                <div class="menu-day-header">
-                    <div class="menu-day-icon">${getDayIcon(dayName)}</div>
-                    <div class="menu-day-title">
-                        <h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3>
-                        <div class="menu-day-date">${formatDateIndo(date)}</div>
-                    </div>
-                </div>
-                <div class="menu-items">
-                    <h4>🍽️ Menu Hari Ini</h4>
-                    <div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div>
-                </div>
-                <div class="menu-published">👨‍🍳 Dipublikasi oleh: <strong>${escapeHtml(info.publishedBy)}</strong></div>
-            </div>`;
+            const d = new Date(date);
+            const dayName = d.toLocaleDateString('id-ID', { weekday: 'long' });
+            const icon = icons[dayName.toLowerCase()] || '📅';
+            return `<div class="menu-day-card"><div class="menu-day-header"><div class="menu-day-icon">${icon}</div><div class="menu-day-title"><h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3><div class="menu-day-date">${d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div></div></div><div class="menu-items"><h4>🍽️ Menu Hari Ini</h4><div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div></div><div class="menu-published">👨‍🍳 Dipublikasi oleh: <strong>${escapeHtml(info.publishedBy)}</strong></div></div>`;
         }).join('');
     } catch (error) { console.error('Error loading menu:', error); container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">⚠️</div><h3>Gagal memuat menu</h3></div>'; }
 }
+
+function filterMenuWeek(day, btn) { currentMenuFilter = day; document.querySelectorAll('.menu-week-btn').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); renderMenuWeekly(); }
 function renderMenuWeekly() { loadMenuWeekly(); }
 
-// ===== RUTE DISTRIBUSI =====
 async function loadRuteDistribusi() {
     const container = document.getElementById('ruteContent'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat data rute...</p>';
@@ -232,55 +451,12 @@ async function loadRuteDistribusi() {
         const totalUtara = { sekolah: utara.length, pk: utara.reduce((sum, row) => sum + (parseInt(row['PK']) || 0), 0), pb: utara.reduce((sum, row) => sum + (parseInt(row['PB']) || 0), 0), total: utara.reduce((sum, row) => sum + (parseInt(row['Total']) || 0), 0) };
         const grandTotal = { pk: totalSelatan.pk + totalUtara.pk, pb: totalSelatan.pb + totalUtara.pb, total: totalSelatan.total + totalUtara.total };
         const renderTable = (rows) => rows.map(row => `<tr><td><strong>${escapeHtml(row['Sekolah'])}</strong></td><td class="center">${row['PK'] || 0}</td><td class="center">${row['PB'] || 0}</td><td class="center"><strong>${row['Total'] || 0}</strong></td></tr>`).join('');
-        container.innerHTML = `<div class="rute-summary-grid">
-            <div class="rute-summary-card south">
-                <h3>🚌 Jalur Selatan</h3>
-                <div class="rute-summary-stats">
-                    <div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div>
-                    <div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div>
-                    <div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div>
-                </div>
-                <div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div>
-            </div>
-            <div class="rute-summary-card north">
-                <h3>🚐 Jalur Utara</h3>
-                <div class="rute-summary-stats">
-                    <div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div>
-                    <div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div>
-                    <div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div>
-                </div>
-                <div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div>
-            </div>
-        </div>
-        <div class="rute-tables-grid">
-            <div class="rute-table-wrapper south">
-                <table class="rute-table">
-                    <thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead>
-                    <tbody>${renderTable(selatan)}</tbody>
-                    <tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot>
-                </table>
-            </div>
-            <div class="rute-table-wrapper north">
-                <table class="rute-table">
-                    <thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead>
-                    <tbody>${renderTable(utara)}</tbody>
-                    <tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot>
-                </table>
-            </div>
-        </div>
-        <div class="rute-total-box">
-            <h3>📊 TOTAL KESELURUHAN</h3>
-            <div class="rute-total-stats">
-                <div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div>
-                <div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div>
-                <div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div>
-            </div>
-        </div>`;
+        
+        container.innerHTML = `<div class="rute-summary-grid"><div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div><div class="rute-summary-card north"><h3>🚐 Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div></div><div class="rute-tables-grid"><div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div><div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div></div><div class="rute-total-box"><h3>📊 TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
     } catch (error) { console.error('Error loading rute:', error); container.innerHTML = '<p style="text-align:center;padding:40px;color:#dc3545;">⚠️ Gagal memuat data rute</p>'; }
 }
 
-// ===== DATA LOADERS =====
-async function loadQuote() { const data = await fetchSheetData(SHEET_URLS.quote); if (data.length > 0) { const random = data[Math.floor(Math.random() * data.length)]; document.getElementById('quoteText').textContent = random['Quote'] || random[Object.keys(random)[0]]; } }
+async function loadQuote() { const data = await fetchSheetData(SHEET_URLS.quote); if (data.length > 0) { const random = data[Math.floor(Math.random() * data.length)]; document.getElementById('quoteText').textContent = `❝ ${random['Quote'] || random[Object.keys(random)[0]]} ❞`; } }
 async function loadPengumuman() { const data = await fetchSheetData(SHEET_URLS.pengumuman); document.getElementById('runningText').textContent = data.length === 0 ? 'Tidak ada pengumuman.' : data.map(r => `📢 ${r['Judul'] || ''}: ${r['Isi'] || ''}`).join('   •   '); }
 async function loadAgenda() {
     const data = await fetchSheetData(SHEET_URLS.agenda); const agendaList = document.getElementById('agendaList');
@@ -299,52 +475,157 @@ async function loadBirthday() {
     }
 }
 
-// ===== DAFTAR STAFF =====
-async function loadStaff() {
-    const tbody = document.querySelector('#tableStaff tbody'); if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-    const data = await fetchSheetData(SHEET_URLS.relawan); globalData.relawan = data;
-    if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
-    tbody.innerHTML = data.map((row, i) => {
-        const waNumber = cleanWA(row['Nomor WA']);
-        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
-        return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama'])}</strong></td><td>${waCell}</td><td>${escapeHtml(row['Email'])}</td><td>${escapeHtml(row['Posisi'])}</td></tr>`;
-    }).join('');
-    document.getElementById('searchStaff').addEventListener('input', (e) => filterTable(e, tbody));
-    loadBirthday();
+// ===== LIVE CHAT SYSTEM =====
+let chatUserName = localStorage.getItem('chatUserName') || '';
+
+function toggleChat() {
+    const chatWindow = document.getElementById('chatWindow');
+    if (chatWindow.style.display === 'none') {
+        chatWindow.style.display = 'flex';
+        if (chatUserName) {
+            document.getElementById('chatNameForm').style.display = 'none';
+            document.getElementById('chatRoom').style.display = 'flex';
+            document.getElementById('chatUserLabel').textContent = chatUserName;
+            loadChatMessages();
+        } else {
+            document.getElementById('chatNameForm').style.display = 'flex';
+            document.getElementById('chatRoom').style.display = 'none';
+        }
+    } else {
+        chatWindow.style.display = 'none';
+    }
 }
 
-// ===== KONTAK DARURAT =====
-async function loadKontakDarurat() {
-    const container = document.getElementById('daruratContent'); if (!container) return;
-    container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat kontak darurat...</p>';
-    const data = await fetchSheetData(SHEET_URLS.kontak);
-    if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">☎️</div><h3>Belum ada data kontak</h3><p>Silakan tambahkan data di Spreadsheet "Kontak"</p></div>'; return; }
-    container.innerHTML = data.map(row => {
-        const waNumber = cleanWA(row['Nomor WA']);
-        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" class="birthday-btn" style="margin-top:10px;"><i class="fab fa-whatsapp"></i> Hubungi via WA</a>` : '';
-        return `<div class="info-card"><h3>☎️ ${escapeHtml(row['Nama'])}</h3><p><strong>${escapeHtml(row['Jabatan'])}</strong></p><p>💬 ${waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank">${escapeHtml(row['Nomor WA'])}</a>` : 'Tidak ada'}</p>${waCell}</div>`;
-    }).join('');
+function startChat() {
+    const nameInput = document.getElementById('chatNameInput').value.trim();
+    if (nameInput) {
+        chatUserName = nameInput;
+        localStorage.setItem('chatUserName', chatUserName);
+        document.getElementById('chatNameForm').style.display = 'none';
+        document.getElementById('chatRoom').style.display = 'flex';
+        document.getElementById('chatUserLabel').textContent = chatUserName;
+        loadChatMessages();
+    } else {
+        alert('Silakan masukkan nama Anda terlebih dahulu.');
+    }
+}
+
+function loadChatMessages() {
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.innerHTML = '<div class="chat-loading">⏳ Memuat pesan...</div>';
+    
+    // Simulasi memuat pesan dari localStorage (bisa diganti dengan fetch ke backend/Google Sheets)
+    setTimeout(() => {
+        let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+        if (messages.length === 0) {
+            messages = [{ sender: 'Admin', text: 'Selamat datang di Live Chat SPPG Jatian! Ada yang bisa kami bantu?', time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}), isAdmin: true }];
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+        }
+        renderMessages(messages);
+    }, 500);
+}
+
+function renderMessages(messages) {
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.innerHTML = '';
+    messages.forEach(msg => {
+        const isSelf = msg.sender === chatUserName;
+        const msgClass = msg.isAdmin ? 'chat-message-admin' : (isSelf ? 'chat-message-self' : 'chat-message-other');
+        const senderName = msg.isAdmin ? '👑 Admin' : msg.sender;
+        
+        const msgHTML = `
+            <div class="chat-message ${msgClass}">
+                <div class="chat-message-sender">${senderName}</div>
+                <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
+                <div class="chat-message-time">${msg.time}</div>
+            </div>
+        `;
+        messagesContainer.innerHTML += msgHTML;
+    });
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatMessageInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+    const newMsg = {
+        sender: chatUserName,
+        text: text,
+        time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
+        isAdmin: false
+    };
+    messages.push(newMsg);
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+    
+    input.value = '';
+    renderMessages(messages);
+    
+    // Simulasi balasan admin otomatis setelah 2 detik
+    setTimeout(() => {
+        let currentMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+        const replyMsg = {
+            sender: 'Admin',
+            text: 'Terima kasih atas pesan Anda. Tim kami akan segera membalas.',
+            time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
+            isAdmin: true
+        };
+        currentMessages.push(replyMsg);
+        localStorage.setItem('chatMessages', JSON.stringify(currentMessages));
+        renderMessages(currentMessages);
+    }, 2000);
 }
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     const currentYear = new Date().getFullYear();
+    document.getElementById('year').textContent = currentYear; 
     document.getElementById('footerYear').textContent = currentYear;
-    await loadStaff(); 
-    await loadKontakDarurat(); 
+    
+    await loadSekolah(); 
+    await loadRelawan(); 
+    await loadKoordinator(); 
+    await loadKontak();
+    loadSurat(); 
     loadDokumen(); 
-    loadInfoData(); 
+    loadInfo(); 
     loadMenuWeekly(); 
     loadRuteDistribusi(); 
     loadQuote(); 
     loadPengumuman(); 
     loadAgenda(); 
     updateClock();
+    
+    document.getElementById('mascot').addEventListener('click', handleMascotClick);
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === 'Escape') {
+            if (sidebarOpen) toggleMenu();
+            if (document.getElementById('pinModal').classList.contains('active')) hidePINModal();
+        }
+    });
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sidebarOpen) toggleMenu(); });
+    // Buka accordion pertama secara default
+    const firstAccordion = document.querySelector('.accordion-header');
+    if (firstAccordion) toggleAccordion(firstAccordion);
 
-    // ===== DOWNLOAD PNG FEATURE =====
+    // Handle External Link (Summary Insentif) dengan PIN Check
+    document.querySelectorAll('.external-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (!checkAuth()) {
+                e.preventDefault();
+                showPINModal();
+            }
+        });
+    });
+
+    // Handle Enter key on PIN input
+    document.getElementById('pinInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verifyPIN();
+    });
+    
+    // Download PNG Feature
     const btnDownload = document.getElementById('btnDownloadRute');
     if (btnDownload) {
         btnDownload.addEventListener('click', async () => {
@@ -358,9 +639,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const canvas = await html2canvas(element, {
                     scale: 3,
-                    backgroundColor: '#ffffff',
+                    backgroundColor: '#1a1a1a', // Match dark theme
                     useCORS: true,
-                    allowTaint: true,
+                    allowTident: true,
                     logging: false,
                     windowWidth: element.scrollWidth,
                     windowHeight: element.scrollHeight
