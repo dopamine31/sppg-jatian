@@ -4,57 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal SPPG JATIAN</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
-
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h3>🏛️ Menu Utama</h3>
             <button class="sidebar-close" onclick="toggleMenu()">✕</button>
         </div>
-        <nav class="sidebar-nav">
-            <button class="sidebar-menu-btn home-btn" onclick="showHome()">
-                <span class="menu-icon">🏠</span> Beranda
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('info')">
-                <span class="menu-icon">📢</span> Info & Pengumuman
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('memo')">
-                <span class="menu-icon">📝</span> Memo & Catatan
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('rute')">
-                <span class="menu-icon">🚚</span> Rute Distribusi
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('menu')">
-                <span class="menu-icon">🍱</span> Menu Mingguan
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('dokumen')">
-                <span class="menu-icon">📚</span> Pusat Dokumen
-            </button>
-            <button class="sidebar-menu-btn" onclick="showSection('staff')">
-                <span class="menu-icon">👥</span> Daftar Staff
-            </button>
-            <button class="sidebar-menu-btn warning" onclick="showSection('darurat')">
-                <span class="menu-icon">☎️</span> Kontak Darurat
-            </button>
-        </nav>
+        <div class="sidebar-nav">
+            <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">🏠</span> Beranda</button>
+            <button class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📢</span> Info & Pengumuman</button>
+            <button class="sidebar-menu-btn" onclick="showSection('memo')"><span class="menu-icon">📝</span> Memo & Catatan</button>
+            <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
+            <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">🍱</span> Menu Mingguan</button>
+            <button class="sidebar-menu-btn" onclick="showSection('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</button>
+            <button class="sidebar-menu-btn" onclick="showSection('staff')"><span class="menu-icon">👥</span> Daftar Staff</button>
+            <button class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">☎️</span> Kontak Darurat</button>
+        </div>
         <div class="sidebar-footer">
             © <span id="footerYear">2024</span> SPPG JATIAN
         </div>
     </div>
 
-    <!-- Sticky Header -->
-    <header class="sticky-header">
+    <div class="sticky-header">
         <div class="header-top">
-            <button class="hamburger-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i> Menu
-            </button>
+            <button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
             <div class="header-title">
                 <h1>🏛️ PORTAL SPPG JATIAN</h1>
                 <p>Satuan Pelayanan Pemenuhan Gizi Jatian</p>
@@ -76,20 +54,16 @@
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Running Text -->
-        <div class="running-text-container">
-            <span class="running-text-label">📢 INFO</span>
-            <div class="running-text-wrapper">
-                <div class="running-text" id="runningText">Memuat pengumuman...</div>
+        <div id="section-home" class="content-section">
+            <div class="running-text-container">
+                <div class="running-text-label">📢 INFO</div>
+                <div class="running-text-wrapper">
+                    <div class="running-text" id="runningText">Memuat pengumuman...</div>
+                </div>
             </div>
-        </div>
-
-        <!-- SECTION: HOME -->
-        <section id="section-home" class="content-section">
             <div class="welcome-card">
                 <div class="welcome-icon">👋</div>
                 <div class="welcome-content">
@@ -97,30 +71,26 @@
                     <p>Sistem informasi terpadu untuk koordinasi, distribusi, dan manajemen data SPPG Jatian. Gunakan menu di kiri atas untuk mengakses fitur.</p>
                 </div>
             </div>
-
             <div class="quote-card">
                 <p id="quoteText">❝ Memuat quote... ❞</p>
             </div>
-
             <div class="birthday-card" id="birthdayCard" style="display: none;">
                 <div class="birthday-icon">🎂</div>
                 <div class="birthday-content">
                     <h3>🎉 Hari ini Ulang Tahun!</h3>
                     <p id="birthdayText">-</p>
-                    <a href="#" id="birthdayWaLink" class="birthday-btn" target="_blank">Kirim Ucapan</a>
+                    <a id="birthdayWaLink" href="#" target="_blank" class="birthday-btn">Kirim Ucapan</a>
                 </div>
             </div>
-
             <div class="agenda-card">
                 <h2>📅 Agenda Mendatang</h2>
                 <div class="agenda-list" id="agendaList">
                     <p>Memuat agenda...</p>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- SECTION: INFO & PENGUMUMAN -->
-        <section id="section-info" class="content-section" style="display: none;">
+        <div id="section-info" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>📢 Info & Pengumuman</h2>
@@ -128,13 +98,10 @@
             <div class="search-box">
                 <input type="text" id="searchInfoPengumuman" placeholder="🔍 Cari pengumuman...">
             </div>
-            <div class="info-board" id="infoPengumumanBoard">
-                <p style="text-align:center; padding: 40px;">⏳ Memuat informasi...</p>
-            </div>
-        </section>
+            <div class="info-board" id="infoPengumumanBoard">⏳ Memuat informasi...</div>
+        </div>
 
-        <!-- SECTION: MEMO & CATATAN -->
-        <section id="section-memo" class="content-section" style="display: none;">
+        <div id="section-memo" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>📝 Memo & Catatan</h2>
@@ -142,48 +109,39 @@
             <div class="search-box">
                 <input type="text" id="searchMemoCatatan" placeholder="🔍 Cari memo atau catatan...">
             </div>
-            <div class="info-board" id="memoCatatanBoard">
-                <p style="text-align:center; padding: 40px;">⏳ Memuat informasi...</p>
-            </div>
-        </section>
+            <div class="info-board" id="memoCatatanBoard">⏳ Memuat informasi...</div>
+        </div>
 
-        <!-- SECTION: RUTE DISTRIBUSI -->
-        <section id="section-rute" class="content-section" style="display: none;">
+        <div id="section-rute" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>🚚 Rute Distribusi MBG</h2>
-                <button id="btnDownloadRute" class="btn-download-rute">
-                    <i class="fas fa-download"></i> Download PNG
-                </button>
             </div>
-            <div id="ruteContent">
-                <p style="text-align:center; padding: 40px;">⏳ Memuat data rute...</p>
-            </div>
-        </section>
+            <button id="btnDownloadRute" class="btn-download-rute">
+                <i class="fas fa-camera"></i> Download PNG
+            </button>
+            <div id="ruteContent">⏳ Memuat data rute...</div>
+        </div>
 
-        <!-- SECTION: MENU MINGGUAN -->
-        <section id="section-menu" class="content-section" style="display: none;">
+        <div id="section-menu" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>🍱 Menu Mingguan</h2>
             </div>
             <div class="menu-weekly-nav">
                 <button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Senin', this)">Senin</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Selasa', this)">Selasa</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Rabu', this)">Rabu</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Kamis', this)">Kamis</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Jumat', this)">Jumat</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Sabtu', this)">Sabtu</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('Minggu', this)">Minggu</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
+                <button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
             </div>
-            <div class="menu-weekly-container" id="menuWeeklyContainer">
-                <p style="text-align:center; padding: 40px;">⏳ Memuat menu mingguan...</p>
-            </div>
-        </section>
+            <div id="menuWeeklyContainer">⏳ Memuat menu mingguan...</div>
+        </div>
 
-        <!-- SECTION: PUSAT DOKUMEN -->
-        <section id="section-dokumen" class="content-section" style="display: none;">
+        <div id="section-dokumen" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>📚 Pusat Dokumen</h2>
@@ -199,13 +157,10 @@
             <div class="search-box">
                 <input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen...">
             </div>
-            <div class="doc-grid" id="docGrid">
-                <p style="text-align:center; padding: 40px; grid-column: 1/-1;">⏳ Memuat dokumen...</p>
-            </div>
-        </section>
+            <div class="doc-grid" id="docGrid">⏳ Memuat dokumen...</div>
+        </div>
 
-        <!-- SECTION: DAFTAR STAFF -->
-        <section id="section-staff" class="content-section" style="display: none;">
+        <div id="section-staff" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>👥 Daftar Staff</h2>
@@ -226,65 +181,283 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="5" style="text-align:center; padding:20px;">⏳ Memuat data...</td>
+                            <td colspan="5" style="text-align:center;padding:20px;">⏳ Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <!-- SECTION: KONTAK DARURAT -->
-        <section id="section-darurat" class="content-section" style="display: none;">
+        <div id="section-kontak" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>☎️ Kontak Darurat</h2>
             </div>
-            <div class="card-grid" id="daruratContent">
-                <p style="text-align:center; padding: 40px; grid-column: 1/-1;">⏳ Memuat kontak darurat...</p>
-            </div>
-        </section>
+            <div class="card-grid" id="daruratContent">⏳ Memuat kontak darurat...</div>
+        </div>
     </div>
 
-    <!-- LIVE CHAT WIDGET -->
-    <div class="chat-widget">
-        <div class="chat-window" id="chatWindow" style="display: none;">
-            <div class="chat-header">
-                <div class="chat-header-info">
-                    <h3>💬 Live Chat</h3>
-                    <span class="chat-user-label">Pengunjung</span>
-                </div>
-                <button class="chat-close-btn" onclick="document.getElementById('chatWindow').style.display='none'">✕</button>
-            </div>
-            
+    <!-- ===== LIVE CHAT WIDGET ===== -->
+    <div class="chat-widget" id="chatWidget">
+        <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()">
+            <i class="fas fa-comments" id="chatToggleIcon"></i>
+            <span class="chat-badge" id="chatBadge" style="display:none;"></span>
+        </button>
+
+        <div class="chat-window" id="chatWindow" style="display:none;">
             <!-- Form Nama -->
-            <div class="chat-name-form">
+            <div class="chat-name-form" id="chatNameForm">
+                <div class="chat-header">
+                    <h3>💬 Live Chat</h3>
+                    <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+                </div>
                 <div class="chat-name-body">
                     <div class="chat-welcome-icon">👋</div>
                     <h4>Selamat Datang!</h4>
                     <p>Masukkan nama Anda untuk mulai mengobrol</p>
-                    <input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="20">
-                    <button class="chat-start-btn" id="btnStartChat">Mulai Chat</button>
+                    <input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="30" autocomplete="off">
+                    <button class="chat-start-btn" id="chatStartBtn" onclick="startChat()">Mulai Chat</button>
                     <p class="chat-hint">💡 Masukkan kode khusus jika Anda adalah admin</p>
                 </div>
             </div>
 
-            <!-- Ruang Chat -->
-            <div class="chat-room" style="display: none;">
+            <!-- Room Chat -->
+            <div class="chat-room" id="chatRoom" style="display:none;">
+                <div class="chat-header">
+                    <div class="chat-header-info">
+                        <h3>💬 Live Chat</h3>
+                        <span class="chat-user-label" id="chatUserLabel"></span>
+                    </div>
+                    <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+                </div>
                 <div class="chat-messages" id="chatMessages">
                     <div class="chat-loading">⏳ Memuat pesan...</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan...">
-                    <button class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="chatInput" placeholder="Ketik pesan..." maxlength="500" autocomplete="off">
+                    <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        <button class="chat-toggle-btn" onclick="document.getElementById('chatWindow').style.display = (document.getElementById('chatWindow').style.display === 'none' || document.getElementById('chatWindow').style.display === '') ? 'flex' : 'none'">
-            <i class="fas fa-comment-dots"></i>
-            <span class="chat-badge"></span>
-        </button>
     </div>
 
     <script src="script.js"></script>
+
+    <!-- ===== FIREBASE LIVE CHAT MODULE ===== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBTmEXeyfgE-DKg73OmkgroBtp1_NLAOU",
+            authDomain: "chat-portal-67948.firebaseapp.com",
+            databaseURL: "https://chat-portal-67948-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "chat-portal-67948",
+            storageBucket: "chat-portal-67948.firebasestorage.app",
+            messagingSenderId: "536843661380",
+            appId: "1:536843661380:web:4eae78f035d0d21eb4cc11"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const messagesRef = ref(db, 'chat_messages');
+
+        let chatState = {
+            isOpen: false,
+            userName: '',
+            isAdmin: false,
+            sessionId: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            hasNewMessage: false,
+            messagesLoaded: false
+        };
+
+        window.toggleChat = function() {
+            chatState.isOpen = !chatState.isOpen;
+            const chatWindow = document.getElementById('chatWindow');
+            const chatBadge = document.getElementById('chatBadge');
+            const chatToggleIcon = document.getElementById('chatToggleIcon');
+
+            if (chatState.isOpen) {
+                chatWindow.style.display = 'flex';
+                chatBadge.style.display = 'none';
+                chatState.hasNewMessage = false;
+                chatToggleIcon.className = 'fas fa-times';
+
+                if (!chatState.userName) {
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('chatNameInput');
+                        if (nameInput) nameInput.focus();
+                    }, 100);
+                } else {
+                    setTimeout(() => {
+                        const chatInput = document.getElementById('chatInput');
+                        if (chatInput) chatInput.focus();
+                        scrollToBottom();
+                    }, 100);
+                }
+            } else {
+                chatWindow.style.display = 'none';
+                chatToggleIcon.className = 'fas fa-comments';
+            }
+        };
+
+        window.startChat = function() {
+            const nameInput = document.getElementById('chatNameInput');
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameInput.style.borderColor = '#ff1493';
+                nameInput.setAttribute('placeholder', 'Nama wajib diisi!');
+                nameInput.focus();
+                return;
+            }
+
+            // LOGIKA ADMIN: Jika ketik "31", otomatis jadi ADMIN
+            if (name === '31') {
+                chatState.userName = 'ADMIN';
+                chatState.isAdmin = true;
+            } else {
+                chatState.userName = name;
+                chatState.isAdmin = false;
+            }
+
+            document.getElementById('chatNameForm').style.display = 'none';
+            document.getElementById('chatRoom').style.display = 'flex';
+
+            const userLabel = document.getElementById('chatUserLabel');
+            if (chatState.isAdmin) {
+                userLabel.innerHTML = '🛡️ ' + chatState.userName;
+                userLabel.style.color = '#ff69b4';
+            } else {
+                userLabel.textContent = chatState.userName;
+                userLabel.style.color = '#f9a8d4';
+            }
+
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+                scrollToBottom();
+            }, 100);
+
+            if (!chatState.messagesLoaded) {
+                loadMessages();
+                chatState.messagesLoaded = true;
+            }
+        };
+
+        window.sendMessage = function() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !chatState.userName) return;
+
+            const messageData = {
+                sender: chatState.userName,
+                isAdmin: chatState.isAdmin,
+                sessionId: chatState.sessionId,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            push(messagesRef, messageData)
+                .then(() => {
+                    input.value = '';
+                    input.focus();
+                })
+                .catch(err => console.error('Error sending message:', err));
+        };
+
+        function loadMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '<div class="chat-loading">⏳ Memuat pesan...</div>';
+
+            onChildAdded(messagesRef, (snapshot) => {
+                const msg = snapshot.val();
+                if (!msg) return;
+                appendMessage(msg);
+            });
+        }
+
+        function appendMessage(msg) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const loading = messagesContainer.querySelector('.chat-loading');
+            if (loading) loading.remove();
+
+            const isSelf = (msg.sessionId === chatState.sessionId);
+            const isAdmin = msg.isAdmin === true || (msg.sender && msg.sender === 'ADMIN');
+
+            const msgEl = document.createElement('div');
+            msgEl.className = 'chat-message';
+
+            if (isSelf) {
+                msgEl.classList.add('chat-message-self');
+            } else if (isAdmin) {
+                msgEl.classList.add('chat-message-admin');
+            } else {
+                msgEl.classList.add('chat-message-other');
+            }
+
+            const senderEl = document.createElement('div');
+            senderEl.className = 'chat-message-sender';
+            if (isAdmin) {
+                senderEl.innerHTML = '🛡️ <strong>' + escapeHtml(msg.sender) + '</strong>';
+            } else {
+                senderEl.innerHTML = '<strong>' + escapeHtml(msg.sender || 'Anonim') + '</strong>';
+            }
+
+            const bubbleEl = document.createElement('div');
+            bubbleEl.className = 'chat-message-bubble';
+            bubbleEl.textContent = msg.text || '';
+
+            const timeEl = document.createElement('div');
+            timeEl.className = 'chat-message-time';
+            const date = msg.timestamp ? new Date(msg.timestamp) : new Date();
+            timeEl.textContent = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            msgEl.appendChild(senderEl);
+            msgEl.appendChild(bubbleEl);
+            msgEl.appendChild(timeEl);
+            messagesContainer.appendChild(msgEl);
+
+            scrollToBottom();
+
+            // Tampilkan badge notifikasi jika chat tertutup dan pesan bukan dari diri sendiri
+            if (!chatState.isOpen && !isSelf) {
+                chatState.hasNewMessage = true;
+                const chatBadge = document.getElementById('chatBadge');
+                if (chatBadge) chatBadge.style.display = 'flex';
+            }
+        }
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (messagesContainer) {
+                setTimeout(() => {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 50);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (document.activeElement?.id === 'chatInput') {
+                    e.preventDefault();
+                    sendMessage();
+                } else if (document.activeElement?.id === 'chatNameInput') {
+                    e.preventDefault();
+                    startChat();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
