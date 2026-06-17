@@ -4,31 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal ASLAP SPPG JATIAN</title>
-    
-    <!-- FONT AWESOME & HTML2CANVAS (FIX BUG IKON & DOWNLOAD PNG) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
     <!-- PIN MODAL -->
-    <div class="pin-modal-overlay" id="pinModal">
+    <div id="pinModal" class="pin-modal-overlay">
         <div class="pin-modal">
             <div class="pin-header">
                 <i class="fas fa-lock"></i>
                 <h3>Akses Terbatas</h3>
             </div>
             <p>Masukkan PIN keamanan untuk mengakses fitur ini.</p>
-            <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••">
+            <input type="password" id="pinInput" class="pin-input" placeholder="Masukkan PIN (Default: 2024)" maxlength="10">
             <div class="pin-actions">
                 <button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
                 <button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
             </div>
+            <p class="pin-hint">💡 PIN default adalah: <strong>2024</strong></p>
         </div>
     </div>
 
@@ -39,65 +34,66 @@
             <h3>🏛️ Menu Utama</h3>
             <button class="sidebar-close" onclick="toggleMenu()">✕</button>
         </div>
-        <nav class="sidebar-nav">
-            <a href="#" class="sidebar-menu-btn home-btn" onclick="showHome()"><i class="fas fa-home menu-icon"></i> Beranda</a>
+        <div class="sidebar-nav">
+            <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">🏠</span> Beranda</button>
             
             <div class="accordion-group">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title"><i class="fas fa-box menu-icon"></i> Operasional & Logistik</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <span class="accordion-title"><span class="menu-icon"></span> Operasional & Logistik</span>
+                    <span class="accordion-icon">▼</span>
                 </button>
                 <div class="accordion-content">
-                    <a href="#" class="sidebar-menu-btn" onclick="checkAndShow('sekolah')"><i class="fas fa-school menu-icon"></i> Daftar Sekolah</a>
-                    <a href="#" class="sidebar-menu-btn" onclick="showSection('menu')"><i class="fas fa-calendar-week menu-icon"></i> Menu Mingguan</a>
-                    <a href="#" class="sidebar-menu-btn" onclick="showSection('rute')"><i class="fas fa-truck menu-icon"></i> Rute Distribusi</a>
+                    <button class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon">🏫</span> Daftar Sekolah</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
                 </div>
             </div>
 
             <div class="accordion-group">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title"><i class="fas fa-users menu-icon"></i> Manajemen Tim</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <span class="accordion-title"><span class="menu-icon">👥</span> Manajemen Tim</span>
+                    <span class="accordion-icon">▼</span>
                 </button>
                 <div class="accordion-content">
-                    <a href="#" class="sidebar-menu-btn" onclick="checkAndShow('relawan')"><i class="fas fa-user-friends menu-icon"></i> Daftar Relawan</a>
-                    <a href="#" class="sidebar-menu-btn" onclick="showSection('koordinator')"><i class="fas fa-user-tie menu-icon"></i> Koordinator</a>
-                    <a href="#" class="sidebar-menu-btn" onclick="showSection('kontak')"><i class="fas fa-phone menu-icon"></i> Kontak Staff</a>
+                    <button class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon">👥</span> Daftar Relawan</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon"></span> Koordinator</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">📞</span> Kontak Staff</button>
                 </div>
             </div>
 
+            <button class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</button>
+            
             <div class="accordion-group">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title"><i class="fas fa-info-circle menu-icon"></i> Informasi & Dokumen</span>
-                    <i class="fas fa-chevron-down accordion-icon"></i>
+                    <span class="accordion-title"><span class="menu-icon">ℹ️</span> Informasi & Dokumen</span>
+                    <span class="accordion-icon">▼</span>
                 </button>
                 <div class="accordion-content">
-                    <a href="#" class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><i class="fas fa-folder-open menu-icon"></i> Pusat Dokumen</a>
-                    <a href="#" class="sidebar-menu-btn" onclick="showSection('info')">
-                        <i class="fas fa-bullhorn menu-icon"></i> Papan Informasi 
+                    <button class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</button>
+                    <button class="sidebar-menu-btn" onclick="showSection('info')">
+                        <span class="menu-icon">📢</span> Papan Informasi 
                         <span class="badge-count" id="badgeInfo" style="display:none;">0</span>
-                    </a>
-                    <a href="https://dopamine31.github.io/insentif-pic/" target="_blank" class="sidebar-menu-btn" onclick="return checkExternalLink(event)">
-                        <i class="fas fa-money-bill-wave menu-icon"></i> Summary Insentif PIC
-                        <span class="external-badge">Eksternal</span>
-                    </a>
-                    <a href="#" class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><i class="fas fa-exclamation-triangle menu-icon"></i> Surat Peringatan</a>
+                    </button>
                 </div>
             </div>
-        </nav>
+
+            <button class="sidebar-menu-btn special external-link" data-url="https://rido31.github.io/insentif-pic/">
+                <span class="menu-icon">💰</span> Summary Insentif PIC <span class="external-badge"><i class="fas fa-external-link-alt"></i></span>
+            </button>
+        </div>
         <div class="sidebar-footer">
-            © <span id="year"></span> ASLAP SPPG JATIAN
+            © <span id="footerYear"></span> ASLAP SPPG JATIAN
         </div>
     </div>
 
     <!-- STICKY HEADER -->
-    <header class="sticky-header">
+    <div class="sticky-header">
         <div class="header-top">
             <button class="hamburger-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i> Menu
+                <span class="hamburger-icon">☰</span> Menu
             </button>
             <div class="header-title">
-                <h1>️ PORTAL ASLAP SPPG JATIAN</h1>
+                <h1>🏛️ PORTAL ASLAP SPPG JATIAN</h1>
                 <p>Satuan Pelayanan Pemenuhan Gizi Jatian</p>
             </div>
             <div class="clock-container">
@@ -110,22 +106,21 @@
                     </div>
                 </div>
                 <div class="digital-clock">
-                    <div class="time-display" id="digitalTime">00:00:00</div>
-                    <div class="ms-display" id="msDisplay">000</div>
+                    <div class="time-display"><span id="digitalTime">00:00:00</span><span class="ms-display" id="msDisplay">000</span></div>
                     <div class="date-display" id="dateDisplay">-</div>
-                    <span class="timezone-badge">WIB</span>
+                    <div class="timezone-badge">WIB</div>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
     <!-- MAIN CONTAINER -->
-    <main class="container">
+    <div class="container">
         
-        <!-- HOME SECTION -->
-        <section id="section-home" class="content-section">
+        <!-- SECTION: HOME -->
+        <div id="section-home" class="content-section home-section">
             <div class="running-text-container">
-                <span class="running-text-label">📢 INFO</span>
+                <div class="running-text-label"> INFO</div>
                 <div class="running-text-wrapper">
                     <div class="running-text" id="runningText">Memuat pengumuman...</div>
                 </div>
@@ -143,94 +138,94 @@
                 <p id="quoteText">❝ Memuat quote... ❞</p>
             </div>
 
-            <div class="birthday-card" id="birthdayCard" style="display:none;">
-                <div class="birthday-icon">🎉</div>
+            <div class="birthday-card" id="birthdayCard" style="display: none;">
+                <div class="birthday-icon">🎂</div>
                 <div class="birthday-content">
-                    <h3>Hari ini Ulang Tahun!</h3>
+                    <h3>🎉 Hari ini Ulang Tahun!</h3>
                     <p id="birthdayText">-</p>
-                    <a href="#" id="birthdayWaLink" target="_blank" class="birthday-btn">
-                        <i class="fab fa-whatsapp"></i> Kirim Ucapan
-                    </a>
+                    <a href="#" id="birthdayWaLink" class="birthday-btn" target="_blank"><i class="fab fa-whatsapp"></i> Kirim Ucapan</a>
                 </div>
             </div>
 
             <div class="agenda-card">
                 <h2>📅 Agenda Mendatang</h2>
-                <div class="agenda-list" id="agendaList">
-                    <p>Memuat agenda...</p>
-                </div>
+                <div class="agenda-list" id="agendaList">Memuat agenda...</div>
             </div>
-        </section>
+        </div>
 
-        <!-- SEKOLAH SECTION -->
-        <section id="section-sekolah" class="content-section" style="display:none;">
+        <!-- SECTION: SEKOLAH -->
+        <div id="section-sekolah" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>🏫 Daftar Sekolah</h2>
             </div>
             <div class="search-box">
-                <input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah, PIC, atau lokasi...">
+                <input type="text" id="searchSekolah" placeholder="🔍 Cari nama sekolah, PIC, atau lokasi...">
             </div>
             <div class="table-container">
                 <table id="tableSekolah">
                     <thead>
-                        <tr>
-                            <th>No</th><th>Nama Sekolah</th><th>PIC</th><th>💬 WA PIC</th>
-                            <th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th>
-                        </tr>
+                        <tr><th>No</th><th>Nama Sekolah</th><th> PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <!-- RELAWAN SECTION -->
-        <section id="section-relawan" class="content-section" style="display:none;">
+        <!-- SECTION: RELAWAN -->
+        <div id="section-relawan" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>👥 Daftar Relawan</h2>
             </div>
             <div class="search-box">
-                <input type="text" id="searchRelawan" placeholder="🔍 Cari nama, posisi, atau email...">
+                <input type="text" id="searchRelawan" placeholder="🔍 Cari nama, NIK, atau posisi...">
             </div>
             <div class="table-container">
                 <table id="tableRelawan">
                     <thead>
-                        <tr>
-                            <th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>📧 Email</th><th>📌 Posisi</th>
-                        </tr>
+                        <tr><th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th> Email</th><th>📌 Posisi</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <!-- KOORDINATOR SECTION -->
-        <section id="section-koordinator" class="content-section" style="display:none;">
+        <!-- SECTION: KOORDINATOR -->
+        <div id="section-koordinator" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>👔 Koordinator</h2>
+                <h2>👔 Koordinator & Kontak</h2>
             </div>
             <div class="card-grid" id="cardKoordinator"></div>
-        </section>
+        </div>
 
-        <!-- KONTAK SECTION -->
-        <section id="section-kontak" class="content-section" style="display:none;">
+        <!-- SECTION: KONTAK -->
+        <div id="section-kontak" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>📞 Kontak Staff Internal</h2>
             </div>
             <div class="card-grid" id="cardKontak"></div>
-        </section>
+        </div>
 
-        <!-- DOKUMEN SECTION -->
-        <section id="section-dokumen" class="content-section" style="display:none;">
+        <!-- SECTION: SURAT PERINGATAN (LOCKED) -->
+        <div id="section-surat" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>📁 Pusat Dokumen</h2>
+                <h2>⚠️ Surat Peringatan</h2>
             </div>
             <div class="search-box">
-                <input type="text" id="searchDokumen" placeholder="🔍 Cari judul atau deskripsi dokumen...">
+                <input type="text" id="searchSurat" placeholder="🔍 Cari nama relawan...">
+            </div>
+            <div class="card-grid" id="cardSurat"></div>
+        </div>
+
+        <!-- SECTION: DOKUMEN (LOCKED) -->
+        <div id="section-dokumen" class="content-section" style="display: none;">
+            <div class="section-header">
+                <button class="back-btn" onclick="showHome()">← Beranda</button>
+                <h2>📚 Pusat Dokumen</h2>
             </div>
             <div class="doc-categories">
                 <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
@@ -240,36 +235,39 @@
                 <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
                 <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
             </div>
+            <div class="search-box">
+                <input type="text" id="searchDokumen" placeholder="🔍 Cari judul atau deskripsi dokumen...">
+            </div>
             <div class="doc-grid" id="docGrid"></div>
-        </section>
+        </div>
 
-        <!-- INFO SECTION -->
-        <section id="section-info" class="content-section" style="display:none;">
+        <!-- SECTION: INFO -->
+        <div id="section-info" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>📢 Papan Informasi & Memo</h2>
+                <h2> Papan Informasi & Memo</h2>
             </div>
             <div class="info-stats">
-                <div class="info-stat-item"><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
-                <div class="info-stat-item"><span class="info-stat-label">🆕 Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
-                <div class="info-stat-item"><span class="info-stat-label">🔴 Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchInfo" placeholder="🔍 Cari informasi...">
+                <div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
+                <div class="info-stat-item"><span class="info-stat-icon"></span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
+                <div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
             </div>
             <div class="info-categories">
-                <button class="info-cat-btn active" onclick="filterInfo('all', this)">Semua</button>
-                <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
+                <button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
+                <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)"> Pengumuman</button>
                 <button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
                 <button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
                 <button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
-                <button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
+                <button class="info-cat-btn" onclick="filterInfo('update', this)"> Update</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInfo" placeholder=" Cari judul, isi, atau penulis...">
             </div>
             <div class="info-board" id="infoBoard"></div>
-        </section>
+        </div>
 
-        <!-- MENU SECTION -->
-        <section id="section-menu" class="content-section" style="display:none;">
+        <!-- SECTION: MENU -->
+        <div id="section-menu" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
                 <h2>🍱 Menu Mingguan</h2>
@@ -285,89 +283,80 @@
                 <button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
             </div>
             <div class="menu-weekly-container" id="menuWeeklyContainer"></div>
-        </section>
+        </div>
 
-        <!-- RUTE SECTION -->
-        <section id="section-rute" class="content-section" style="display:none;">
+        <!-- SECTION: RUTE -->
+        <div id="section-rute" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>🚚 Rute Distribusi MBG</h2>
+                <h2> Rute Distribusi MBG</h2>
             </div>
-            <button class="btn-download-rute" id="btnDownloadRute">
-                <i class="fas fa-download"></i> Download PNG
-            </button>
-            <div id="ruteContent">
-                <p style="text-align:center;padding:40px;">⏳ Memuat data rute...</p>
-            </div>
-        </section>
+            <button id="btnDownloadRute" class="btn-download-rute"><i class="fas fa-download"></i> Download PNG</button>
+            <div id="ruteContent"> Memuat data rute...</div>
+        </div>
 
-        <!-- SURAT SECTION -->
-        <section id="section-surat" class="content-section" style="display:none;">
-            <div class="section-header">
-                <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>⚠️ Surat Peringatan</h2>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchSurat" placeholder="🔍 Cari nama relawan...">
-            </div>
-            <div class="card-grid" id="cardSurat"></div>
-        </section>
+    </div>
 
-        <footer class="footer">
-            <p>© <span id="footerYear"></span> ASLAP SPPG JATIAN - Badan Gizi Nasional</p>
-            <p class="footer-small">Made with ❤️ by DIAH AYU UMAMI</p>
-        </footer>
-    </main>
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>© <span id="year"></span> ASLAP SPPG JATIAN - Badan Gizi Nasional</p>
+        <p class="footer-small">Made with 🖤 by DIAH AYU UMAMI</p>
+    </div>
 
-    <!-- CHAT WIDGET -->
-    <div class="chat-widget">
-        <button class="chat-toggle-btn" onclick="toggleChat()">
-            <i class="fas fa-comments"></i>
-            <span class="chat-badge" id="chatBadge"></span>
-        </button>
-        <div class="chat-window" id="chatWindow" style="display:none;">
+    <!-- MASCOT -->
+    <div class="mascot-container" id="mascot" onclick="handleMascotClick()">
+        <div class="mascot-counter" id="mascotCounter">0</div>
+        <div class="mascot-speech" id="mascotSpeech">Halo! 👋</div>
+        <div class="mascot-body">
+            <div class="mascot-head">
+                <div class="mascot-eye left"></div>
+                <div class="mascot-eye right"></div>
+                <div class="mascot-mouth"></div>
+            </div>
+            <div class="mascot-tail"></div>
+            <div class="mascot-leg left"></div>
+            <div class="mascot-leg right"></div>
+        </div>
+    </div>
+
+    <!-- LIVE CHAT WIDGET -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-window" id="chatWindow" style="display: none;">
             <div class="chat-header">
                 <div class="chat-header-info">
-                    <h3>🚨 REDZONE CHAT ROOM</h3>
-                    <div class="chat-header-meta">
-                        <div class="online-indicator">
-                            <span class="online-dot"></span>
-                            <span id="onlineCount">0</span> Online
-                        </div>
-                        <span class="chat-user-label" id="chatUserLabel">Guest</span>
-                    </div>
+                    <h3>💬 Live Chat</h3>
+                    <span class="chat-user-label" id="chatUserLabel">Guest</span>
                 </div>
-                <div class="chat-header-actions">
-                    <button class="chat-change-name-btn" id="changeNameBtn" onclick="changeChatName()" style="display:none;">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="chat-close-btn" onclick="toggleChat()">✕</button>
-                </div>
+                <button class="chat-close-btn" onclick="toggleChat()">✕</button>
             </div>
             
+            <!-- Name Form -->
             <div class="chat-name-form" id="chatNameForm">
                 <div class="chat-name-body">
                     <div class="chat-welcome-icon">👋</div>
-                    <h4 id="chatFormTitle">Selamat Datang!</h4>
-                    <p id="chatFormDesc">Masukkan nama Anda untuk mulai mengobrol</p>
-                    <input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="20">
-                    <button class="chat-start-btn" onclick="startChat()">Masuk ke Room Chat</button>
-                    <p class="chat-hint">💡 Setiap nama memiliki warna unik</p>
+                    <h4>Selamat Datang!</h4>
+                    <p>Masukkan nama Anda untuk mulai mengobrol</p>
+                    <input type="text" id="chatNameInput" placeholder="Nama Anda" maxlength="20">
+                    <button class="chat-start-btn" onclick="startChat()">Mulai Chat</button>
+                    <p class="chat-hint">💡 Masukkan kode khusus jika Anda adalah admin</p>
                 </div>
             </div>
 
-            <div class="chat-room" id="chatRoom" style="display:none;">
+            <!-- Chat Room -->
+            <div class="chat-room" id="chatRoom" style="display: none;">
                 <div class="chat-messages" id="chatMessages">
-                    <div class="chat-loading">⏳ Menghubungkan ke room chat...</div>
+                    <div class="chat-loading">⏳ Memuat pesan...</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." maxlength="500" onkeypress="if(event.key==='Enter') sendMessage()">
-                    <button class="chat-send-btn" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
+        <button class="chat-toggle-btn" onclick="toggleChat()">
+            <i class="fas fa-comment-dots"></i>
+            <span class="chat-badge"></span>
+        </button>
     </div>
 
     <script src="script.js"></script>
