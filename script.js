@@ -9,7 +9,6 @@ const firebaseConfig = {
     appId: "1:536843661380:web:4eae78f035d0d21eb4cc11"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const chatMessagesRef = db.ref('portal_chat/messages');
@@ -32,16 +31,12 @@ const SHEET_URLS = {
 };
 
 let globalData = { relawan: [], sekolah: [], info: [] };
-let mascotClickCount = 0;
 let sidebarOpen = false;
 let currentFilter = 'all';
 let currentInfoFilter = 'all';
 let currentMenuFilter = 'all';
 
-const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job! 👍", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
-const easterEggPhrases = ["🎉 Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇮🇩", "Kamu luar biasa! 💖", "Rahasia: Dino suka nasi padang 🍛"];
-
-// ===== PIN & SECURITY SYSTEM (PIN = 31) =====
+// ===== PIN & SECURITY SYSTEM (PIN = 2024) =====
 function checkAuth() {
     return sessionStorage.getItem('isAuthenticated') === 'true';
 }
@@ -58,13 +53,12 @@ function hidePINModal() {
 
 function verifyPIN() {
     const input = document.getElementById('pinInput').value;
-    if (input === '31') {
+    if (input === '2024') {
         sessionStorage.setItem('isAuthenticated', 'true');
         hidePINModal();
-        alert('✅ Akses diberikan! Anda sekarang adalah Admin.');
+        alert('✅ Akses diberikan! Fitur terkunci telah dibuka.');
         loadRelawan();
         loadSekolah();
-        // Update chat admin status jika sedang di chat
         if (chatUserName && chatRoomActive) {
             updateUserPresence();
         }
@@ -96,18 +90,28 @@ function checkAndShow(sectionName) {
     showSection(sectionName);
 }
 
+// ===== CHECK EXTERNAL LINK =====
+function checkExternalLink(event) {
+    if (!checkAuth()) {
+        event.preventDefault();
+        showPINModal();
+        return false;
+    }
+    return true;
+}
+
 // ===== COLOR GENERATION FROM NAME =====
 function nameToColor(name) {
-    if (!name) return 'hsl(330, 65%, 55%)';
+    if (!name) return 'hsl(330, 65%, 65%)';
     let hash = 0;
     const str = name.toLowerCase().trim();
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        hash = hash & hash; // Convert to 32bit integer
+        hash = hash & hash;
     }
     const hue = Math.abs(hash % 360);
-    const saturation = 60 + (Math.abs(hash >> 8) % 20); // 60-80%
-    const lightness = 55 + (Math.abs(hash >> 16) % 15); // 55-70%
+    const saturation = 60 + (Math.abs(hash >> 8) % 20);
+    const lightness = 60 + (Math.abs(hash >> 16) % 15);
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -162,36 +166,6 @@ function toggleAccordion(header) {
     }
 }
 
-// ===== MASCOT =====
-function showMascotSpeech(customText = null) {
-    const speech = document.getElementById('mascotSpeech');
-    const phrase = customText || mascotPhrases[Math.floor(Math.random() * mascotPhrases.length)];
-    speech.textContent = phrase;
-    speech.classList.add('show');
-    setTimeout(() => speech.classList.remove('show'), 2500);
-}
-
-function animateMascot() {
-    const mascot = document.getElementById('mascot');
-    mascot.style.transform = 'scale(1.2) rotate(5deg)';
-    setTimeout(() => { mascot.style.transform = 'scale(1) rotate(0deg)'; }, 300);
-}
-
-function handleMascotClick() {
-    mascotClickCount++;
-    const counter = document.getElementById('mascotCounter');
-    counter.textContent = mascotClickCount;
-    counter.classList.add('show');
-    animateMascot();
-    if (mascotClickCount % 10 === 0) { 
-        const msg = easterEggPhrases[Math.floor(Math.random() * easterEggPhrases.length)]; 
-        showMascotSpeech(`🎁 ${msg}`); 
-    } else { 
-        showMascotSpeech(); 
-    }
-    setTimeout(() => counter.classList.remove('show'), 3000);
-}
-
 // ===== NAVIGATION =====
 function showHome() {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
@@ -199,8 +173,6 @@ function showHome() {
     if (home) {
         home.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        animateMascot();
-        showMascotSpeech("Selamat datang! 👋");
     }
     if (sidebarOpen) toggleMenu();
 }
@@ -212,8 +184,6 @@ function showSection(sectionName) {
     if (section) {
         section.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        animateMascot();
-        showMascotSpeech();
     }
     if (sidebarOpen) toggleMenu();
 }
@@ -295,7 +265,7 @@ async function loadKoordinator() {
     const container = document.getElementById('cardKoordinator'); if (!container) return; 
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
     const data = await fetchSheetData(SHEET_URLS.koordinator); 
-    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
+    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
         const waNumber = cleanWA(row['Nomor WA']); 
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">Tidak ada</span>';
@@ -306,7 +276,7 @@ async function loadKoordinator() {
 
 async function loadKontak() {
     const container = document.getElementById('cardKontak'); if (!container) return; 
-    container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
+    container.innerHTML = '<p style="text-align:center;padding:20px;"> Memuat data...</p>';
     const data = await fetchSheetData(SHEET_URLS.kontak); 
     if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
@@ -320,7 +290,7 @@ async function loadSurat() {
     const container = document.getElementById('cardSurat'); if (!container) return; 
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
     const dataSP = await fetchSheetData(SHEET_URLS.surat); 
-    if (dataSP.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Belum ada surat peringatan</p>'; return; }
+    if (dataSP.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">️ Belum ada surat peringatan</p>'; return; }
     container.innerHTML = dataSP.map(row => {
         const namaRelawan = escapeHtml(row['Nama Relawan']); 
         const linkDokumen = isValidLink(row['Link Dokumen']) ? row['Link Dokumen'].trim() : null;
@@ -350,8 +320,7 @@ async function loadDokumen() {
     const filteredData = currentFilter === 'all' ? data : data.filter(doc => doc['Kategori']?.toLowerCase() === currentFilter);
     const searchTerm = document.getElementById('searchDokumen')?.value.toLowerCase() || '';
     const searchedData = filteredData.filter(doc => doc['Judul']?.toLowerCase().includes(searchTerm) || doc['Deskripsi']?.toLowerCase().includes(searchTerm));
-    
-    const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '📖', internal: '📁' };
+    const icons = { sop: '📋', template: '📝', form: '', sk: '📜', panduan: '📖', internal: '📁' };
     
     grid.innerHTML = searchedData.map((doc) => {
         const category = doc['Kategori']?.toLowerCase() || 'internal';
@@ -430,8 +399,8 @@ function renderInfoBoard() {
         const tanggal = item['Tanggal'] ? new Date(item['Tanggal']).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
         const isNew = item['Baru']?.toLowerCase() === 'ya' || item['New']?.toLowerCase() === 'yes';
         const itemId = `info-content-${idx}`;
-        const kategoriLabel = { pengumuman: '📢 Pengumuman', memo: '📝 Memo', catatan: '📒 Catatan', penting: '⚠️ Info Penting', update: '🔄 Update' }[kategori] || kategori;
-        const prioritasLabel = { mendesak: '🔥 Mendesak', penting: '⚡ Penting', normal: '✅ Normal' }[prioritas] || '✅ Normal';
+        const kategoriLabel = { pengumuman: '📢 Pengumuman', memo: ' Memo', catatan: '📒 Catatan', penting: '⚠️ Info Penting', update: '🔄 Update' }[kategori] || kategori;
+        const prioritasLabel = { mendesak: ' Mendesak', penting: '⚡ Penting', normal: '✅ Normal' }[prioritas] || '✅ Normal';
         const contentFormatted = formatInfoContent(isi); const isLong = isi.length > 400;
         const shareText = encodeURIComponent(`*${item['Judul']}*\n\n${isi}\n\n— ${penulis} (${tanggal})\n_Dari Portal ASLAP SPPG JATIAN_`);
         return `<div class="info-item priority-${prioritas}">
@@ -447,7 +416,7 @@ function renderInfoBoard() {
 
 function toggleInfoContent(id, btn) {
     const el = document.getElementById(id);
-    if (el.classList.contains('collapsed')) { el.classList.remove('collapsed'); btn.innerHTML = '📕 Tutup'; }
+    if (el.classList.contains('collapsed')) { el.classList.remove('collapsed'); btn.innerHTML = ' Tutup'; }
     else { el.classList.add('collapsed'); btn.innerHTML = '📖 Baca Selengkapnya'; el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 }
 
@@ -471,7 +440,7 @@ async function loadMenuWeekly() {
         }); }
         if (displayDates.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada menu</h3></div>'; return; }
         displayDates.sort((a, b) => new Date(a) - new Date(b));
-        const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '🌈', 'minggu': '☀️' };
+        const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '🌈', 'minggu': '️' };
         
         container.innerHTML = displayDates.map(date => {
             const info = menuByDate[date];
@@ -479,7 +448,7 @@ async function loadMenuWeekly() {
             const d = new Date(date);
             const dayName = d.toLocaleDateString('id-ID', { weekday: 'long' });
             const icon = icons[dayName.toLowerCase()] || '📅';
-            return `<div class="menu-day-card"><div class="menu-day-header"><div class="menu-day-icon">${icon}</div><div class="menu-day-title"><h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3><div class="menu-day-date">${d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div></div></div><div class="menu-items"><h4>🍽️ Menu Hari Ini</h4><div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div></div><div class="menu-published">👨‍🍳 Dipublikasi oleh: <strong>${escapeHtml(info.publishedBy)}</strong></div></div>`;
+            return `<div class="menu-day-card"><div class="menu-day-header"><div class="menu-day-icon">${icon}</div><div class="menu-day-title"><h3>${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</h3><div class="menu-day-date">${d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div></div></div><div class="menu-items"><h4>🍽️ Menu Hari Ini</h4><div class="menu-list">${menuItems.map(item => `<span class="menu-item-tag">${escapeHtml(item)}</span>`).join('')}</div></div><div class="menu-published">👨🍳 Dipublikasi oleh: <strong>${escapeHtml(info.publishedBy)}</strong></div></div>`;
         }).join('');
     } catch (error) { console.error('Error loading menu:', error); container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">⚠️</div><h3>Gagal memuat menu</h3></div>'; }
 }
@@ -500,7 +469,7 @@ async function loadRuteDistribusi() {
         const grandTotal = { pk: totalSelatan.pk + totalUtara.pk, pb: totalSelatan.pb + totalUtara.pb, total: totalSelatan.total + totalUtara.total };
         const renderTable = (rows) => rows.map(row => `<tr><td><strong>${escapeHtml(row['Sekolah'])}</strong></td><td class="center">${row['PK'] || 0}</td><td class="center">${row['PB'] || 0}</td><td class="center"><strong>${row['Total'] || 0}</strong></td></tr>`).join('');
         
-        container.innerHTML = `<div class="rute-summary-grid"><div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div><div class="rute-summary-card north"><h3>🚐 Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div></div><div class="rute-tables-grid"><div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div><div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div></div><div class="rute-total-box"><h3>📊 TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
+        container.innerHTML = `<div class="rute-summary-grid"><div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div><div class="rute-summary-card north"><h3>🚐 Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div></div><div class="rute-tables-grid"><div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div><div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4"> Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div></div><div class="rute-total-box"><h3> TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
     } catch (error) { console.error('Error loading rute:', error); container.innerHTML = '<p style="text-align:center;padding:40px;color:#dc3545;">⚠️ Gagal memuat data rute</p>'; }
 }
 
@@ -519,7 +488,7 @@ async function loadBirthday() {
     if (birthdayPersons.length > 0) {
         const names = birthdayPersons.map(p => p['Nama']).join(', '); document.getElementById('birthdayText').textContent = `🎈 ${names} 🎈`;
         const firstPerson = birthdayPersons[0]; const waNumber = cleanWA(firstPerson['Nomor WA']);
-        if (waNumber) { const message = encodeURIComponent(`Halo ${firstPerson['Nama']}! 🎉 Selamat ulang tahun! Semoga sehat selalu. - Dari SPPG Jatian`); document.getElementById('birthdayWaLink').href = `https://wa.me/${waNumber}?text=${message}`; document.getElementById('birthdayCard').style.display = 'flex'; }
+        if (waNumber) { const message = encodeURIComponent(`Halo ${firstPerson['Nama']}!  Selamat ulang tahun! Semoga sehat selalu. - Dari SPPG Jatian`); document.getElementById('birthdayWaLink').href = `https://wa.me/${waNumber}?text=${message}`; document.getElementById('birthdayCard').style.display = 'flex'; }
     }
 }
 
@@ -527,11 +496,12 @@ async function loadBirthday() {
 // ===== FIREBASE REAL-TIME CHAT ROOM SYSTEM =====
 // =====================================================================
 
-let chatUserName = localStorage.getItem('chatUserName') || '';
+let chatUserName = '';
 let userColor = '';
 let chatRoomActive = false;
 let chatListenersAttached = false;
 let currentUserId = '';
+let chatSessionId = '';
 
 function toggleChat() {
     const chatWindow = document.getElementById('chatWindow');
@@ -567,49 +537,55 @@ function startChat() {
     
     chatUserName = name;
     userColor = nameToColor(name);
-    currentUserId = name.replace(/\s+/g, '_').toLowerCase() + '_' + Date.now();
-    localStorage.setItem('chatUserName', chatUserName);
+    
+    if (!chatSessionId) {
+        chatSessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    currentUserId = chatSessionId;
     
     enterChatRoom();
+}
+
+function changeChatName() {
+    if (currentUserId) {
+        onlineUsersRef.child(currentUserId).remove();
+    }
+    
+    document.getElementById('chatFormTitle').textContent = 'Ganti Nama';
+    document.getElementById('chatFormDesc').textContent = 'Masukkan nama baru Anda. Warna nama akan berubah sesuai nama baru.';
+    document.getElementById('chatNameInput').value = chatUserName || '';
+    document.getElementById('chatNameForm').style.display = 'flex';
+    document.getElementById('chatRoom').style.display = 'none';
+    document.getElementById('changeNameBtn').style.display = 'none';
+    setTimeout(() => document.getElementById('chatNameInput').focus(), 100);
 }
 
 function enterChatRoom() {
     if (!chatUserName) return;
     
     userColor = nameToColor(chatUserName);
-    currentUserId = chatUserName.replace(/\s+/g, '_').toLowerCase() + '_' + localStorage.getItem('chatSessionId');
-    
-    if (!localStorage.getItem('chatSessionId')) {
-        localStorage.setItem('chatSessionId', Date.now().toString());
-        currentUserId = chatUserName.replace(/\s+/g, '_').toLowerCase() + '_' + localStorage.getItem('chatSessionId');
-    }
     
     document.getElementById('chatNameForm').style.display = 'none';
     document.getElementById('chatRoom').style.display = 'flex';
     document.getElementById('chatUserLabel').textContent = chatUserName;
     document.getElementById('chatUserLabel').style.color = userColor;
+    document.getElementById('changeNameBtn').style.display = 'flex';
     
     chatRoomActive = true;
     
-    // Setup Firebase listeners
     setupChatListeners();
-    
-    // Set user online
     updateUserPresence();
     
-    // Focus on input
     document.getElementById('chatMessageInput').focus();
 }
 
 function leaveChatRoom() {
     chatRoomActive = false;
     
-    // Remove user from online list
     if (currentUserId) {
         onlineUsersRef.child(currentUserId).remove();
     }
     
-    // Detach listeners
     detachChatListeners();
 }
 
@@ -625,22 +601,17 @@ function updateUserPresence() {
     };
     
     userRef.set(userData);
-    
-    // Remove user when disconnect
     userRef.onDisconnect().remove();
 }
 
 function setupChatListeners() {
     if (chatListenersAttached) return;
     
-    // Clear existing messages
     const messagesContainer = document.getElementById('chatMessages');
     messagesContainer.innerHTML = '';
     
-    // Add system message
-    addSystemMessage('🔗 Terhubung ke Room Chat SPPG Jatian');
+    addSystemMessage('🔗 Terhubung ke REDZONE CHAT ROOM');
     
-    // Listen for new messages (last 50)
     chatMessagesRef.limitToLast(50).on('child_added', (snapshot) => {
         const message = snapshot.val();
         if (message) {
@@ -648,7 +619,6 @@ function setupChatListeners() {
         }
     });
     
-    // Listen for online users
     onlineUsersRef.on('value', (snapshot) => {
         const users = snapshot.val() || {};
         const count = Object.keys(users).length;
@@ -679,11 +649,10 @@ function addSystemMessage(text) {
 function appendMessage(message) {
     const messagesContainer = document.getElementById('chatMessages');
     
-    // Remove loading message if exists
     const loading = messagesContainer.querySelector('.chat-loading');
     if (loading) loading.remove();
     
-    const isSelf = message.sender === chatUserName;
+    const isSelf = message.sender === chatUserName && message.sessionId === chatSessionId;
     const isAdmin = message.isAdmin === true;
     
     let msgClass = 'chat-message-other';
@@ -694,20 +663,22 @@ function appendMessage(message) {
     }
     
     const msgColor = message.color || nameToColor(message.sender);
-    const bubbleColor = isSelf ? nameToDarkColor(message.sender) : (isAdmin ? '' : '#2d2d2d');
+    const bubbleColor = isSelf ? nameToDarkColor(message.sender) : '';
     
     const timeStr = message.timestamp ? formatTimestamp(message.timestamp) : '';
     
     const senderNameHtml = isAdmin 
-        ? `${escapeHtml(message.sender)} <span class="admin-badge">👑 ADMIN</span>`
+        ? `${escapeHtml(message.sender)} <span class="admin-badge"> ADMIN</span>`
         : escapeHtml(message.sender);
+    
+    const bubbleStyle = (!isAdmin && isSelf && bubbleColor) ? `style="background: ${bubbleColor}; color: #fff;"` : '';
     
     const msgHTML = `
         <div class="chat-message ${msgClass}">
             <div class="chat-message-sender" style="color: ${msgColor};">
                 ${senderNameHtml}
             </div>
-            <div class="chat-message-bubble" ${!isAdmin && isSelf ? `style="background: ${bubbleColor}; color: #fff;"` : ''}>
+            <div class="chat-message-bubble" ${bubbleStyle}>
                 ${escapeHtml(message.text)}
             </div>
             <div class="chat-message-time">${timeStr}</div>
@@ -715,11 +686,8 @@ function appendMessage(message) {
     `;
     
     messagesContainer.insertAdjacentHTML('beforeend', msgHTML);
-    
-    // Auto-scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Show badge on toggle button if chat is hidden
     const chatWindow = document.getElementById('chatWindow');
     if (chatWindow.style.display === 'none' && !isSelf) {
         const badge = document.getElementById('chatBadge');
@@ -755,6 +723,7 @@ function sendMessage() {
     
     const messageData = {
         sender: chatUserName,
+        sessionId: chatSessionId,
         text: text,
         color: userColor,
         isAdmin: checkAuth(),
@@ -792,7 +761,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadAgenda(); 
     updateClock();
     
-    document.getElementById('mascot').addEventListener('click', handleMascotClick);
     document.addEventListener('keydown', (e) => { 
         if (e.key === 'Escape') {
             if (sidebarOpen) toggleMenu();
@@ -800,26 +768,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Buka accordion pertama secara default
     const firstAccordion = document.querySelector('.accordion-header');
     if (firstAccordion) toggleAccordion(firstAccordion);
 
-    // Handle External Link (Summary Insentif) dengan PIN Check
-    document.querySelectorAll('.external-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (!checkAuth()) {
-                e.preventDefault();
-                showPINModal();
-            }
-        });
-    });
-
-    // Handle Enter key on PIN input
     document.getElementById('pinInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyPIN();
     });
     
-    // Download PNG Feature
     const btnDownload = document.getElementById('btnDownloadRute');
     if (btnDownload) {
         btnDownload.addEventListener('click', async () => {
@@ -855,7 +810,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // Cleanup chat on page unload
     window.addEventListener('beforeunload', () => {
         if (currentUserId && chatRoomActive) {
             onlineUsersRef.child(currentUserId).remove();
