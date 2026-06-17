@@ -58,7 +58,12 @@
                 </div>
             </div>
         </div>
-        <div class="sidebar-footer">💰 Summary Insentif PIC<br>© <span id="year"></span> ASLAP SPPG JATIAN</div>
+        <div class="sidebar-footer">
+    <a href="http://portalsppgjatian.my.id/" target="_blank" rel="noopener noreferrer" class="sidebar-insentif-btn">
+        💰 Summary Insentif PIC
+    </a>
+    <div class="sidebar-copyright">© <span id="year"></span> ASLAP SPPG JATIAN</div>
+</div>
     </div>
 
     <!-- Sticky Header -->
@@ -287,30 +292,30 @@
             return isOnline;
         }
 
-        async function joinRedzone() {
-            const nameInput = document.getElementById('chatNameInput');
-            let name = nameInput.value.trim();
-            if (!name) { alert('Silakan masukkan nama Anda.'); return; }
-            const validation = validateName(name);
-            if (!validation.valid) { alert(validation.msg); return; }
+        window.joinRedzone = async function() {
+    const nameInput = document.getElementById('chatNameInput');
+    let name = nameInput.value.trim();
+    if (!name) { alert('Silakan masukkan nama Anda.'); return; }
+    const validation = validateName(name);
+    if (!validation.valid) { alert(validation.msg); return; }
 
-            if (name === '31') {
-                const isAdminOnline = await isNameOnline('ADMIN');
-                if (isAdminOnline) { alert("ADMIN sedang aktif."); return; }
-                currentUser = { uid: generateUID(), name: 'ADMIN', isAdmin: true };
-            } else {
-                const isOnline = await isNameOnline(name);
-                if (isOnline) { alert("Nama tersebut sedang digunakan oleh pengguna lain. Silakan gunakan nama yang berbeda."); return; }
-                currentUser = { uid: generateUID(), name: name, isAdmin: false };
-            }
+    if (name === '31') {
+        const isAdminOnline = await isNameOnline('ADMIN');
+        if (isAdminOnline) { alert("ADMIN sedang aktif."); return; }
+        currentUser = { uid: generateUID(), name: 'ADMIN', isAdmin: true };
+    } else {
+        const isOnline = await isNameOnline(name);
+        if (isOnline) { alert("Nama tersebut sedang digunakan oleh pengguna lain. Silakan gunakan nama yang berbeda."); return; }
+        currentUser = { uid: generateUID(), name: name, isAdmin: false };
+    }
 
-            localStorage.setItem('redzone_user', JSON.stringify(currentUser));
-            document.getElementById('chatNameForm').style.display = 'none';
-            document.getElementById('chatRoom').style.display = 'flex';
-            document.getElementById('currentUserName').textContent = currentUser.name;
-            await registerOnline();
-            startListeners();
-        }
+    localStorage.setItem('redzone_user', JSON.stringify(currentUser));
+    document.getElementById('chatNameForm').style.display = 'none';
+    document.getElementById('chatRoom').style.display = 'flex';
+    document.getElementById('currentUserName').textContent = currentUser.name;
+    await registerOnline();
+    startListeners();
+}
 
         async function registerOnline() {
             const userDoc = doc(db, "users_online", currentUser.uid);
