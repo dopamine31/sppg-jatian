@@ -17,8 +17,7 @@
         </div>
         <div class="sidebar-nav">
             <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">🏠</span> Beranda</button>
-            <button class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📢</span> Info & Pengumuman</button>
-            <button class="sidebar-menu-btn" onclick="showSection('memo')"><span class="menu-icon">📝</span> Memo & Catatan</button>
+            <button class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📢</span> Papan Informasi & Memo</button>
             <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
             <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">🍱</span> Menu Mingguan</button>
             <button class="sidebar-menu-btn" onclick="showSection('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</button>
@@ -90,26 +89,16 @@
             </div>
         </div>
 
+        <!-- SECTION INFO & MEMO DIGABUNG MENJADI SATU -->
         <div id="section-info" class="content-section" style="display: none;">
             <div class="section-header">
                 <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>📢 Info & Pengumuman</h2>
+                <h2>📢 Papan Informasi & Memo</h2>
             </div>
             <div class="search-box">
-                <input type="text" id="searchInfoPengumuman" placeholder="🔍 Cari pengumuman...">
+                <input type="text" id="searchInfoPengumuman" placeholder="🔍 Cari pengumuman, memo, atau catatan...">
             </div>
             <div class="info-board" id="infoPengumumanBoard">⏳ Memuat informasi...</div>
-        </div>
-
-        <div id="section-memo" class="content-section" style="display: none;">
-            <div class="section-header">
-                <button class="back-btn" onclick="showHome()">← Beranda</button>
-                <h2>📝 Memo & Catatan</h2>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchMemoCatatan" placeholder="🔍 Cari memo atau catatan...">
-            </div>
-            <div class="info-board" id="memoCatatanBoard">⏳ Memuat informasi...</div>
         </div>
 
         <div id="section-rute" class="content-section" style="display: none;">
@@ -205,7 +194,6 @@
         </button>
 
         <div class="chat-window" id="chatWindow" style="display:none;">
-            <!-- Form Nama -->
             <div class="chat-name-form" id="chatNameForm">
                 <div class="chat-header">
                     <h3>💬 Live Chat</h3>
@@ -221,7 +209,6 @@
                 </div>
             </div>
 
-            <!-- Room Chat -->
             <div class="chat-room" id="chatRoom" style="display:none;">
                 <div class="chat-header">
                     <div class="chat-header-info">
@@ -273,6 +260,19 @@
             messagesLoaded: false
         };
 
+        function getNameColor(name) {
+            const gradients = [
+                'linear-gradient(135deg, #ec4899 0%, #be185d 100%)', 'linear-gradient(135deg, #d946ef 0%, #a21caf 100%)',
+                'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+                'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
+                'linear-gradient(135deg, #f43f5e 0%, #be123c 100%)', 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)',
+                'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', 'linear-gradient(135deg, #f97316 0%, #c2410c 100%)'
+            ];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+            return gradients[Math.abs(hash) % gradients.length];
+        }
+
         window.toggleChat = function() {
             chatState.isOpen = !chatState.isOpen;
             const chatWindow = document.getElementById('chatWindow');
@@ -284,18 +284,10 @@
                 chatBadge.style.display = 'none';
                 chatState.hasNewMessage = false;
                 chatToggleIcon.className = 'fas fa-times';
-
                 if (!chatState.userName) {
-                    setTimeout(() => {
-                        const nameInput = document.getElementById('chatNameInput');
-                        if (nameInput) nameInput.focus();
-                    }, 100);
+                    setTimeout(() => { const nameInput = document.getElementById('chatNameInput'); if (nameInput) nameInput.focus(); }, 100);
                 } else {
-                    setTimeout(() => {
-                        const chatInput = document.getElementById('chatInput');
-                        if (chatInput) chatInput.focus();
-                        scrollToBottom();
-                    }, 100);
+                    setTimeout(() => { const chatInput = document.getElementById('chatInput'); if (chatInput) chatInput.focus(); scrollToBottom(); }, 100);
                 }
             } else {
                 chatWindow.style.display = 'none';
@@ -313,7 +305,6 @@
                 return;
             }
 
-            // LOGIKA ADMIN: Jika ketik "31", otomatis jadi ADMIN
             if (name === '31') {
                 chatState.userName = 'ADMIN';
                 chatState.isAdmin = true;
@@ -334,15 +325,8 @@
                 userLabel.style.color = '#f9a8d4';
             }
 
-            setTimeout(() => {
-                document.getElementById('chatInput').focus();
-                scrollToBottom();
-            }, 100);
-
-            if (!chatState.messagesLoaded) {
-                loadMessages();
-                chatState.messagesLoaded = true;
-            }
+            setTimeout(() => { document.getElementById('chatInput').focus(); scrollToBottom(); }, 100);
+            if (!chatState.messagesLoaded) { loadMessages(); chatState.messagesLoaded = true; }
         };
 
         window.sendMessage = function() {
@@ -350,26 +334,18 @@
             const text = input.value.trim();
             if (!text || !chatState.userName) return;
 
-            const messageData = {
+            push(messagesRef, {
                 sender: chatState.userName,
                 isAdmin: chatState.isAdmin,
                 sessionId: chatState.sessionId,
                 text: text,
                 timestamp: Date.now()
-            };
-
-            push(messagesRef, messageData)
-                .then(() => {
-                    input.value = '';
-                    input.focus();
-                })
-                .catch(err => console.error('Error sending message:', err));
+            }).then(() => { input.value = ''; input.focus(); }).catch(err => console.error('Error:', err));
         };
 
         function loadMessages() {
             const messagesContainer = document.getElementById('chatMessages');
             messagesContainer.innerHTML = '<div class="chat-loading">⏳ Memuat pesan...</div>';
-
             onChildAdded(messagesRef, (snapshot) => {
                 const msg = snapshot.val();
                 if (!msg) return;
@@ -387,19 +363,14 @@
 
             const msgEl = document.createElement('div');
             msgEl.className = 'chat-message';
-
-            if (isSelf) {
-                msgEl.classList.add('chat-message-self');
-            } else if (isAdmin) {
-                msgEl.classList.add('chat-message-admin');
-            } else {
-                msgEl.classList.add('chat-message-other');
-            }
+            if (isSelf) msgEl.classList.add('chat-message-self');
+            else msgEl.classList.add('chat-message-other');
 
             const senderEl = document.createElement('div');
             senderEl.className = 'chat-message-sender';
             if (isAdmin) {
                 senderEl.innerHTML = '🛡️ <strong>' + escapeHtml(msg.sender) + '</strong>';
+                senderEl.style.color = '#ff69b4';
             } else {
                 senderEl.innerHTML = '<strong>' + escapeHtml(msg.sender || 'Anonim') + '</strong>';
             }
@@ -407,6 +378,15 @@
             const bubbleEl = document.createElement('div');
             bubbleEl.className = 'chat-message-bubble';
             bubbleEl.textContent = msg.text || '';
+            
+            if (isAdmin) {
+                bubbleEl.style.background = 'linear-gradient(135deg, #ff1493 0%, #c71585 100%)';
+                bubbleEl.style.boxShadow = '0 0 15px rgba(255, 20, 147, 0.5)';
+                bubbleEl.style.border = '1px solid #ff69b4';
+            } else {
+                bubbleEl.style.background = getNameColor(msg.sender || 'Anonim');
+                bubbleEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+            }
 
             const timeEl = document.createElement('div');
             timeEl.className = 'chat-message-time';
@@ -417,10 +397,8 @@
             msgEl.appendChild(bubbleEl);
             msgEl.appendChild(timeEl);
             messagesContainer.appendChild(msgEl);
-
             scrollToBottom();
 
-            // Tampilkan badge notifikasi jika chat tertutup dan pesan bukan dari diri sendiri
             if (!chatState.isOpen && !isSelf) {
                 chatState.hasNewMessage = true;
                 const chatBadge = document.getElementById('chatBadge');
@@ -432,10 +410,7 @@
             const messagesContainer = document.getElementById('chatMessages');
             if (messagesContainer) {
                 setTimeout(() => {
-                    messagesContainer.scrollTo({
-                        top: messagesContainer.scrollHeight,
-                        behavior: 'smooth'
-                    });
+                    messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
                 }, 50);
             }
         }
@@ -449,13 +424,8 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                if (document.activeElement?.id === 'chatInput') {
-                    e.preventDefault();
-                    sendMessage();
-                } else if (document.activeElement?.id === 'chatNameInput') {
-                    e.preventDefault();
-                    startChat();
-                }
+                if (document.activeElement?.id === 'chatInput') { e.preventDefault(); sendMessage(); }
+                else if (document.activeElement?.id === 'chatNameInput') { e.preventDefault(); startChat(); }
             }
         });
     </script>
