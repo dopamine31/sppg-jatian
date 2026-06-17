@@ -606,6 +606,7 @@ td a:hover { text-decoration: underline; color: #ec4899; }
 .chat-header h3 { margin: 0; font-size: 16px; font-weight: 900; }
 .chat-header-info { display: flex; flex-direction: column; gap: 4px; }
 .chat-header-meta { display: flex; align-items: center; gap: 10px; font-size: 11px; }
+.chat-header-actions { display: flex; align-items: center; gap: 8px; }
 .chat-user-label { font-weight: 700; color: #fce7f3; }
 
 /* ===== ONLINE INDICATOR ===== */
@@ -623,6 +624,15 @@ td a:hover { text-decoration: underline; color: #ec4899; }
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.2); }
 }
+
+/* ===== CHANGE NAME BUTTON ===== */
+.chat-change-name-btn {
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+    font-size: 14px; transition: all 0.3s ease;
+    display: flex; align-items: center; justify-content: center;
+}
+.chat-change-name-btn:hover { background: rgba(255,255,255,0.35); transform: scale(1.1); }
 
 .chat-close-btn {
     background: rgba(0,0,0,0.3); border: none; color: #fff;
@@ -696,10 +706,10 @@ td a:hover { text-decoration: underline; color: #ec4899; }
 .chat-message-self .chat-message-time { text-align: right; }
 .chat-message-admin { align-self: flex-start; align-items: flex-start; }
 .chat-message-admin .chat-message-bubble {
-    background: linear-gradient(135deg, #7c1d6f 0%, #4a0e4e 100%) !important;
+    background: linear-gradient(135deg, #ff1493 0%, #c71585 100%) !important;
     color: #fff; border-bottom-left-radius: 4px;
-    border: 1px solid #fbbf24;
-    box-shadow: 0 2px 12px rgba(251, 191, 36, 0.3);
+    border: 1px solid #ff69b4;
+    box-shadow: 0 2px 12px rgba(255, 20, 147, 0.4);
 }
 .chat-message-other { align-self: flex-start; align-items: flex-start; }
 .chat-message-other .chat-message-bubble {
@@ -727,24 +737,6 @@ td a:hover { text-decoration: underline; color: #ec4899; }
 }
 .chat-send-btn:hover { transform: scale(1.15) rotate(-15deg); box-shadow: 0 4px 15px rgba(236, 72, 153, 0.6); }
 .chat-send-btn:active { transform: scale(0.95); }
-
-/* ===== MASCOT ===== */
-.mascot-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; cursor: pointer; transition: all 0.3s ease; }
-.mascot-container:hover { transform: scale(1.1); }
-.mascot-body { position: relative; width: 100px; height: 100px; animation: bounce 2s ease-in-out infinite; }
-.mascot-head { width: 60px; height: 50px; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); border-radius: 50% 50% 45% 45%; position: absolute; top: 10px; left: 20px; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3); }
-.mascot-eye { width: 10px; height: 10px; background: #000; border-radius: 50%; position: absolute; top: 15px; animation: blink 4s ease-in-out infinite; }
-.mascot-eye.left { left: 12px; } .mascot-eye.right { right: 12px; }
-@keyframes blink { 0%, 96%, 100% { transform: scaleY(1); } 98% { transform: scaleY(0.1); } }
-.mascot-mouth { width: 20px; height: 8px; background: #000; border-radius: 0 0 10px 10px; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); }
-.mascot-tail { width: 30px; height: 20px; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); border-radius: 50%; position: absolute; bottom: 20px; right: 0; transform: rotate(-30deg); }
-.mascot-leg { width: 12px; height: 25px; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); border-radius: 6px; position: absolute; bottom: 0; }
-.mascot-leg.left { left: 25px; } .mascot-leg.right { right: 25px; }
-.mascot-speech { position: absolute; top: -40px; left: 0; background: #000; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; white-space: nowrap; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1001; }
-.mascot-speech.show { opacity: 1; transform: translateY(0); }
-.mascot-speech::after { content: ''; position: absolute; bottom: -8px; left: 20px; border-width: 8px 8px 0; border-style: solid; border-color: #000 transparent; }
-.mascot-counter { position: absolute; top: -10px; right: -10px; background: #ff1493; color: #fff; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s; z-index: 1001; }
-.mascot-counter.show { opacity: 1; }
 
 /* ===== FOOTER ===== */
 .footer { background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); padding: 25px; border-radius: 15px; text-align: center; color: #ffd6e7; box-shadow: 0 5px 20px rgba(0,0,0,0.3); border: 2px solid #ec4899; margin-top: 20px; }
@@ -779,7 +771,4 @@ td a:hover { text-decoration: underline; color: #ec4899; }
     .chat-toggle-btn { width: 60px; height: 60px; font-size: 24px; }
     .chat-window { width: 100%; height: 85vh; position: fixed; bottom: 0; right: 0; left: 0; border-radius: 15px 15px 0 0; max-width: 100vw; }
     .chat-message { max-width: 85%; }
-    
-    .mascot-container { bottom: 10px; left: 10px; }
-    .mascot-body { width: 80px; height: 80px; }
 }
