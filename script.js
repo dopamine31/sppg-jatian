@@ -1,3 +1,21 @@
+// ===== FIREBASE CONFIGURATION =====
+const firebaseConfig = {
+    apiKey: "AIzaSyBBTmEXeyfgE-DKg73OmkgroBtp1_NLAOU",
+    authDomain: "chat-portal-67948.firebaseapp.com",
+    databaseURL: "https://chat-portal-67948-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "chat-portal-67948",
+    storageBucket: "chat-portal-67948.firebasestorage.app",
+    messagingSenderId: "536843661380",
+    appId: "1:536843661380:web:4eae78f035d0d21eb4cc11"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const chatMessagesRef = db.ref('portal_chat/messages');
+const onlineUsersRef = db.ref('portal_chat/onlineUsers');
+
+// ===== GOOGLE SHEETS URLS =====
 const SHEET_URLS = {
     sekolah: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=0&single=true&output=csv',
     relawan: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS6sp9uAC1QfKdtfMAZfRQeeMqhVOCTc13xMc3YlVQepkuK3XKjTjvrr7t1vWtbV8EoYtrMXrwqTDTF/pub?gid=1957179512&single=true&output=csv',
@@ -20,10 +38,10 @@ let currentFilter = 'all';
 let currentInfoFilter = 'all';
 let currentMenuFilter = 'all';
 
-const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job! ", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
-const easterEggPhrases = [" Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇩", "Kamu luar biasa! ", "Rahasia: Dino suka nasi padang 🍛"];
+const mascotPhrases = ["Halo! 👋", "Semangat! 💪", "Keren! ⭐", "Lanjut! 🚀", "Good job! 👍", "Yuk lihat! 👀", "Mantap! 🔥", "Sip! ✅"];
+const easterEggPhrases = ["🎉 Easter Egg!", "Jangan lupa minum air ya 😁", "Semangat distribusi!", "Terima kasih 🇮🇩", "Kamu luar biasa! 💖", "Rahasia: Dino suka nasi padang 🍛"];
 
-// ===== PIN & SECURITY SYSTEM =====
+// ===== PIN & SECURITY SYSTEM (PIN = 31) =====
 function checkAuth() {
     return sessionStorage.getItem('isAuthenticated') === 'true';
 }
@@ -40,12 +58,16 @@ function hidePINModal() {
 
 function verifyPIN() {
     const input = document.getElementById('pinInput').value;
-    if (input === '2024') {
+    if (input === '31') {
         sessionStorage.setItem('isAuthenticated', 'true');
         hidePINModal();
-        alert('✅ Akses diberikan! Fitur terkunci telah dibuka.');
+        alert('✅ Akses diberikan! Anda sekarang adalah Admin.');
         loadRelawan();
         loadSekolah();
+        // Update chat admin status jika sedang di chat
+        if (chatUserName && chatRoomActive) {
+            updateUserPresence();
+        }
     } else {
         alert('❌ PIN salah! Silakan coba lagi.');
         document.getElementById('pinInput').value = '';
@@ -72,6 +94,35 @@ function checkAndShow(sectionName) {
         return;
     }
     showSection(sectionName);
+}
+
+// ===== COLOR GENERATION FROM NAME =====
+function nameToColor(name) {
+    if (!name) return 'hsl(330, 65%, 55%)';
+    let hash = 0;
+    const str = name.toLowerCase().trim();
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    const hue = Math.abs(hash % 360);
+    const saturation = 60 + (Math.abs(hash >> 8) % 20); // 60-80%
+    const lightness = 55 + (Math.abs(hash >> 16) % 15); // 55-70%
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+function nameToDarkColor(name) {
+    if (!name) return 'hsl(330, 55%, 35%)';
+    let hash = 0;
+    const str = name.toLowerCase().trim();
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    const hue = Math.abs(hash % 360);
+    const saturation = 50 + (Math.abs(hash >> 8) % 20);
+    const lightness = 30 + (Math.abs(hash >> 16) % 15);
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 // ===== SIDEBAR & ACCORDION =====
@@ -257,7 +308,7 @@ async function loadKontak() {
     const container = document.getElementById('cardKontak'); if (!container) return; 
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
     const data = await fetchSheetData(SHEET_URLS.kontak); 
-    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">️ Data tidak tersedia</p>'; return; }
+    if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
         const waNumber = cleanWA(row['Nomor WA']); 
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">Tidak ada</span>';
@@ -300,7 +351,7 @@ async function loadDokumen() {
     const searchTerm = document.getElementById('searchDokumen')?.value.toLowerCase() || '';
     const searchedData = filteredData.filter(doc => doc['Judul']?.toLowerCase().includes(searchTerm) || doc['Deskripsi']?.toLowerCase().includes(searchTerm));
     
-    const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '', internal: '📁' };
+    const icons = { sop: '📋', template: '📝', form: '📊', sk: '📜', panduan: '📖', internal: '📁' };
     
     grid.innerHTML = searchedData.map((doc) => {
         const category = doc['Kategori']?.toLowerCase() || 'internal';
@@ -379,7 +430,7 @@ function renderInfoBoard() {
         const tanggal = item['Tanggal'] ? new Date(item['Tanggal']).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
         const isNew = item['Baru']?.toLowerCase() === 'ya' || item['New']?.toLowerCase() === 'yes';
         const itemId = `info-content-${idx}`;
-        const kategoriLabel = { pengumuman: ' Pengumuman', memo: '📝 Memo', catatan: '📒 Catatan', penting: '️ Info Penting', update: '🔄 Update' }[kategori] || kategori;
+        const kategoriLabel = { pengumuman: '📢 Pengumuman', memo: '📝 Memo', catatan: '📒 Catatan', penting: '⚠️ Info Penting', update: '🔄 Update' }[kategori] || kategori;
         const prioritasLabel = { mendesak: '🔥 Mendesak', penting: '⚡ Penting', normal: '✅ Normal' }[prioritas] || '✅ Normal';
         const contentFormatted = formatInfoContent(isi); const isLong = isi.length > 400;
         const shareText = encodeURIComponent(`*${item['Judul']}*\n\n${isi}\n\n— ${penulis} (${tanggal})\n_Dari Portal ASLAP SPPG JATIAN_`);
@@ -418,9 +469,9 @@ async function loadMenuWeekly() {
             const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
             return days[d.getDay()] === currentMenuFilter;
         }); }
-        if (displayDates.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon"></div><h3>Tidak ada menu</h3></div>'; return; }
+        if (displayDates.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📭</div><h3>Tidak ada menu</h3></div>'; return; }
         displayDates.sort((a, b) => new Date(a) - new Date(b));
-        const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '', 'minggu': '☀️' };
+        const icons = { 'senin': '🌟', 'selasa': '🔥', 'rabu': '💎', 'kamis': '🌸', 'jumat': '🕌', 'sabtu': '🌈', 'minggu': '☀️' };
         
         container.innerHTML = displayDates.map(date => {
             const info = menuByDate[date];
@@ -438,7 +489,7 @@ function renderMenuWeekly() { loadMenuWeekly(); }
 
 async function loadRuteDistribusi() {
     const container = document.getElementById('ruteContent'); if (!container) return;
-    container.innerHTML = '<p style="text-align:center;padding:40px;"> Memuat data rute...</p>';
+    container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat data rute...</p>';
     try {
         const data = await fetchSheetData(SHEET_URLS.rute);
         if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">🚚</div><h3>Belum ada data rute</h3></div>'; return; }
@@ -449,12 +500,12 @@ async function loadRuteDistribusi() {
         const grandTotal = { pk: totalSelatan.pk + totalUtara.pk, pb: totalSelatan.pb + totalUtara.pb, total: totalSelatan.total + totalUtara.total };
         const renderTable = (rows) => rows.map(row => `<tr><td><strong>${escapeHtml(row['Sekolah'])}</strong></td><td class="center">${row['PK'] || 0}</td><td class="center">${row['PB'] || 0}</td><td class="center"><strong>${row['Total'] || 0}</strong></td></tr>`).join('');
         
-        container.innerHTML = `<div class="rute-summary-grid"><div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div><div class="rute-summary-card north"><h3> Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div></div><div class="rute-tables-grid"><div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div><div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div></div><div class="rute-total-box"><h3>📊 TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
+        container.innerHTML = `<div class="rute-summary-grid"><div class="rute-summary-card south"><h3>🚌 Jalur Selatan</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalSelatan.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalSelatan.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalSelatan.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalSelatan.total}</span></div></div><div class="rute-summary-card north"><h3>🚐 Jalur Utara</h3><div class="rute-summary-stats"><div class="rute-summary-stat"><span class="label">Sekolah</span><span class="value">${totalUtara.sekolah}</span></div><div class="rute-summary-stat"><span class="label">Total PK</span><span class="value">${totalUtara.pk}</span></div><div class="rute-summary-stat"><span class="label">Total PB</span><span class="value">${totalUtara.pb}</span></div></div><div class="rute-summary-grand"><span class="label">Grand Total</span><span class="value">${totalUtara.total}</span></div></div></div><div class="rute-tables-grid"><div class="rute-table-wrapper south"><table class="rute-table"><thead><tr><th colspan="4">🚌 Distribusi Jalur Selatan</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(selatan)}</tbody><tfoot><tr><td>TOTAL SELATAN</td><td class="center">${totalSelatan.pk}</td><td class="center">${totalSelatan.pb}</td><td class="center">${totalSelatan.total}</td></tr></tfoot></table></div><div class="rute-table-wrapper north"><table class="rute-table"><thead><tr><th colspan="4">🚐 Distribusi Jalur Utara</th></tr><tr><th>Sekolah</th><th class="center">PK</th><th class="center">PB</th><th class="center">Total</th></tr></thead><tbody>${renderTable(utara)}</tbody><tfoot><tr><td>TOTAL UTARA</td><td class="center">${totalUtara.pk}</td><td class="center">${totalUtara.pb}</td><td class="center">${totalUtara.total}</td></tr></tfoot></table></div></div><div class="rute-total-box"><h3>📊 TOTAL KESELURUHAN</h3><div class="rute-total-stats"><div class="rute-total-item"><span class="rute-total-label">Total PK</span><span class="rute-total-value">${grandTotal.pk}</span></div><div class="rute-total-item"><span class="rute-total-label">Total PB</span><span class="rute-total-value">${grandTotal.pb}</span></div><div class="rute-total-item"><span class="rute-total-label">Grand Total</span><span class="rute-total-value">${grandTotal.total}</span></div></div></div>`;
     } catch (error) { console.error('Error loading rute:', error); container.innerHTML = '<p style="text-align:center;padding:40px;color:#dc3545;">⚠️ Gagal memuat data rute</p>'; }
 }
 
 async function loadQuote() { const data = await fetchSheetData(SHEET_URLS.quote); if (data.length > 0) { const random = data[Math.floor(Math.random() * data.length)]; document.getElementById('quoteText').textContent = `❝ ${random['Quote'] || random[Object.keys(random)[0]]} ❞`; } }
-async function loadPengumuman() { const data = await fetchSheetData(SHEET_URLS.pengumuman); document.getElementById('runningText').textContent = data.length === 0 ? 'Tidak ada pengumuman.' : data.map(r => ` ${r['Judul'] || ''}: ${r['Isi'] || ''}`).join('   •   '); }
+async function loadPengumuman() { const data = await fetchSheetData(SHEET_URLS.pengumuman); document.getElementById('runningText').textContent = data.length === 0 ? 'Tidak ada pengumuman.' : data.map(r => `📢 ${r['Judul'] || ''}: ${r['Isi'] || ''}`).join('   •   '); }
 async function loadAgenda() {
     const data = await fetchSheetData(SHEET_URLS.agenda); const agendaList = document.getElementById('agendaList');
     if (data.length === 0) { agendaList.innerHTML = '<p>Tidak ada agenda.</p>'; return; }
@@ -466,110 +517,259 @@ async function loadBirthday() {
     const today = new Date(); const todayMonth = today.getMonth() + 1; const todayDay = today.getDate();
     const birthdayPersons = data.filter(row => { const tglLahir = row['Tanggal Lahir']; if (!tglLahir) return false; const date = new Date(tglLahir); return (date.getMonth() + 1) === todayMonth && date.getDate() === todayDay; });
     if (birthdayPersons.length > 0) {
-        const names = birthdayPersons.map(p => p['Nama']).join(', '); document.getElementById('birthdayText').textContent = ` ${names} 🎈`;
+        const names = birthdayPersons.map(p => p['Nama']).join(', '); document.getElementById('birthdayText').textContent = `🎈 ${names} 🎈`;
         const firstPerson = birthdayPersons[0]; const waNumber = cleanWA(firstPerson['Nomor WA']);
         if (waNumber) { const message = encodeURIComponent(`Halo ${firstPerson['Nama']}! 🎉 Selamat ulang tahun! Semoga sehat selalu. - Dari SPPG Jatian`); document.getElementById('birthdayWaLink').href = `https://wa.me/${waNumber}?text=${message}`; document.getElementById('birthdayCard').style.display = 'flex'; }
     }
 }
 
-// ===== LIVE CHAT SYSTEM =====
+// =====================================================================
+// ===== FIREBASE REAL-TIME CHAT ROOM SYSTEM =====
+// =====================================================================
+
 let chatUserName = localStorage.getItem('chatUserName') || '';
+let userColor = '';
+let chatRoomActive = false;
+let chatListenersAttached = false;
+let currentUserId = '';
 
 function toggleChat() {
     const chatWindow = document.getElementById('chatWindow');
     if (chatWindow.style.display === 'none') {
         chatWindow.style.display = 'flex';
         if (chatUserName) {
-            document.getElementById('chatNameForm').style.display = 'none';
-            document.getElementById('chatRoom').style.display = 'flex';
-            document.getElementById('chatUserLabel').textContent = chatUserName;
-            loadChatMessages();
+            enterChatRoom();
         } else {
             document.getElementById('chatNameForm').style.display = 'flex';
             document.getElementById('chatRoom').style.display = 'none';
         }
     } else {
         chatWindow.style.display = 'none';
+        if (chatRoomActive) {
+            leaveChatRoom();
+        }
     }
 }
 
 function startChat() {
-    const nameInput = document.getElementById('chatNameInput').value.trim();
-    if (nameInput) {
-        chatUserName = nameInput;
-        localStorage.setItem('chatUserName', chatUserName);
-        document.getElementById('chatNameForm').style.display = 'none';
-        document.getElementById('chatRoom').style.display = 'flex';
-        document.getElementById('chatUserLabel').textContent = chatUserName;
-        loadChatMessages();
-    } else {
+    const nameInput = document.getElementById('chatNameInput');
+    const name = nameInput.value.trim();
+    
+    if (!name) {
         alert('Silakan masukkan nama Anda terlebih dahulu.');
+        return;
+    }
+    
+    if (name.length < 2) {
+        alert('Nama minimal 2 karakter.');
+        return;
+    }
+    
+    chatUserName = name;
+    userColor = nameToColor(name);
+    currentUserId = name.replace(/\s+/g, '_').toLowerCase() + '_' + Date.now();
+    localStorage.setItem('chatUserName', chatUserName);
+    
+    enterChatRoom();
+}
+
+function enterChatRoom() {
+    if (!chatUserName) return;
+    
+    userColor = nameToColor(chatUserName);
+    currentUserId = chatUserName.replace(/\s+/g, '_').toLowerCase() + '_' + localStorage.getItem('chatSessionId');
+    
+    if (!localStorage.getItem('chatSessionId')) {
+        localStorage.setItem('chatSessionId', Date.now().toString());
+        currentUserId = chatUserName.replace(/\s+/g, '_').toLowerCase() + '_' + localStorage.getItem('chatSessionId');
+    }
+    
+    document.getElementById('chatNameForm').style.display = 'none';
+    document.getElementById('chatRoom').style.display = 'flex';
+    document.getElementById('chatUserLabel').textContent = chatUserName;
+    document.getElementById('chatUserLabel').style.color = userColor;
+    
+    chatRoomActive = true;
+    
+    // Setup Firebase listeners
+    setupChatListeners();
+    
+    // Set user online
+    updateUserPresence();
+    
+    // Focus on input
+    document.getElementById('chatMessageInput').focus();
+}
+
+function leaveChatRoom() {
+    chatRoomActive = false;
+    
+    // Remove user from online list
+    if (currentUserId) {
+        onlineUsersRef.child(currentUserId).remove();
+    }
+    
+    // Detach listeners
+    detachChatListeners();
+}
+
+function updateUserPresence() {
+    if (!chatUserName || !currentUserId) return;
+    
+    const userRef = onlineUsersRef.child(currentUserId);
+    const userData = {
+        name: chatUserName,
+        color: userColor,
+        isAdmin: checkAuth(),
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+    };
+    
+    userRef.set(userData);
+    
+    // Remove user when disconnect
+    userRef.onDisconnect().remove();
+}
+
+function setupChatListeners() {
+    if (chatListenersAttached) return;
+    
+    // Clear existing messages
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.innerHTML = '';
+    
+    // Add system message
+    addSystemMessage('🔗 Terhubung ke Room Chat SPPG Jatian');
+    
+    // Listen for new messages (last 50)
+    chatMessagesRef.limitToLast(50).on('child_added', (snapshot) => {
+        const message = snapshot.val();
+        if (message) {
+            appendMessage(message);
+        }
+    });
+    
+    // Listen for online users
+    onlineUsersRef.on('value', (snapshot) => {
+        const users = snapshot.val() || {};
+        const count = Object.keys(users).length;
+        document.getElementById('onlineCount').textContent = count;
+    });
+    
+    chatListenersAttached = true;
+}
+
+function detachChatListeners() {
+    if (!chatListenersAttached) return;
+    
+    chatMessagesRef.off();
+    onlineUsersRef.off();
+    
+    chatListenersAttached = false;
+}
+
+function addSystemMessage(text) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-system-msg';
+    msgDiv.textContent = text;
+    messagesContainer.appendChild(msgDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function appendMessage(message) {
+    const messagesContainer = document.getElementById('chatMessages');
+    
+    // Remove loading message if exists
+    const loading = messagesContainer.querySelector('.chat-loading');
+    if (loading) loading.remove();
+    
+    const isSelf = message.sender === chatUserName;
+    const isAdmin = message.isAdmin === true;
+    
+    let msgClass = 'chat-message-other';
+    if (isAdmin) {
+        msgClass = 'chat-message-admin';
+    } else if (isSelf) {
+        msgClass = 'chat-message-self';
+    }
+    
+    const msgColor = message.color || nameToColor(message.sender);
+    const bubbleColor = isSelf ? nameToDarkColor(message.sender) : (isAdmin ? '' : '#2d2d2d');
+    
+    const timeStr = message.timestamp ? formatTimestamp(message.timestamp) : '';
+    
+    const senderNameHtml = isAdmin 
+        ? `${escapeHtml(message.sender)} <span class="admin-badge">👑 ADMIN</span>`
+        : escapeHtml(message.sender);
+    
+    const msgHTML = `
+        <div class="chat-message ${msgClass}">
+            <div class="chat-message-sender" style="color: ${msgColor};">
+                ${senderNameHtml}
+            </div>
+            <div class="chat-message-bubble" ${!isAdmin && isSelf ? `style="background: ${bubbleColor}; color: #fff;"` : ''}>
+                ${escapeHtml(message.text)}
+            </div>
+            <div class="chat-message-time">${timeStr}</div>
+        </div>
+    `;
+    
+    messagesContainer.insertAdjacentHTML('beforeend', msgHTML);
+    
+    // Auto-scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Show badge on toggle button if chat is hidden
+    const chatWindow = document.getElementById('chatWindow');
+    if (chatWindow.style.display === 'none' && !isSelf) {
+        const badge = document.getElementById('chatBadge');
+        badge.classList.add('show');
+        setTimeout(() => badge.classList.remove('show'), 3000);
     }
 }
 
-function loadChatMessages() {
-    const messagesContainer = document.getElementById('chatMessages');
-    messagesContainer.innerHTML = '<div class="chat-loading">⏳ Memuat pesan...</div>';
-    setTimeout(() => {
-        let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-        if (messages.length === 0) {
-            messages = [{ sender: 'Admin', text: 'Selamat datang di Live Chat SPPG Jatian! Ada yang bisa kami bantu?', time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}), isAdmin: true }];
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
-        }
-        renderMessages(messages);
-    }, 500);
-}
-
-function renderMessages(messages) {
-    const messagesContainer = document.getElementById('chatMessages');
-    messagesContainer.innerHTML = '';
-    messages.forEach(msg => {
-        const isSelf = msg.sender === chatUserName;
-        const msgClass = msg.isAdmin ? 'chat-message-admin' : (isSelf ? 'chat-message-self' : 'chat-message-other');
-        const senderName = msg.isAdmin ? '👑 Admin' : msg.sender;
-        
-        const msgHTML = `
-            <div class="chat-message ${msgClass}">
-                <div class="chat-message-sender">${senderName}</div>
-                <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
-                <div class="chat-message-time">${msg.time}</div>
-            </div>
-        `;
-        messagesContainer.innerHTML += msgHTML;
-    });
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    
+    const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    
+    if (isToday) {
+        return timeStr;
+    } else {
+        return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + timeStr;
+    }
 }
 
 function sendMessage() {
     const input = document.getElementById('chatMessageInput');
     const text = input.value.trim();
+    
     if (!text) return;
     
-    let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-    const newMsg = {
+    if (!chatUserName) {
+        alert('Silakan masukkan nama terlebih dahulu.');
+        return;
+    }
+    
+    const messageData = {
         sender: chatUserName,
         text: text,
-        time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
-        isAdmin: false
+        color: userColor,
+        isAdmin: checkAuth(),
+        timestamp: firebase.database.ServerValue.TIMESTAMP
     };
-    messages.push(newMsg);
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
     
-    input.value = '';
-    renderMessages(messages);
-    
-    setTimeout(() => {
-        let currentMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-        const replyMsg = {
-            sender: 'Admin',
-            text: 'Terima kasih atas pesan Anda. Tim kami akan segera membalas.',
-            time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
-            isAdmin: true
-        };
-        currentMessages.push(replyMsg);
-        localStorage.setItem('chatMessages', JSON.stringify(currentMessages));
-        renderMessages(currentMessages);
-    }, 2000);
+    chatMessagesRef.push(messageData)
+        .then(() => {
+            input.value = '';
+            input.focus();
+        })
+        .catch((error) => {
+            console.error('Error sending message:', error);
+            alert('Gagal mengirim pesan. Silakan coba lagi.');
+        });
 }
 
 // ===== INIT =====
@@ -600,9 +800,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Buka accordion pertama secara default
     const firstAccordion = document.querySelector('.accordion-header');
     if (firstAccordion) toggleAccordion(firstAccordion);
 
+    // Handle External Link (Summary Insentif) dengan PIN Check
     document.querySelectorAll('.external-link').forEach(link => {
         link.addEventListener('click', (e) => {
             if (!checkAuth()) {
@@ -612,10 +814,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // Handle Enter key on PIN input
     document.getElementById('pinInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verifyPIN();
     });
     
+    // Download PNG Feature
     const btnDownload = document.getElementById('btnDownloadRute');
     if (btnDownload) {
         btnDownload.addEventListener('click', async () => {
@@ -650,4 +854,12 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+    
+    // Cleanup chat on page unload
+    window.addEventListener('beforeunload', () => {
+        if (currentUserId && chatRoomActive) {
+            onlineUsersRef.child(currentUserId).remove();
+        }
+        detachChatListeners();
+    });
 });
