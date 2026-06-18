@@ -355,3 +355,34 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
+
+// ===== ANIMASI JUDUL HALAMAN (Tidak Biasa) =====
+const specialChars = ['🔄', '🌀', '⚡', '🔥', '💡', '✨', '🚨', '💥'];
+let titleIndex = 0;
+
+function animateTitle() {
+    const now = new Date().getHours();
+    let baseTitle = 'SPPG JATIAN';
+    
+    // Tambahkan efek berbeda di jam-jam tertentu
+    if (now >= 18 || now < 6) {
+        baseTitle = 'SPPG JATIAN - Malam';
+    } else if (now >= 12) {
+        baseTitle = 'SPPG JATIAN - Siang';
+    } else {
+        baseTitle = 'SPPG JATIAN - Pagi';
+    }
+    
+    // Tambahkan simbol berputar
+    document.title = `${specialChars[titleIndex]} ${baseTitle} ${specialChars[titleIndex]}`;
+    titleIndex = (titleIndex + 1) % specialChars.length;
+    
+    // Atur kecepatan animasi (lebih cepat di malam hari)
+    const speed = (now >= 18 || now < 6) ? 400 : 800;
+    setTimeout(animateTitle, speed);
+}
+
+// Jalankan animasi setelah halaman selesai dimuat
+window.addEventListener('DOMContentLoaded', () => {
+    animateTitle();
+});
