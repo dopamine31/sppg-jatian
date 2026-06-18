@@ -71,23 +71,6 @@ function showSection(sectionName) {
     const section = document.getElementById('section-' + sectionName);
     if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
-
-    // ===== LAZY LOADING TRIGGER =====
-    const loaders = {
-        sekolah: loadSekolah,
-        relawan: loadRelawan,
-        koordinator: loadKoordinator,
-        kontak: loadKontak,
-        surat: loadSurat,
-        dokumen: loadDokumen,
-        info: loadInfo,
-        menu: loadMenuWeekly,
-        rute: loadRuteDistribusi
-    };
-
-    if (loaders[sectionName]) {
-        loaders[sectionName]();
-    }
 }
 
 // ===== CLOCK =====
@@ -332,10 +315,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('year').textContent = currentYear;
     document.getElementById('footerYear').textContent = currentYear;
 
-    // HANYA LOAD DATA BERANDA (Sisanya di-load saat user klik menu)
+    // LOAD SEMUA DATA SEKALIGUS SAAT WEBSITE DIBUKA
     await loadQuote();
     await loadPengumuman();
     await loadAgenda();
+    await loadSekolah();
+    await loadRelawan();
+    await loadKoordinator();
+    await loadKontak();
+    await loadSurat();
+    await loadDokumen();
+    await loadInfo();
+    await loadMenuWeekly();
+    await loadRuteDistribusi();
     
     updateClock();
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (sidebarOpen) toggleMenu(); if (document.getElementById('pinModal').classList.contains('active')) hidePINModal(); } });
