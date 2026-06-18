@@ -366,11 +366,11 @@ function animateTitle() {
     
     // Tambahkan efek berbeda di jam-jam tertentu
     if (now >= 18 || now < 6) {
-        baseTitle = 'SPPG JATIAN - Malam';
+        baseTitle = 'SPPG JATIAN';
     } else if (now >= 12) {
-        baseTitle = 'SPPG JATIAN - Siang';
+        baseTitle = 'SPPG JATIAN';
     } else {
-        baseTitle = 'SPPG JATIAN - Pagi';
+        baseTitle = 'SPPG JATIAN';
     }
     
     // Tambahkan simbol berputar
@@ -378,7 +378,7 @@ function animateTitle() {
     titleIndex = (titleIndex + 1) % specialChars.length;
     
     // Atur kecepatan animasi (lebih cepat di malam hari)
-    const speed = (now >= 18 || now < 6) ? 400 : 800;
+    const speed = (now >= 18 || now < 6) ? 50 : 150;
     setTimeout(animateTitle, speed);
 }
 
