@@ -158,7 +158,7 @@ async function loadKoordinator() {
 async function loadKontak() {
     const container = document.getElementById('cardKontak'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
-    const data = await fetchJsonData('Kontak');
+    const data = await fetchJsonData('Staff');
     if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
         const waNumber = cleanWA(row['Nomor WA']);
@@ -176,7 +176,7 @@ async function loadSurat() {
         await loadRelawan();
     }
     
-    const dataSP = await fetchJsonData('Surat');
+    const dataSP = await fetchJsonData('Surat Peringatan');
     if (dataSP.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Belum ada surat peringatan</p>'; return; }
     container.innerHTML = dataSP.map(row => {
         const namaRelawan = escapeHtml(row['Nama Relawan']);
@@ -222,7 +222,7 @@ function filterDokumen(category, btn) { currentFilter = category; document.query
 async function loadInfo() {
     const board = document.getElementById('infoBoard'); if (!board) return;
     board.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat informasi...</p>';
-    const data = await fetchJsonData('Info'); globalData.info = data;
+    const data = await fetchJsonData('Papan Informasi'); globalData.info = data;
     document.getElementById('totalMemo').textContent = data.length;
     document.getElementById('totalBaru').textContent = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
     document.getElementById('totalMendesak').textContent = data.filter(d => d['Prioritas']?.toLowerCase() === 'mendesak').length;
@@ -267,7 +267,7 @@ async function loadMenuWeekly() {
     const container = document.getElementById('menuWeeklyContainer'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat menu mingguan...</p>';
     try {
-        const data = await fetchJsonData('Menu');
+        const data = await fetchJsonData('Menu Mingguan');
         if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📅</div><h3>Belum ada menu</h3></div>'; return; }
         const menuByDate = {};
         data.forEach(row => { const tanggal = row['Tanggal'] || ''; const menu = row['Menu'] || ''; const publishedBy = row['Dipublikasi'] || row['Penulis'] || row['Ahli Gizi'] || 'Ahli Gizi'; if (tanggal && menu && !menuByDate[tanggal]) menuByDate[tanggal] = { menu: menu, publishedBy: publishedBy }; });
@@ -293,7 +293,7 @@ async function loadRuteDistribusi() {
     const container = document.getElementById('ruteContent'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">Memuat data rute...</p>';
     try {
-        const data = await fetchJsonData('Rute');
+        const data = await fetchJsonData('RuteDistribusi');
         if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">🚚</div><h3>Belum ada data rute</h3></div>'; return; }
         const selatan = data.filter(row => (row['Rute'] || '').toLowerCase().trim() === 'selatan');
         const utara = data.filter(row => (row['Rute'] || '').toLowerCase().trim() === 'utara');
