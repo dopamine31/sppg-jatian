@@ -1,13 +1,17 @@
 // ===== GOOGLE APPS SCRIPT API CONFIG =====
-// GANTI URL DI BAWAH INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
 const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyvLWLfWMbSI0VDuGRtCYCzplru6F1FZOw3fb11Af6k3vJhpw4zWnTYllYRgwAT9DQu/exec';
 
-// Fungsi Fetch Baru (Menggunakan JSON API dari Apps Script)
 async function fetchJsonData(sheetName) {
     try {
         const response = await fetch(`${API_BASE_URL}?sheet=${encodeURIComponent(sheetName)}`);
         if (!response.ok) throw new Error('Network error');
-        return await response.json();
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Respon bukan JSON (Mungkin salah nama tab atau belum Allow):', sheetName, text);
+            return [];
+        }
     } catch (error) {
         console.error(`Error loading sheet ${sheetName}:`, error);
         return [];
@@ -57,7 +61,7 @@ function toggleAccordion(header) {
     if (!isOpen) { group.classList.add('active'); content.style.maxHeight = content.scrollHeight + 50 + 'px'; icon.style.transform = 'rotate(180deg)'; }
 }
 
-// ===== NAVIGATION =====
+// ===== NAVIGATION (WITH LAZY LOADING) =====
 function showHome() {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     const home = document.getElementById('section-home');
@@ -71,6 +75,14 @@ function showSection(sectionName) {
     const section = document.getElementById('section-' + sectionName);
     if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     if (sidebarOpen) toggleMenu();
+
+    // TRIGGER LAZY LOAD
+    const loaders = {
+        sekolah: loadSekolah, relawan: loadRelawan, koordinator: loadKoordinator,
+        kontak: loadKontak, surat: loadSurat, dokumen: loadDokumen,
+        info: loadInfo, menu: loadMenuWeekly, rute: loadRuteDistribusi
+    };
+    if (loaders[sectionName]) loaders[sectionName]();
 }
 
 // ===== CLOCK =====
@@ -93,11 +105,13 @@ function cleanWA(number) { if (!number) return ''; let clean = String(number).re
 function isValidLink(link) { if (!link) return false; const trimmed = link.trim().toLowerCase(); return trimmed !== '' && trimmed !== '-' && trimmed !== 'null'; }
 function filterTable(e, tbody) { const q = e.target.value.toLowerCase(); tbody.querySelectorAll('tr').forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
 
-// ===== DATA LOADERS (Updated to use fetchJsonData) =====
+// ===== DATA LOADERS =====
 async function loadSekolah() {
     const tbody = document.querySelector('#tableSekolah tbody'); if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-    const data = await fetchJsonData('Sekolah'); globalData.sekolah = data;
+    // ⚠️ PENTING: 'Sekolah' harus sama persis dengan nama Tab di Spreadsheet Anda
+    const data = await fetchJsonData('Sekolah'); 
+    globalData.sekolah = data;
     if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
     tbody.innerHTML = data.map((row, i) => {
         const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null;
@@ -112,7 +126,8 @@ async function loadSekolah() {
 async function loadRelawan() {
     const tbody = document.querySelector('#tableRelawan tbody'); if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-    const data = await fetchJsonData('Relawan'); globalData.relawan = data;
+    const data = await fetchJsonData('Relawan');
+    globalData.relawan = data;
     if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
     tbody.innerHTML = data.map((row, i) => {
         const waNumber = cleanWA(row['Nomor WA']);
@@ -141,7 +156,7 @@ async function loadKoordinator() {
 async function loadKontak() {
     const container = document.getElementById('cardKontak'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
-    const data = await fetchJsonData('Staff');
+    const data = await fetchJsonData('Kontak');
     if (data.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</p>'; return; }
     container.innerHTML = data.map(row => {
         const waNumber = cleanWA(row['Nomor WA']);
@@ -153,13 +168,8 @@ async function loadKontak() {
 async function loadSurat() {
     const container = document.getElementById('cardSurat'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:20px;">⏳ Memuat data...</p>';
-    
-    // Pastikan data relawan sudah dimuat
-    if (!globalData.relawan || globalData.relawan.length === 0) {
-        await loadRelawan();
-    }
-    
-    const dataSP = await fetchJsonData('Surat Peringatan');
+    if (!globalData.relawan || globalData.relawan.length === 0) await loadRelawan();
+    const dataSP = await fetchJsonData('Surat');
     if (dataSP.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">⚠️ Belum ada surat peringatan</p>'; return; }
     container.innerHTML = dataSP.map(row => {
         const namaRelawan = escapeHtml(row['Nama Relawan']);
@@ -205,7 +215,7 @@ function filterDokumen(category, btn) { currentFilter = category; document.query
 async function loadInfo() {
     const board = document.getElementById('infoBoard'); if (!board) return;
     board.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat informasi...</p>';
-    const data = await fetchJsonData('Papan Informasi'); globalData.info = data;
+    const data = await fetchJsonData('Info'); globalData.info = data;
     document.getElementById('totalMemo').textContent = data.length;
     document.getElementById('totalBaru').textContent = data.filter(d => d['Baru']?.toLowerCase() === 'ya' || d['New']?.toLowerCase() === 'yes').length;
     document.getElementById('totalMendesak').textContent = data.filter(d => d['Prioritas']?.toLowerCase() === 'mendesak').length;
@@ -250,7 +260,7 @@ async function loadMenuWeekly() {
     const container = document.getElementById('menuWeeklyContainer'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">⏳ Memuat menu mingguan...</p>';
     try {
-        const data = await fetchJsonData('Menu Mingguan');
+        const data = await fetchJsonData('Menu');
         if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">📅</div><h3>Belum ada menu</h3></div>'; return; }
         const menuByDate = {};
         data.forEach(row => { const tanggal = row['Tanggal'] || ''; const menu = row['Menu'] || ''; const publishedBy = row['Dipublikasi'] || row['Penulis'] || row['Ahli Gizi'] || 'Ahli Gizi'; if (tanggal && menu && !menuByDate[tanggal]) menuByDate[tanggal] = { menu: menu, publishedBy: publishedBy }; });
@@ -276,7 +286,7 @@ async function loadRuteDistribusi() {
     const container = document.getElementById('ruteContent'); if (!container) return;
     container.innerHTML = '<p style="text-align:center;padding:40px;">Memuat data rute...</p>';
     try {
-        const data = await fetchJsonData('RuteDistribusi');
+        const data = await fetchJsonData('Rute');
         if (data.length === 0) { container.innerHTML = '<div class="info-empty"><div class="info-empty-icon">🚚</div><h3>Belum ada data rute</h3></div>'; return; }
         const selatan = data.filter(row => (row['Rute'] || '').toLowerCase().trim() === 'selatan');
         const utara = data.filter(row => (row['Rute'] || '').toLowerCase().trim() === 'utara');
@@ -290,7 +300,6 @@ async function loadRuteDistribusi() {
 
 async function loadQuote() { const data = await fetchJsonData('Quote'); if (data.length > 0) { const random = data[Math.floor(Math.random() * data.length)]; document.getElementById('quoteText').textContent = `❝ ${random['Quote'] || random[Object.keys(random)[0]]} ❞`; } }
 async function loadPengumuman() { const data = await fetchJsonData('Pengumuman'); document.getElementById('runningText').textContent = data.length === 0 ? 'Tidak ada pengumuman.' : data.map(r => `${r['Judul'] || ''}: ${r['Isi'] || ''}`).join('   •   '); }
-
 async function loadAgenda() {
     const data = await fetchJsonData('Agenda'); const agendaList = document.getElementById('agendaList');
     if (data.length === 0) { agendaList.innerHTML = '<p>Tidak ada agenda.</p>'; return; }
@@ -309,31 +318,22 @@ async function loadBirthday() {
     }
 }
 
-// ===== INIT (LAZY LOADING - Hanya load data Beranda) =====
+// ===== INIT =====
 window.addEventListener('DOMContentLoaded', async () => {
     const currentYear = new Date().getFullYear();
     document.getElementById('year').textContent = currentYear;
     document.getElementById('footerYear').textContent = currentYear;
 
-    // LOAD SEMUA DATA SEKALIGUS SAAT WEBSITE DIBUKA
+    // HANYA LOAD DATA BERANDA (Sisanya di-load saat user klik menu)
     await loadQuote();
     await loadPengumuman();
     await loadAgenda();
-    await loadSekolah();
-    await loadRelawan();
-    await loadKoordinator();
-    await loadKontak();
-    await loadSurat();
-    await loadDokumen();
-    await loadInfo();
-    await loadMenuWeekly();
-    await loadRuteDistribusi();
-    
+
     updateClock();
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (sidebarOpen) toggleMenu(); if (document.getElementById('pinModal').classList.contains('active')) hidePINModal(); } });
     const firstAccordion = document.querySelector('.accordion-header'); if (firstAccordion) toggleAccordion(firstAccordion);
     document.getElementById('pinInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyPIN(); });
-    
+
     const btnDownload = document.getElementById('btnDownloadRute');
     if (btnDownload) {
         btnDownload.addEventListener('click', async () => {
@@ -357,4 +357,4 @@ setInterval(() => {
         document.title = 'SPPG JATIAN 💥';
     }
     isAlert = !isAlert;
-}, 100);
+}, 50);
