@@ -362,7 +362,7 @@ setInterval(() => {
     if (isAlert) {
         document.title = 'SPPG JATIAN 🚨';
     } else {
-        document.title = 'SPPG JATIAN';
+        document.title = 'SPPG JATIAN 💥';
     }
     isAlert = !isAlert;
 }, 100);
