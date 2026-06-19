@@ -1,1 +1,4 @@
+User-agent: *
+Allow: /
 
+Sitemap: https://portalsppgjatian.web.id/sitemap.xml
