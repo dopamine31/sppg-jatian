@@ -123,35 +123,83 @@ return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama Sekolah'])}</str
 }).join('');
 document.getElementById('searchSekolah').addEventListener('input', (e) => filterTable(e, tbody));
 }
+// ===== FUNGSI KTP =====
+function getKTPUrl(nama) {
+    if (!nama) return null;
+    const KTP_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/ktp/`;
+    const filename = encodeURIComponent(nama.trim());
+    return `${KTP_BASE_URL}${filename}.jpg`;
+}
+
+function showKTPModal(url, nama) {
+    let modal = document.getElementById('ktpModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'ktpModal';
+        modal.className = 'ktp-modal-overlay';
+        modal.innerHTML = `
+            <div class="ktp-modal-content">
+                <button class="ktp-modal-close" onclick="closeKTPModal()">✕</button>
+                <h3 class="ktp-modal-title">📷 KTP: <span id="ktpModalNama"></span></h3>
+                <img id="ktpModalImg" src="" alt="KTP">
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    document.getElementById('ktpModalNama').textContent = nama;
+    document.getElementById('ktpModalImg').src = url;
+    modal.classList.add('active');
+}
+
+function closeKTPModal() {
+    const modal = document.getElementById('ktpModal');
+    if (modal) modal.classList.remove('active');
+}
+
+function toggleKTPBlur(element, nama, ktpUrl) {
+    if (checkAuth()) {
+        showKTPModal(ktpUrl, nama);
+    } else {
+        showPINModal();
+        const checkInterval = setInterval(() => {
+            if (checkAuth()) {
+                clearInterval(checkInterval);
+                showKTPModal(ktpUrl, nama);
+                element.classList.add('revealed');
+                const overlay = element.querySelector('.ktp-blur-overlay');
+                if (overlay) overlay.remove();
+            }
+        }, 500);
+        setTimeout(() => clearInterval(checkInterval), 10000);
+    }
+}
+
 async function loadRelawan() {
     const tbody = document.querySelector('#tableRelawan tbody'); if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
     const data = await fetchJsonData('relawan');
     globalData.relawan = data;
     if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
-    
-    // Base URL untuk mengambil gambar dari Supabase Storage bucket 'ktp'
-    const KTP_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/ktp/`;
-    
+
     tbody.innerHTML = data.map((row, i) => {
         const waNumber = cleanWA(row['Nomor WA']);
         const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
         const nikDisplay = maskNIK(row['NIK']);
         const nikClass = !checkAuth() ? 'masked-nik' : '';
+
+        // KTP dengan blur + klik minta PIN
+        const ktpUrl = getKTPUrl(row['Nama']);
+        const isAuthenticated = checkAuth();
         
-        // KTP Auto-display berdasarkan nama relawan
-        const namaRelawan = row['Nama'] || '';
-        const ktpFilename = encodeURIComponent(namaRelawan.trim());
-        const ktpUrl = `${KTP_BASE_URL}${ktpFilename}.jpg`;
-        
-        const ktpCell = namaRelawan ? 
-            `<a href="${ktpUrl}" target="_blank" rel="noopener noreferrer" class="ktp-image-link">
-                <img src="${ktpUrl}" alt="KTP ${escapeHtml(namaRelawan)}" class="ktp-thumbnail" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <span style="display:none;color:#666;font-size:10px;"> Belum ada</span>
-             </a>` : 
+        const ktpCell = row['Nama'] ? 
+            `<div class="ktp-container" onclick="toggleKTPBlur(this, '${escapeHtml(row['Nama'])}', '${ktpUrl}')">
+                <div class="ktp-blurred ${isAuthenticated ? 'revealed' : ''}">
+                    <img src="${ktpUrl}" alt="KTP ${escapeHtml(row['Nama'])}" class="ktp-thumbnail">
+                    ${!isAuthenticated ? '<div class="ktp-blur-overlay"><i class="fas fa-lock"></i><span>Klik untuk lihat</span></div>' : ''}
+                </div>
+            </div>` : 
             '<span style="color:#999;">-</span>';
-        
+
         return `<tr>
             <td>${i + 1}</td>
             <td><strong>${escapeHtml(row['Nama'])}</strong></td>
