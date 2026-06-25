@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPPG JATIAN</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+
 <!-- PIN MODAL -->
 <div class="pin-modal-overlay" id="pinModal">
 <div class="pin-modal">
@@ -31,7 +33,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
-<h3>🏛️ Menu Utama</h3>
+<h3>️ Menu Utama</h3>
 <button class="sidebar-close" onclick="toggleMenu()">✕</button>
 </div>
 <div class="sidebar-nav">
@@ -42,7 +44,7 @@
 <span class="accordion-icon">▼</span>
 </button>
 <div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon"></span> Daftar Sekolah</a>
+<a class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon">🏫</span> Daftar Sekolah</a>
 <a class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</a>
 <a class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</a>
 </div>
@@ -53,20 +55,20 @@
 <span class="accordion-icon">▼</span>
 </button>
 <div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon"></span> Daftar Relawan</a>
+<a class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon">👥</span> Daftar Relawan</a>
 <a class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon">👔</span> Koordinator</a>
-<a class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">📞</span> Kontak Staff</a>
-<a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</a>
+<a class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon"></span> Kontak Staff</a>
+<a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">️</span> Surat Peringatan</a>
 </div>
 </div>
 <div class="accordion-group">
 <button class="accordion-header" onclick="toggleAccordion(this)">
-<span class="accordion-title"><span class="menu-icon">️</span> Informasi & Dokumen</span>
+<span class="accordion-title"><span class="menu-icon">ℹ️</span> Informasi & Dokumen</span>
 <span class="accordion-icon">▼</span>
 </button>
 <div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon"></span> Pusat Dokumen</a>
-<a class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📢</span> Papan Informasi</a>
+<a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</a>
+<a class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon"></span> Papan Informasi</a>
 </div>
 </div>
 <a href="http://portalsppgjatian.my.id/" target="_blank" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
@@ -81,7 +83,7 @@
 <div class="header-top">
 <button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
 <div class="header-title">
-<h1>🏛️ P O R T A L S P P G J A T I A N</h1>
+<h1>️ P O R T A L S P P G J A T I A N</h1>
 <p>Jatian Pakusari Jember</p>
 </div>
 <div class="clock-container">
@@ -123,7 +125,7 @@
 </div>
 
 <div class="quote-card">
-<p id="quoteText">❝ Memuat quote... ❞</p>
+<p id="quoteText">❝ Memuat quote... </p>
 </div>
 
 <div class="birthday-card" id="birthdayCard" style="display:none;">
@@ -136,7 +138,7 @@
 </div>
 
 <div class="agenda-card">
-<h2> Agenda Mendatang</h2>
+<h2>📅 Agenda Mendatang</h2>
 <div class="agenda-list" id="agendaList">
 <p>Sedang memuat...</p>
 </div>
@@ -156,7 +158,7 @@
 <table id="tableSekolah">
 <thead>
 <tr>
-<th>No</th><th>Nama Sekolah</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>‍🎓 Siswa</th>
+<th>No</th><th>Nama Sekolah</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -198,7 +200,7 @@
 <div class="content-section" id="section-kontak" style="display:none;">
 <div class="section-header">
 <button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>📞 Kontak Staff Internal</h2>
+<h2> Kontak Staff Internal</h2>
 </div>
 <div class="card-grid" id="cardKontak"></div>
 </div>
@@ -225,8 +227,8 @@
 <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
 <button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
 <button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
-<button class="category-btn" onclick="filterDokumen('form', this)"> Form</button>
-<button class="category-btn" onclick="filterDokumen('sk', this)"> SK</button>
+<button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
+<button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
 <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
 </div>
 <div class="search-box">
@@ -242,14 +244,14 @@
 <h2>📢 Papan Informasi & Memo</h2>
 </div>
 <div class="info-stats">
-<div class="info-stat-item"><span class="info-stat-icon"></span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
+<div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
 <div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
 <div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
 </div>
 <div class="info-categories">
 <button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
-<button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
-<button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
+<button class="info-cat-btn" onclick="filterInfo('pengumuman', this)"> Pengumuman</button>
+<button class="info-cat-btn" onclick="filterInfo('memo', this)"> Memo</button>
 <button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
 <button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
 <button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
@@ -345,7 +347,7 @@
 </div>
 <div class="chat-input-area">
 <input type="text" id="chatInput" placeholder="Ketik pesan..." onkeypress="handleChatKeypress(event)">
-<button class="chat-send-btn" onclick="sendMessage()">➤</button>
+<button class="chat-send-btn" onclick="sendMessage()"></button>
 </div>
 </div>
 </div>
