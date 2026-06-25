@@ -425,3 +425,35 @@ td a:hover { text-decoration: underline; color: #ec4899; }
     .chat-window { width: 100%; height: 85vh; position: fixed; bottom: 0; right: 0; left: 0; border-radius: 15px 15px 0 0; max-width: 100vw; }
     .chat-message { max-width: 85%; }
 }
+/* ===== KTP IMAGE STYLING ===== */
+.ktp-image-link {
+    display: inline-block;
+    border: 2px solid #ec4899;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: #1a1a1a;
+    min-width: 100px;
+    text-align: center;
+}
+
+.ktp-image-link:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.6);
+    border-color: #f472b6;
+    z-index: 10;
+    position: relative;
+}
+
+.ktp-thumbnail {
+    width: 100px;
+    height: 65px;
+    object-fit: cover;
+    display: block;
+    background: #0f0f0f;
+}
+
+@media (max-width: 768px) {
+    .ktp-thumbnail { width: 60px; height: 40px; }
+    .ktp-image-link { min-width: 60px; }
+}
