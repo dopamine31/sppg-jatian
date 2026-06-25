@@ -442,54 +442,29 @@ background: #0f0f0f;
     cursor: pointer;
 }
 
-.ktp-blurred {
+/* ===== KTP THUMBNAIL & MODAL ===== */
+.ktp-container {
     position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    border: 2px solid #ec4899;
+    display: inline-block;
+    cursor: pointer;
     transition: all 0.3s ease;
-    background: #1a1a1a;
 }
 
-.ktp-blurred img {
+.ktp-container:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.6);
+    border-radius: 8px;
+    z-index: 10;
+}
+
+.ktp-thumbnail {
     display: block;
     width: 100px;
     height: 65px;
     object-fit: cover;
-    filter: blur(8px);
-    transition: filter 0.3s ease;
-}
-
-.ktp-blurred.revealed img {
-    filter: blur(0);
-}
-
-.ktp-blur-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    gap: 4px;
-    transition: opacity 0.3s ease;
-}
-
-.ktp-blur-overlay i {
-    font-size: 22px;
-    color: #f472b6;
-}
-
-.ktp-blurred:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.5);
+    border-radius: 8px;
+    border: 2px solid #ec4899;
+    background: #1a1a1a;
 }
 
 /* KTP Modal (Gambar Penuh) */
@@ -573,7 +548,7 @@ background: #0f0f0f;
 
 /* Responsive KTP */
 @media (max-width: 768px) {
-    .ktp-blurred img {
+    .ktp-thumbnail {
         width: 60px;
         height: 40px;
     }
