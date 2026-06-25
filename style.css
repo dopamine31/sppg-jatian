@@ -402,6 +402,38 @@ background: #0f0f0f;
 .footer { background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); padding: 25px; border-radius: 15px; text-align: center; color: #ffd6e7; box-shadow: 0 5px 20px rgba(0,0,0,0.3); border: 2px solid #ec4899; margin-top: 20px; }
 .footer p { margin: 5px 0; }
 .footer-small { font-size: 12px; color: #f472b6; }
+/* ===== KTP IMAGE STYLING ===== */
+.ktp-image-link {
+    display: inline-block;
+    border: 2px solid #ec4899;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: #1a1a1a;
+    min-width: 100px;
+    text-align: center;
+}
+
+.ktp-image-link:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.6);
+    border-color: #f472b6;
+    z-index: 10;
+    position: relative;
+}
+
+.ktp-thumbnail {
+    width: 100px;
+    height: 65px;
+    object-fit: cover;
+    display: block;
+    background: #0f0f0f;
+}
+
+@media (max-width: 768px) {
+    .ktp-thumbnail { width: 60px; height: 40px; }
+    .ktp-image-link { min-width: 60px; }
+}
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
 .container { padding: 15px; }
