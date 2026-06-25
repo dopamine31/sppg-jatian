@@ -99,30 +99,6 @@ function cleanWA(number) { if (!number) return ''; let clean = String(number).re
 function isValidLink(link) { if (!link) return false; const trimmed = link.trim().toLowerCase(); return trimmed !== '' && trimmed !== '-' && trimmed !== 'null'; }
 function filterTable(e, tbody) { const q = e.target.value.toLowerCase(); tbody.querySelectorAll('tr').forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none'; }); }
 
-// ===== FUNGSI KTP AUTO-DISPLAY =====
-function getKTPUrl(nama) {
-    if (!nama) return null;
-    const KTP_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/ktp/`;
-    const filename = encodeURIComponent(nama.trim());
-    return `${KTP_BASE_URL}${filename}`;
-}
-
-// ===== DATA LOADERS =====
-async function loadSekolah() {
-const tbody = document.querySelector('#tableSekolah tbody'); if (!tbody) return;
-tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-const data = await fetchJsonData('sekolah');
-globalData.sekolah = data;
-if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
-tbody.innerHTML = data.map((row, i) => {
-const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null;
-const waNumber = cleanWA(row['WA PIC']);
-const mapsCell = mapsLink ? `<a href="${mapsLink}" target="_blank" rel="noopener noreferrer">📍 Maps</a>` : '<span style="color:#999;">-</span>';
-const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">💬 ${escapeHtml(row['WA PIC'])}</a>` : '<span style="color:#999;">-</span>';
-return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama Sekolah'])}</strong></td><td>${escapeHtml(row['Nama PIC'])}</td><td>${waCell}</td><td>${escapeHtml(row['Kepala Sekolah'])}</td><td>${escapeHtml(row['Rekening Insentif'])}</td><td>${mapsCell}</td><td>${escapeHtml(row['Jumlah Siswa'])}</td></tr>`;
-}).join('');
-document.getElementById('searchSekolah').addEventListener('input', (e) => filterTable(e, tbody));
-}
 // ===== FUNGSI KTP =====
 function getKTPUrl(nama) {
     if (!nama) return null;
@@ -156,21 +132,21 @@ function closeKTPModal() {
     if (modal) modal.classList.remove('active');
 }
 
-function toggleKTPBlur(element, nama, ktpUrl) {
+// Fungsi baru: Klik thumbnail -> Cek PIN -> Buka Modal
+function handleKTPClick(nama, ktpUrl) {
     if (checkAuth()) {
         showKTPModal(ktpUrl, nama);
     } else {
         showPINModal();
+        // Cek secara berkala apakah PIN sudah dimasukkan dengan benar
         const checkInterval = setInterval(() => {
             if (checkAuth()) {
                 clearInterval(checkInterval);
                 showKTPModal(ktpUrl, nama);
-                element.classList.add('revealed');
-                const overlay = element.querySelector('.ktp-blur-overlay');
-                if (overlay) overlay.remove();
             }
         }, 500);
-        setTimeout(() => clearInterval(checkInterval), 10000);
+        // Hentikan pengecekan setelah 2 menit untuk mencegah memory leak
+        setTimeout(() => clearInterval(checkInterval), 120000);
     }
 }
 
@@ -187,16 +163,13 @@ async function loadRelawan() {
         const nikDisplay = maskNIK(row['NIK']);
         const nikClass = !checkAuth() ? 'masked-nik' : '';
 
-        // KTP dengan blur + klik minta PIN
+        // KTP - Thumbnail UTUH (tanpa blur/kunci), klik baru minta PIN
         const ktpUrl = getKTPUrl(row['Nama']);
-        const isAuthenticated = checkAuth();
         
         const ktpCell = row['Nama'] ? 
-            `<div class="ktp-container" onclick="toggleKTPBlur(this, '${escapeHtml(row['Nama'])}', '${ktpUrl}')">
-                <div class="ktp-blurred ${isAuthenticated ? 'revealed' : ''}">
-                    <img src="${ktpUrl}" alt="KTP ${escapeHtml(row['Nama'])}" class="ktp-thumbnail">
-                    ${!isAuthenticated ? '<div class="ktp-blur-overlay"><i class="fas fa-lock"></i><span>Klik untuk lihat</span></div>' : ''}
-                </div>
+            `<div class="ktp-container" onclick="handleKTPClick('${escapeHtml(row['Nama'])}', '${ktpUrl}')">
+                <img src="${ktpUrl}" alt="KTP ${escapeHtml(row['Nama'])}" class="ktp-thumbnail" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none;color:#666;font-size:10px;">📷 Belum ada</span>
             </div>` : 
             '<span style="color:#999;">-</span>';
 
