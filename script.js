@@ -124,30 +124,46 @@ function getKTPUrl(nama) {
 }
 
 async function loadRelawan() {
-const tbody = document.querySelector('#tableRelawan tbody'); if (!tbody) return;
-tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-const data = await fetchJsonData('relawan');
-globalData.relawan = data;
-if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
-tbody.innerHTML = data.map((row, i) => {
-const waNumber = cleanWA(row['Nomor WA']);
-const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
-const nikDisplay = maskNIK(row['NIK']);
-const nikClass = !checkAuth() ? 'masked-nik' : '';
+    const tbody = document.querySelector('#tableRelawan tbody'); if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+    const data = await fetchJsonData('relawan');
+    globalData.relawan = data;
+    if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
+    
+    // Base URL untuk mengambil gambar dari Supabase Storage bucket 'ktp'
+    const KTP_BASE_URL = `${SUPABASE_URL}/storage/v1/object/public/ktp/`;
 
-// KTP Auto-display
-const ktpUrl = getKTPUrl(row['Nama']);
-const ktpCell = ktpUrl ? 
-    `<a href="${ktpUrl}" target="_blank" rel="noopener noreferrer" class="ktp-image-link">
-        <img src="${ktpUrl}" alt="KTP ${escapeHtml(row['Nama'])}" class="ktp-thumbnail" 
-             onerror="this.parentElement.innerHTML='<span style=\'color:#666;font-size:11px;\'>📷 Belum ada</span>'">
-     </a>` : 
-    '<span style="color:#999;">-</span>';
+    tbody.innerHTML = data.map((row, i) => {
+        const waNumber = cleanWA(row['Nomor WA']);
+        const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">${escapeHtml(row['Nomor WA'])}</a>` : '<span style="color:#999;">-</span>';
+        const nikDisplay = maskNIK(row['NIK']);
+        const nikClass = !checkAuth() ? 'masked-nik' : '';
 
-return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama'])}</strong></td><td class="${nikClass}">${nikDisplay}</td><td>${waCell}</td><td>${escapeHtml(row['Email'])}</td><td>${escapeHtml(row['Posisi'])}</td><td>${ktpCell}</td></tr>`;
-}).join('');
-document.getElementById('searchRelawan').addEventListener('input', (e) => filterTable(e, tbody));
-loadBirthday();
+        // Logika KTP Otomatis berdasarkan Nama
+        const namaRelawan = row['Nama'] || '';
+        const ktpFilename = encodeURIComponent(namaRelawan.trim());
+        const ktpUrl = `${KTP_BASE_URL}${ktpFilename}`;
+        
+        const ktpCell = namaRelawan ? 
+            `<a href="${ktpUrl}" target="_blank" rel="noopener noreferrer" class="ktp-image-link">
+                <img src="${ktpUrl}" alt="KTP ${escapeHtml(namaRelawan)}" class="ktp-thumbnail" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none;color:#666;font-size:10px;">📷 Belum ada</span>
+             </a>` : 
+            '<span style="color:#999;">-</span>';
+
+        return `<tr>
+            <td>${i + 1}</td>
+            <td><strong>${escapeHtml(row['Nama'])}</strong></td>
+            <td class="${nikClass}">${nikDisplay}</td>
+            <td>${waCell}</td>
+            <td>${escapeHtml(row['Email'])}</td>
+            <td>${escapeHtml(row['Posisi'])}</td>
+            <td>${ktpCell}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('searchRelawan').addEventListener('input', (e) => filterTable(e, tbody));
+    loadBirthday();
 }
 
 async function loadKoordinator() {
