@@ -1,544 +1,356 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta name="robots" content="noindex, nofollow">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PORTAL SPPG JATIAN</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPPG JATIAN</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <!-- PIN Modal -->
-    <div class="pin-modal-overlay" id="pinModal">
-        <div class="pin-modal">
-            <div class="pin-header"><i class="fas fa-lock"></i><h3>Akses Terbatas</h3></div>
-            <p>Masukkan PIN untuk mengakses fitur ini.</p>
-            <input type="password" id="pinInput" class="pin-input" placeholder="****" maxlength="4">
-            <div class="pin-actions">
-                <button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
-                <button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
-            </div>
-            <p class="pin-hint">💡 PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
-        </div>
-    </div>
+<!-- PIN MODAL -->
+<div class="pin-modal-overlay" id="pinModal">
+<div class="pin-modal">
+<div class="pin-header">
+<i class="fas fa-lock"></i>
+<h3>Akses Terbatas</h3>
+</div>
+<p>Masukkan PIN untuk mengakses fitur ini.</p>
+<input type="password" class="pin-input" id="pinInput" placeholder="••••" maxlength="10">
+<div class="pin-actions">
+<button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
+<button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
+</div>
+<p class="pin-hint">💡 PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
+</div>
+</div>
 
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>🏛️ Menu Utama</h3>
+<button class="sidebar-close" onclick="toggleMenu()">✕</button>
+</div>
+<div class="sidebar-nav">
+<a class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon"></span> Beranda</a>
+<div class="accordion-group">
+<button class="accordion-header" onclick="toggleAccordion(this)">
+<span class="accordion-title"><span class="menu-icon">🏫</span> Operasional & Logistik</span>
+<span class="accordion-icon">▼</span>
+</button>
+<div class="accordion-content">
+<a class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon"></span> Daftar Sekolah</a>
+<a class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</a>
+<a class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</a>
+</div>
+</div>
+<div class="accordion-group">
+<button class="accordion-header" onclick="toggleAccordion(this)">
+<span class="accordion-title"><span class="menu-icon">👥</span> Manajemen Tim</span>
+<span class="accordion-icon">▼</span>
+</button>
+<div class="accordion-content">
+<a class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon"></span> Daftar Relawan</a>
+<a class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon">👔</span> Koordinator</a>
+<a class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">📞</span> Kontak Staff</a>
+<a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</a>
+</div>
+</div>
+<div class="accordion-group">
+<button class="accordion-header" onclick="toggleAccordion(this)">
+<span class="accordion-title"><span class="menu-icon">️</span> Informasi & Dokumen</span>
+<span class="accordion-icon">▼</span>
+</button>
+<div class="accordion-content">
+<a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon"></span> Pusat Dokumen</a>
+<a class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📢</span> Papan Informasi</a>
+</div>
+</div>
+<a href="http://portalsppgjatian.my.id/" target="_blank" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
+</div>
+<div class="sidebar-footer">
+© <span id="year"></span> ASLAP SPPG JATIAN
+</div>
+</div>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>🏛️ Menu Utama</h3>
-            <button class="sidebar-close" onclick="toggleMenu()">✕</button>
-        </div>
-        <div class="sidebar-nav">
-            <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">🏠</span> Beranda</button>
-            <div class="accordion-group">
-                <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">🏫</span> Operasional & Logistik</span><span class="accordion-icon">▼</span></button>
-                <div class="accordion-content">
-                    <button class="sidebar-menu-btn" onclick="showSection('sekolah')">🏫 Daftar Sekolah</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('menu')">📅 Menu Mingguan</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('rute')">🚚 Rute Distribusi</button>
-                </div>
-            </div>
-            <div class="accordion-group">
-                <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">👥</span> Manajemen Tim</span><span class="accordion-icon">▼</span></button>
-                <div class="accordion-content">
-                    <button class="sidebar-menu-btn" onclick="showSection('relawan')">👥 Daftar Relawan</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('koordinator')">👔 Koordinator</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('kontak')">📞 Kontak Staff</button>
-                    <button class="sidebar-menu-btn warning" onclick="checkAndShow('surat')">⚠️ Surat Peringatan</button>
-                </div>
-            </div>
-            <div class="accordion-group">
-                <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">ℹ️</span> Informasi & Dokumen</span><span class="accordion-icon">▼</span></button>
-                <div class="accordion-content">
-                    <button class="sidebar-menu-btn special" onclick="checkAndShow('dokumen')">📚 Pusat Dokumen</button>
-                    <button class="sidebar-menu-btn" onclick="showSection('info')">📢 Papan Informasi</button>
-                </div>
-            </div>
-            <!-- TOMBOL SUMMARY INSENTIF DI SIDEBAR -->
-            <a href="http://portalsppgjatian.my.id/" target="_blank" rel="noopener noreferrer" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
-        </div>
-        <div class="sidebar-footer">© <span id="year"></span> ASLAP SPPG JATIAN</div>
-    </div>
+<!-- STICKY HEADER -->
+<div class="sticky-header">
+<div class="header-top">
+<button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
+<div class="header-title">
+<h1>🏛️ P O R T A L S P P G J A T I A N</h1>
+<p>Jatian Pakusari Jember</p>
+</div>
+<div class="clock-container">
+<div class="analog-clock">
+<div class="clock-face">
+<div class="hour-hand" id="hourHand"></div>
+<div class="minute-hand" id="minuteHand"></div>
+<div class="second-hand" id="secondHand"></div>
+<div class="clock-center"></div>
+</div>
+</div>
+<div class="digital-clock">
+<div class="time-display" id="digitalTime">00:00:00</div>
+<div class="ms-display" id="msDisplay">000</div>
+<div class="date-display" id="dateDisplay">-</div>
+<span class="timezone-badge">WIB</span>
+</div>
+</div>
+</div>
+</div>
 
-    <!-- Sticky Header -->
-    <div class="sticky-header">
-        <div class="header-top">
-            <button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
-            <div class="header-title"><h1> 🏛️ P O R T A L  S P P G  J A T I A N </h1><p>Jatian Pakusari Jember</p></div>
-            <div class="clock-container">
-                <div class="analog-clock"><div class="clock-face"><div class="hour-hand" id="hourHand"></div><div class="minute-hand" id="minuteHand"></div><div class="second-hand" id="secondHand"></div><div class="clock-center"></div></div></div>
-                <div class="digital-clock"><div class="time-display" id="digitalTime">00:00:00</div><div class="ms-display" id="msDisplay">000</div><div class="date-display" id="dateDisplay">-</div><div class="timezone-badge">WIB</div></div>
-            </div>
-        </div>
-    </div>
+<div class="container">
 
-    <div class="container">
-        <!-- Home Section -->
-        <div id="section-home" class="content-section" style="display:block;">
-            <div class="welcome-card"><div class="welcome-icon">👋</div><div class="welcome-content"><h2>INFORMASI</h2><p>Distribusi Program Makan Bergizi Gratis (MBG) SPPG Jatian Pakusari diliburkan pada tanggal 22 Juni 2026 s.d. 12 Juli 2026 sesuai Surat Edaran Badan Gizi Nasional Nomor 12 Tahun 2026. Kegiatan distribusi akan kembali dilaksanakan pada 13 Juli 2026 atau menyesuaikan ketentuan yang berlaku.</p></div></div>
-            <div class="running-text-container"><div class="running-text-label">INFO</div><div class="running-text-wrapper"><div class="running-text" id="runningText">Memuat pengumuman...</div></div></div>
-            <div class="quote-card"><p id="quoteText">❝ Memuat quote... ❞</p></div>
-            <div class="birthday-card" id="birthdayCard" style="display:none;"><div class="birthday-icon">🎂</div><div class="birthday-content"><h3>🎉 Hari ini Ulang Tahun!</h3><p id="birthdayText">-</p><a href="#" id="birthdayWaLink" class="birthday-btn" target="_blank">[ Kirim Ucapan ]</a></div></div>
-            <div class="agenda-card"><h2>📅 Agenda Mendatang</h2><div class="agenda-list" id="agendaList"><p>Sek Lemot...</p></div></div>
-        </div>
+<!-- HOME SECTION -->
+<div class="content-section" id="section-home">
+<div class="welcome-card">
+<div class="welcome-icon">👋</div>
+<div class="welcome-content">
+<h2>Selamat Datang di Portal SPPG Jatian!</h2>
+<p>Platform resmi Satuan Pelayanan Pemenuhan Gizi (SPPG) Jatian, Pakusari, Jember untuk manajemen distribusi program Makan Bergizi Gratis (MBG).</p>
+</div>
+</div>
 
-        <!-- Sekolah Section -->
-        <div id="section-sekolah" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🏫 Daftar Sekolah</h2></div>
-            <div class="search-box"><input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah..."></div>
-            <div class="table-container"><table id="tableSekolah"><thead><tr><th>No</th><th>Nama Sekolah</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>👨‍🎓 Siswa</th></tr></thead><tbody></tbody></table></div>
-        </div>
+<div class="running-text-container">
+<div class="running-text-label">📢 INFORMASI</div>
+<div class="running-text-wrapper">
+<div class="running-text" id="runningText">Memuat pengumuman...</div>
+</div>
+</div>
 
-        <!-- Relawan Section -->
-        <div id="section-relawan" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>👥 Daftar Relawan</h2></div>
-            <div class="search-box"><input type="text" id="searchRelawan" placeholder="🔍 Cari relawan..."></div>
-            <div class="table-container"><table id="tableRelawan">
+<div class="quote-card">
+<p id="quoteText">❝ Memuat quote... ❞</p>
+</div>
+
+<div class="birthday-card" id="birthdayCard" style="display:none;">
+<div class="birthday-icon">🎂</div>
+<div class="birthday-content">
+<h3>🎉 Hari ini Ulang Tahun!</h3>
+<p id="birthdayText">-</p>
+</div>
+<a href="#" target="_blank" class="birthday-btn" id="birthdayWaLink"> Kirim Ucapan</a>
+</div>
+
+<div class="agenda-card">
+<h2> Agenda Mendatang</h2>
+<div class="agenda-list" id="agendaList">
+<p>Sedang memuat...</p>
+</div>
+</div>
+</div>
+
+<!-- SEKOLAH SECTION -->
+<div class="content-section" id="section-sekolah" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>🏫 Daftar Sekolah</h2>
+</div>
+<div class="search-box">
+<input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah...">
+</div>
+<div class="table-container">
+<table id="tableSekolah">
 <thead>
 <tr>
-<th>No</th>
-<th>Nama</th>
-<th>🆔 NIK</th>
-<th>💬 Nomor WA</th>
-<th>Email</th>
-<th>📌 Posisi</th>
-<th>🎂 Tanggal Lahir</th>
-<th>🪪 KTP</th>
+<th>No</th><th>Nama Sekolah</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>🏦 Rekening</th><th>📍 Lokasi</th><th>‍🎓 Siswa</th>
 </tr>
 </thead>
 <tbody></tbody>
-</table></div>
-        </div>
+</table>
+</div>
+</div>
 
-        <!-- Koordinator Section -->
-        <div id="section-koordinator" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>👔 Koordinator & Kontak</h2></div>
-            <div class="card-grid" id="cardKoordinator"></div>
-        </div>
+<!-- RELAWAN SECTION -->
+<div class="content-section" id="section-relawan" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>👥 Daftar Relawan</h2>
+</div>
+<div class="search-box">
+<input type="text" id="searchRelawan" placeholder="🔍 Cari relawan...">
+</div>
+<div class="table-container">
+<table id="tableRelawan">
+<thead>
+<tr>
+<th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>Email</th><th>📌 Posisi</th><th>📷 KTP</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
 
-        <!-- Kontak Section -->
-        <div id="section-kontak" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📞 Kontak Staff Internal</h2></div>
-            <div class="card-grid" id="cardKontak"></div>
-        </div>
+<!-- KOORDINATOR SECTION -->
+<div class="content-section" id="section-koordinator" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>👔 Koordinator & Kontak</h2>
+</div>
+<div class="card-grid" id="cardKoordinator"></div>
+</div>
 
-        <!-- Surat Section -->
-        <div id="section-surat" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>⚠️ Surat Peringatan</h2></div>
-            <div class="search-box"><input type="text" id="searchSurat" placeholder="🔍 Cari surat..."></div>
-            <div class="card-grid" id="cardSurat"></div>
-        </div>
+<!-- KONTAK SECTION -->
+<div class="content-section" id="section-kontak" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>📞 Kontak Staff Internal</h2>
+</div>
+<div class="card-grid" id="cardKontak"></div>
+</div>
 
-        <!-- Dokumen Section -->
-        <div id="section-dokumen" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📚 Pusat Dokumen</h2></div>
-            <div class="doc-categories">
-                <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
-                <button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
-                <button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
-                <button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
-                <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
-                <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
-            </div>
-            <div class="search-box"><input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen..."></div>
-            <div class="doc-grid" id="docGrid"></div>
-        </div>
+<!-- SURAT SECTION -->
+<div class="content-section" id="section-surat" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>⚠️ Surat Peringatan</h2>
+</div>
+<div class="search-box">
+<input type="text" id="searchSurat" placeholder="🔍 Cari surat...">
+</div>
+<div id="cardSurat"></div>
+</div>
 
-        <!-- Info Section -->
-        <div id="section-info" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📢 Papan Informasi & Memo</h2></div>
-            <div class="info-stats">
-                <div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
-                <div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
-                <div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
-            </div>
-            <div class="info-categories">
-                <button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
-                <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
-                <button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
-                <button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
-                <button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
-                <button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
-            </div>
-            <div class="search-box"><input type="text" id="searchInfo" placeholder="🔍 Cari informasi..."></div>
-            <div class="info-board" id="infoBoard"></div>
-        </div>
+<!-- DOKUMEN SECTION -->
+<div class="content-section" id="section-dokumen" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>📚 Pusat Dokumen</h2>
+</div>
+<div class="doc-categories">
+<button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
+<button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
+<button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
+<button class="category-btn" onclick="filterDokumen('form', this)"> Form</button>
+<button class="category-btn" onclick="filterDokumen('sk', this)"> SK</button>
+<button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
+</div>
+<div class="search-box">
+<input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen...">
+</div>
+<div class="doc-grid" id="docGrid"></div>
+</div>
 
-        <!-- Menu Section -->
-        <div id="section-menu" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🍱 Menu Mingguan</h2></div>
-            <div class="menu-weekly-nav">
-                <button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
-                <button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
-            </div>
-            <div class="menu-weekly-container" id="menuWeeklyContainer"></div>
-        </div>
+<!-- INFO SECTION -->
+<div class="content-section" id="section-info" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>📢 Papan Informasi & Memo</h2>
+</div>
+<div class="info-stats">
+<div class="info-stat-item"><span class="info-stat-icon"></span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
+<div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
+<div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
+</div>
+<div class="info-categories">
+<button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
+<button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
+<button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
+<button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
+<button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
+<button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
+</div>
+<div class="search-box">
+<input type="text" id="searchInfo" placeholder="🔍 Cari informasi...">
+</div>
+<div class="info-board" id="infoBoard"></div>
+</div>
 
-        <!-- Rute Section -->
-        <div id="section-rute" class="content-section" style="display:none;">
-            <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🚚 Rute Distribusi MBG</h2><button class="btn-download-rute" id="btnDownloadRute"><i class="fas fa-download"></i> Download PNG</button></div>
-            <div id="ruteContent"><p style="text-align:center;padding:40px;">Memuat data rute...</p></div>
-        </div>
-    </div>
+<!-- MENU SECTION -->
+<div class="content-section" id="section-menu" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>🍱 Menu Mingguan</h2>
+</div>
+<div class="menu-weekly-nav">
+<button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
+<button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
+</div>
+<div class="menu-weekly-container" id="menuWeeklyContainer"></div>
+</div>
 
-    <div class="footer"><p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p><p class="footer-small">📢REDZONE ROOM ADA DI KANAN POJOK BAWAH</p></div>
+<!-- RUTE SECTION -->
+<div class="content-section" id="section-rute" style="display:none;">
+<div class="section-header">
+<button class="back-btn" onclick="showHome()">← Beranda</button>
+<h2>🚚 Rute Distribusi MBG</h2>
+</div>
+<button class="btn-download-rute" id="btnDownloadRute"><i class="fas fa-download"></i> Download PNG</button>
+<div id="ruteContent">Memuat data rute...</div>
+</div>
 
-    <!-- REDZONE CHAT WIDGET -->
-    <div class="chat-widget" id="chatWidget">
-        <button class="chat-toggle-btn" id="chatToggleBtn" onclick="window.toggleRedzoneChat()">
-            
-            <span class="chat-badge" id="chatBadge" style="display:none;">0</span>
-        </button>
-        <div class="chat-window" id="chatWindow" style="display:none;">
-            <div class="chat-name-form" id="chatNameForm">
-                <div class="chat-name-body">
-                    <div class="chat-welcome-icon">🚨</div>
-                    <h4>REDZONE CHAT ROOM</h4>
-                    <p>Masukkan nama Anda untuk bergabung</p>
-                    <input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="20">
-                    <button class="chat-start-btn" onclick="window.joinRedzone()">Masuk Room</button>
-                    <p class="chat-hint">💡 Nama harus unik. Admin gunakan kode khusus.</p>
-                </div>
-            </div>
-            <div class="chat-room" id="chatRoom" style="display:none;">
-                <div class="chat-header">
-                    <div class="chat-header-info">
-                        <h3>🚨 REDZONE ROOM CHAT</h3>
-                        <span class="chat-user-label">Online: <span id="onlineCount">0</span> Pengguna | <span id="currentUserName">Guest</span> <button class="change-name-btn" onclick="window.changeName()" title="Ganti Nama">✏️</button></span>
-                    </div>
-                    <div class="chat-header-actions">
-                        <button class="header-action-btn" onclick="window.toggleEmojiPicker()" title="Emoji">😊</button>
-                        <button class="header-action-btn" onclick="window.toggleSearch()" title="Cari">🔍</button>
-                        <button class="chat-close-btn" onclick="window.toggleRedzoneChat()">✕</button>
-                    </div>
-                </div>
-                <div class="redzone-announcement" id="announcementBox" style="display:none;">
-                    <span class="announcement-text" id="announcementText"></span>
-                    <button class="announcement-close" id="announcementCloseBtn" onclick="window.unpinAnnouncement()" style="display:none;">✕</button>
-                </div>
-                <div class="chat-search-bar" id="chatSearchBar" style="display:none;">
-                    <input type="text" id="chatSearchInput" placeholder="Cari pesan..." oninput="window.filterMessages()">
-                    <button onclick="window.toggleSearch()">✕</button>
-                </div>
-                <div class="chat-messages" id="chatMessages"><div class="chat-loading">⏳ Menghubungkan ke REDZONE...</div></div>
-                <div class="chat-emoji-picker" id="emojiPicker" style="display:none;"></div>
-                <div class="chat-reply-preview" id="replyPreview" style="display:none;">
-                    <span id="replyPreviewText"></span>
-                    <button onclick="window.cancelReply()">✕</button>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." maxlength="500" onkeydown="window.handleEnter(event)">
-                    <button class="chat-send-btn" onclick="window.sendMessage()">➤</button>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- FOOTER -->
+<div class="footer">
+<p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p>
+<p class="footer-small">📢 REDZONE ROOM ADA DI KANAN POJOK BAWAH</p>
+</div>
+
+<!-- REDZONE CHAT ROOM -->
+<div class="chat-widget" id="chatWidget">
+<button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()">
+🚨
+<span class="chat-badge" id="chatBadge">0</span>
+</button>
+<div class="chat-window" id="chatWindow" style="display:none;">
+<div class="chat-header">
+<div class="chat-header-info">
+<h3>🚨 REDZONE ROOM CHAT</h3>
+<div class="chat-user-label" id="chatUserLabel">Online: 0 Pengguna | Guest</div>
+</div>
+<div class="chat-header-actions">
+<button class="change-name-btn" onclick="showChangeName()" title="Ganti Nama">✏️</button>
+<button class="header-action-btn" onclick="toggleEmojiPicker()" title="Emoji">😊</button>
+<button class="header-action-btn" onclick="toggleSearchChat()" title="Cari">🔍</button>
+<button class="chat-close-btn" onclick="toggleChat()">✕</button>
+</div>
+</div>
+<div class="chat-name-form" id="chatNameForm">
+<div class="chat-name-body">
+<div class="chat-welcome-icon">🚨</div>
+<h4>REDZONE CHAT ROOM</h4>
+<p>Masukkan nama Anda untuk bergabung</p>
+<input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="20">
+<button class="chat-start-btn" onclick="joinChat()">Masuk Room</button>
+<p class="chat-hint">💡 Nama harus unik. Admin gunakan kode khusus.</p>
+</div>
+</div>
+<div class="chat-room" id="chatRoom" style="display:none;">
+<div class="redzone-announcement" id="redzoneAnnouncement">
+<span class="announcement-text" id="announcementText">📢 Selamat datang di REDZONE!</span>
+<button class="announcement-close" onclick="closeAnnouncement()">✕</button>
+</div>
+<div class="chat-search-bar" id="chatSearchBar" style="display:none;">
+<input type="text" id="chatSearchInput" placeholder="Cari pesan..." oninput="searchChatMessages()">
+<button onclick="toggleSearchChat()">✕</button>
+</div>
+<div class="chat-messages" id="chatMessages">
+<div class="chat-loading">⏳ Menghubungkan ke REDZONE...</div>
+</div>
+<div class="chat-emoji-picker" id="emojiPicker" style="display:none;"></div>
+<div class="chat-reply-preview" id="replyPreview" style="display:none;">
+<span id="replyText"></span>
+<button onclick="cancelReply()">✕</button>
+</div>
+<div class="chat-input-area">
+<input type="text" id="chatInput" placeholder="Ketik pesan..." onkeypress="handleChatKeypress(event)">
+<button class="chat-send-btn" onclick="sendMessage()">➤</button>
+</div>
+</div>
+</div>
+</div>
+
 <script src="script.js"></script>
-    
-    <!-- Firebase REDZONE Chat Module -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, deleteDoc, doc, setDoc, getDocs, updateDoc, where } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBBTmEXeyfgE-DKg73OmkgroBtp1_NLAOU",
-            authDomain: "chat-portal-67948.firebaseapp.com",
-            databaseURL: "https://chat-portal-67948-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "chat-portal-67948",
-            storageBucket: "chat-portal-67948.firebasestorage.app",
-            messagingSenderId: "536843661380",
-            appId: "1:536843661380:web:4eae78f035d0d21eb4cc11"
-        };
-
-        let app, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            console.log("✅ Firebase berhasil diinisialisasi");
-        } catch (error) {
-            console.error("❌ Error inisialisasi Firebase:", error);
-        }
-
-        let currentUser = { uid: null, name: '', isAdmin: false };
-        let onlineUsers = [];
-        let allMessages = [];
-        let replyTo = null;
-        let isChatOpen = false;
-        let unreadCount = 0;
-        let unsubscribers = [];
-        let currentAnnouncementId = null;
-
-        function generateUID() { return 'user_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); }
-        function loadLocalUser() {
-            const saved = localStorage.getItem('redzone_user');
-            if (saved) { try { currentUser = JSON.parse(saved); return true; } catch(e) {} }
-            return false;
-        }
-        function validateName(name) {
-            const blocked = /^(admin|administrator|adm|admien|mimin|superadmin)$/i;
-            if (blocked.test(name)) return { valid: false, msg: "Nama tersebut tidak dapat digunakan. Silakan gunakan nama lain." };
-            return { valid: true };
-        }
-        async function isNameOnline(name) {
-            if (!db) return false;
-            try {
-                const q = query(collection(db, "users_online"), where("name", "==", name));
-                const snapshot = await getDocs(q);
-                let isOnline = false;
-                const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.lastSeen && data.lastSeen.toDate && data.lastSeen.toDate() > fiveMinsAgo) isOnline = true;
-                });
-                return isOnline;
-            } catch (error) {
-                console.error("Error cek nama online:", error);
-                return false;
-            }
-        }
-
-        window.joinRedzone = async function() {
-            if (!db) { alert("❌ Firebase belum terhubung. Periksa koneksi internet Anda."); return; }
-            const nameInput = document.getElementById('chatNameInput');
-            let name = nameInput.value.trim();
-            if (!name) { alert('Silakan masukkan nama Anda.'); return; }
-            
-            const validation = validateName(name);
-            if (!validation.valid) { alert(validation.msg); return; }
-
-            try {
-                if (name === '31') {
-                    const isAdminOnline = await isNameOnline('ADMIN');
-                    if (isAdminOnline) { alert("ADMIN sedang aktif."); return; }
-                    currentUser = { uid: generateUID(), name: 'ADMIN', isAdmin: true };
-                } else {
-                    const isOnline = await isNameOnline(name);
-                    if (isOnline) { alert("Nama tersebut sedang digunakan oleh pengguna lain. Silakan gunakan nama yang berbeda."); return; }
-                    currentUser = { uid: generateUID(), name: name, isAdmin: false };
-                }
-
-                localStorage.setItem('redzone_user', JSON.stringify(currentUser));
-                document.getElementById('chatNameForm').style.display = 'none';
-                document.getElementById('chatRoom').style.display = 'flex';
-                document.getElementById('currentUserName').textContent = currentUser.name;
-                await registerOnline();
-                startListeners();
-            } catch (error) {
-                console.error("Error saat join:", error);
-                alert("❌ Gagal masuk room. Periksa koneksi internet dan Firebase Rules Anda.");
-            }
-        }
-
-        async function registerOnline() {
-            if (!db || !currentUser.uid) return;
-            try {
-                const userDoc = doc(db, "users_online", currentUser.uid);
-                await setDoc(userDoc, { uid: currentUser.uid, name: currentUser.name, isAdmin: currentUser.isAdmin, lastSeen: serverTimestamp() });
-                if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
-                window.heartbeatInterval = setInterval(async () => {
-                    try { await updateDoc(userDoc, { lastSeen: serverTimestamp() }); } catch(e) { console.error("Heartbeat failed", e); }
-                }, 30000);
-            } catch (error) {
-                console.error("Error register online:", error);
-            }
-        }
-
-        window.addEventListener('beforeunload', async () => {
-            if (currentUser.uid && db) { try { await deleteDoc(doc(db, "users_online", currentUser.uid)); } catch(e) {} }
-        });
-
-        function startListeners() {
-            if (!db) return;
-            unsubscribers.forEach(unsub => unsub());
-            unsubscribers = [];
-            
-            unsubscribers.push(onSnapshot(collection(db, "users_online"), (snapshot) => {
-                const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
-                onlineUsers = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.lastSeen && data.lastSeen.toDate && data.lastSeen.toDate() > fiveMinsAgo) onlineUsers.push(data);
-                });
-                document.getElementById('onlineCount').textContent = onlineUsers.length;
-            }, (error) => console.error("Error users_online listener:", error)));
-            
-            unsubscribers.push(onSnapshot(collection(db, "announcements"), (snapshot) => {
-                const box = document.getElementById('announcementBox');
-                const text = document.getElementById('announcementText');
-                const closeBtn = document.getElementById('announcementCloseBtn');
-                if (!snapshot.empty) {
-                    const ann = snapshot.docs[0].data();
-                    text.innerHTML = `📢 <strong>Pengumuman:</strong> ${sanitize(ann.message)}`;
-                    box.style.display = 'flex';
-                    closeBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
-                    currentAnnouncementId = snapshot.docs[0].id;
-                } else {
-                    box.style.display = 'none';
-                    currentAnnouncementId = null;
-                }
-            }, (error) => console.error("Error announcements listener:", error)));
-            
-            const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(100));
-            unsubscribers.push(onSnapshot(q, (snapshot) => {
-                const isAtBottom = isScrolledToBottom();
-                allMessages = [];
-                snapshot.forEach(docSnap => allMessages.push({ id: docSnap.id, ...docSnap.data() }));
-                allMessages.reverse();
-                renderMessages();
-                if (isAtBottom) scrollToBottom();
-                else if (!isChatOpen) { unreadCount++; updateBadge(); }
-            }, (error) => {
-                console.error("Error messages listener:", error);
-                document.getElementById('chatMessages').innerHTML = '<div class="chat-loading" style="color:#f87171;">❌ Gagal memuat pesan. Periksa Firebase Rules.</div>';
-            }));
-        }
-
-        function sanitize(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
-        function isScrolledToBottom() { const el = document.getElementById('chatMessages'); return el.scrollHeight - el.clientHeight <= el.scrollTop + 50; }
-        function scrollToBottom() { const el = document.getElementById('chatMessages'); el.scrollTop = el.scrollHeight; }
-        function updateBadge() {
-            const badge = document.getElementById('chatBadge');
-            if (unreadCount > 0) { badge.textContent = unreadCount > 99 ? '99+' : unreadCount; badge.style.display = 'flex'; }
-            else badge.style.display = 'none';
-        }
-        function getUserColor(name) {
-            if (name === 'ADMIN') return 'linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)';
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            const h = Math.abs(hash) % 360;
-            return `hsl(${h}, 70%, 40%)`;
-        }
-
-        function renderMessages() {
-            const container = document.getElementById('chatMessages');
-            const searchTerm = document.getElementById('chatSearchInput').value.toLowerCase();
-            let filtered = allMessages;
-            if (searchTerm) filtered = allMessages.filter(m => m.message.toLowerCase().includes(searchTerm) || m.name.toLowerCase().includes(searchTerm));
-            container.innerHTML = '';
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="chat-loading">Belum ada pesan. Jadilah yang pertama!</div>';
-                return;
-            }
-            filtered.forEach(msg => {
-                const isSelf = msg.name === currentUser.name;
-                const time = msg.timestamp && msg.timestamp.toDate ? msg.timestamp.toDate().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
-                const color = getUserColor(msg.name);
-                let replyHtml = msg.replyTo ? `<div class="chat-message-reply">${sanitize(msg.replyTo)}</div>` : '';
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `chat-message ${isSelf ? 'chat-message-self' : (msg.isAdmin ? 'chat-message-admin' : 'chat-message-other')}`;
-                msgDiv.dataset.id = msg.id;
-                let adminActions = '';
-                if (currentUser.isAdmin && !msg.isAdmin) {
-                    adminActions = `<div class="chat-message-actions"><button class="msg-action-btn" onclick="window.deleteMessage('${msg.id}')" title="Hapus">🗑️</button><button class="msg-action-btn" onclick="window.pinMessage('${msg.id}')" title="Pin">📌</button></div>`;
-                }
-                msgDiv.innerHTML = `<div class="chat-message-sender" style="color: ${msg.isAdmin ? '#fbbf24' : color}">${msg.isAdmin ? '👑 ADMIN' : sanitize(msg.name)}</div>${replyHtml}<div class="chat-message-bubble" style="${!isSelf && !msg.isAdmin ? `background: ${color}; border: 1px solid ${color};` : ''}">${sanitize(msg.message)}</div><div class="chat-message-time">${time}${!isSelf ? `<button class="reply-btn" onclick="window.setReply('${msg.id}')">↩️</button>` : ''}</div>${adminActions}`;
-                container.appendChild(msgDiv);
-            });
-        }
-
-        window.deleteMessage = async function(id) { if (!currentUser.isAdmin || !db) return; if (confirm("Hapus pesan ini?")) await deleteDoc(doc(db, "messages", id)); };
-        window.pinMessage = async function(id) {
-            if (!currentUser.isAdmin || !db) return;
-            const msg = allMessages.find(m => m.id === id);
-            if (!msg) return;
-            const annSnap = await getDocs(collection(db, "announcements"));
-            const batch = [];
-            annSnap.forEach(d => batch.push(deleteDoc(doc(db, "announcements", d.id))));
-            await Promise.all(batch);
-            await addDoc(collection(db, "announcements"), { message: msg.message, timestamp: serverTimestamp() });
-        };
-        window.unpinAnnouncement = async function() { if (!currentUser.isAdmin || !currentAnnouncementId || !db) return; await deleteDoc(doc(db, "announcements", currentAnnouncementId)); };
-        window.setReply = function(id) {
-            const msg = allMessages.find(m => m.id === id);
-            if (!msg) return;
-            replyTo = { id: msg.id, name: msg.name, text: msg.message.substring(0, 50) };
-            document.getElementById('replyPreview').style.display = 'flex';
-            document.getElementById('replyPreviewText').textContent = `↩️ ${msg.name}: ${replyTo.text}`;
-            document.getElementById('chatMessageInput').focus();
-        };
-        window.cancelReply = function() { replyTo = null; document.getElementById('replyPreview').style.display = 'none'; };
-        window.sendMessage = async function() {
-            if (!db) return;
-            const input = document.getElementById('chatMessageInput');
-            const text = input.value.trim();
-            if (!text) return;
-            if (text.length > 500) { alert("Pesan maksimal 500 karakter."); return; }
-            const newMsg = { name: currentUser.name, message: text, timestamp: serverTimestamp(), isAdmin: currentUser.isAdmin };
-            if (replyTo) { newMsg.replyTo = `${replyTo.name}: ${replyTo.text}`; window.cancelReply(); }
-            await addDoc(collection(db, "messages"), newMsg);
-            input.value = '';
-            scrollToBottom();
-        };
-        window.handleEnter = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.sendMessage(); } };
-        window.toggleRedzoneChat = function() {
-            const chatWindow = document.getElementById('chatWindow');
-            isChatOpen = chatWindow.style.display !== 'none';
-            if (isChatOpen) { chatWindow.style.display = 'none'; isChatOpen = false; }
-            else {
-                chatWindow.style.display = 'flex';
-                isChatOpen = true;
-                unreadCount = 0;
-                updateBadge();
-                scrollToBottom();
-                if (loadLocalUser() && db) {
-                    document.getElementById('chatNameForm').style.display = 'none';
-                    document.getElementById('chatRoom').style.display = 'flex';
-                    document.getElementById('currentUserName').textContent = currentUser.name;
-                    registerOnline();
-                    startListeners();
-                } else {
-                    document.getElementById('chatNameForm').style.display = 'flex';
-                    document.getElementById('chatRoom').style.display = 'none';
-                }
-            }
-        };
-        window.changeName = function() {
-            if (confirm("Keluar dan ganti nama? Status online Anda akan dihapus.")) {
-                if (currentUser.uid && db) deleteDoc(doc(db, "users_online", currentUser.uid));
-                if (window.heartbeatInterval) clearInterval(window.heartbeatInterval);
-                localStorage.removeItem('redzone_user');
-                currentUser = { uid: null, name: '', isAdmin: false };
-                document.getElementById('chatNameForm').style.display = 'flex';
-                document.getElementById('chatRoom').style.display = 'none';
-                document.getElementById('chatNameInput').value = '';
-            }
-        };
-        window.toggleEmojiPicker = function() {
-            const picker = document.getElementById('emojiPicker');
-            if (picker.style.display === 'none') {
-                picker.style.display = 'grid';
-                if (picker.children.length === 0) {
-                    const emojis = ['😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎','😍','😘','😗','😙','😚','😇','😐','😑','😶','😏','😣','😥','😮','😯','😪','😫','😴','😌','😛','😜','😝','😒','😓','😔','😕','😲','😷','😖','😞','😟','😤','😢','😭','😦','😧','😨','😬','😰','😱','😳','😵','😡','😠','👍','👎','👌','👊','✊','✌️','👋','👏','🙌','🙏','🔥','❤️','💔','💯','💢','💨','💦','💫','💬','👑','🚨','📢','📌','📅','📊','📉','📈'];
-                    emojis.forEach(e => {
-                        const btn = document.createElement('button');
-                        btn.className = 'emoji-btn';
-                        btn.textContent = e;
-                        btn.onclick = () => { document.getElementById('chatMessageInput').value += e; picker.style.display = 'none'; };
-                        picker.appendChild(btn);
-                    });
-                }
-            } else picker.style.display = 'none';
-        };
-        window.toggleSearch = function() {
-            const bar = document.getElementById('chatSearchBar');
-            if (bar.style.display === 'none') { bar.style.display = 'flex'; document.getElementById('chatSearchInput').focus(); }
-            else { bar.style.display = 'none'; document.getElementById('chatSearchInput').value = ''; renderMessages(); }
-        };
-        window.filterMessages = function() { renderMessages(); };
-    </script>
 </body>
 </html>
