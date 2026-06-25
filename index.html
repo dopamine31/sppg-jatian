@@ -31,74 +31,147 @@
 
 <!-- SIDEBAR -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
 <div class="sidebar" id="sidebar">
-<div class="sidebar-header">
-<h3>️ Menu Utama</h3>
-<button class="sidebar-close" onclick="toggleMenu()">✕</button>
-</div>
-<div class="sidebar-nav">
-<a class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">✨</span> Beranda</a>
-<div class="accordion-group">
-<button class="accordion-header" onclick="toggleAccordion(this)">
-<span class="accordion-title"><span class="menu-icon">🏫</span> Operasional & Logistik</span>
-<span class="accordion-icon">▼</span>
-</button>
-<div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon">🏫</span> Daftar Sekolah</a>
-<a class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</a>
-<a class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</a>
-</div>
-</div>
-<div class="accordion-group">
-<button class="accordion-header" onclick="toggleAccordion(this)">
-<span class="accordion-title"><span class="menu-icon">👥</span> Manajemen Tim</span>
-<span class="accordion-icon">▼</span>
-</button>
-<div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon">👥</span> Daftar Relawan</a>
-<a class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon">👔</span> Koordinator</a>
-<a class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">👩‍💼📞</span> Kontak Staff</a>
-<a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️<button class="accordion-header" onclick="toggleAccordion(this)">
-<span class="accordion-title"><span class="menu-icon">ℹ️</span> Informasi & Dokumen</span>
-<span class="accordion-icon">▼</span>
-</button>
-<div class="accordion-content">
-<a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</a>
-<a class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📋</span> Papan Informasi</a>
-</div>
-</div>
-<a href="http://portalsppgjatian.my.id/" target="_blank" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
-</div>
-<div class="sidebar-footer">
-© <span id="year"></span> ASLAP SPPG JATIAN
-</div>
+
+    <div class="sidebar-header">
+        <h3>☰ Menu Utama</h3>
+        <button class="sidebar-close" onclick="toggleMenu()">✕</button>
+    </div>
+
+    <div class="sidebar-nav">
+
+        <!-- BERANDA -->
+        <a class="sidebar-menu-btn home-btn" onclick="showHome()">
+            <span class="menu-icon">✨</span> Beranda
+        </a>
+
+        <!-- OPERASIONAL -->
+        <div class="accordion-group">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+                <span class="accordion-title">
+                    <span class="menu-icon">🏫</span>
+                    Operasional & Logistik
+                </span>
+                <span class="accordion-icon">▼</span>
+            </button>
+
+            <div class="accordion-content">
+                <a class="sidebar-menu-btn" onclick="showSection('sekolah')">
+                    <span class="menu-icon">🏫</span> Daftar Sekolah
+                </a>
+
+                <a class="sidebar-menu-btn" onclick="showSection('menu')">
+                    <span class="menu-icon">📅</span> Menu Mingguan
+                </a>
+
+                <a class="sidebar-menu-btn" onclick="showSection('rute')">
+                    <span class="menu-icon">🚚</span> Rute Distribusi
+                </a>
+            </div>
+        </div>
+
+        <!-- MANAJEMEN TIM -->
+        <div class="accordion-group">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+                <span class="accordion-title">
+                    <span class="menu-icon">👥</span>
+                    Manajemen Tim
+                </span>
+                <span class="accordion-icon">▼</span>
+            </button>
+
+            <div class="accordion-content">
+
+                <a class="sidebar-menu-btn" onclick="showSection('relawan')">
+                    <span class="menu-icon">👥</span> Daftar Relawan
+                </a>
+
+                <a class="sidebar-menu-btn" onclick="showSection('koordinator')">
+                    <span class="menu-icon">👔</span> Koordinator
+                </a>
+
+                <a class="sidebar-menu-btn" onclick="showSection('kontak')">
+                    <span class="menu-icon">👩‍💼📞</span> Kontak Staff
+                </a>
+
+                <a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')">
+                    <span class="menu-icon">⚠️</span> Surat Peringatan
+                </a>
+
+            </div>
+        </div>
+
+        <!-- INFORMASI -->
+        <div class="accordion-group">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+                <span class="accordion-title">
+                    <span class="menu-icon">📚</span>
+                    Informasi & Dokumen
+                </span>
+                <span class="accordion-icon">▼</span>
+            </button>
+
+            <div class="accordion-content">
+
+                <a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')">
+                    <span class="menu-icon">📚</span> Pusat Dokumen
+                </a>
+
+                <a class="sidebar-menu-btn" onclick="showSection('info')">
+                    <span class="menu-icon">📋</span> Papan Informasi
+                </a>
+
+            </div>
+        </div>
+
+        <!-- INSENTIF -->
+        <a href="http://portalsppgjatian.my.id/" target="_blank" class="sidebar-insentif-btn">
+            💰 Summary Insentif PIC
+        </a>
+
+    </div>
+
+    <div class="sidebar-footer">
+        © <span id="year"></span> ASLAP SPPG JATIAN
+    </div>
+
 </div>
 
 <!-- STICKY HEADER -->
 <div class="sticky-header">
-<div class="header-top">
-<button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
-<div class="header-title">
-<h1>️ P O R T A L S P P G J A T I A N</h1>
-<p>Jatian Pakusari Jember</p>
-</div>
-<div class="clock-container">
-<div class="analog-clock">
-<div class="clock-face">
-<div class="hour-hand" id="hourHand"></div>
-<div class="minute-hand" id="minuteHand"></div>
-<div class="second-hand" id="secondHand"></div>
-<div class="clock-center"></div>
-</div>
-</div>
-<div class="digital-clock">
-<div class="time-display" id="digitalTime">00:00:00</div>
-<div class="ms-display" id="msDisplay">000</div>
-<div class="date-display" id="dateDisplay">-</div>
-<span class="timezone-badge">WIB</span>
-</div>
-</div>
-</div>
+
+    <div class="header-top">
+
+        <button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
+
+        <div class="header-title">
+            <h1>PORTAL SPPG JATIAN</h1>
+            <p>Jatian Pakusari Jember</p>
+        </div>
+
+        <div class="clock-container">
+
+            <div class="analog-clock">
+                <div class="clock-face">
+                    <div class="hour-hand" id="hourHand"></div>
+                    <div class="minute-hand" id="minuteHand"></div>
+                    <div class="second-hand" id="secondHand"></div>
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+
+            <div class="digital-clock">
+                <div class="time-display" id="digitalTime">00:00:00</div>
+                <div class="ms-display" id="msDisplay">000</div>
+                <div class="date-display" id="dateDisplay">-</div>
+                <span class="timezone-badge">WIB</span>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <div class="container">
