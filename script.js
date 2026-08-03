@@ -168,12 +168,13 @@ async function loadSekolah() {
         const kecamatan     = escapeHtml(row['Kecamatan'] || row['kecamatan'] || '-');
         const kelDesa       = escapeHtml(row['Kel/Desa'] || row['Kelurahan'] || row['Desa'] || row['kel_desa'] || '-');
         const alamat        = escapeHtml(row['Alamat'] || row['alamat'] || '-');
+        const totalPM       = escapeHtml(row['Total PM'] || row['total_pm'] || row['Jumlah Siswa'] || '-');
         const namaPIC       = escapeHtml(row['Nama PIC'] || row['PIC'] || '-');
         const kepalaSekolah = escapeHtml(row['Kepala Sekolah'] || row['Kepsek'] || '-');
         const noTelp        = escapeHtml(row['No Telp'] || row['No. Telp'] || row['No Telp Sekolah'] || row['no_telp'] || '-');
         const email         = escapeHtml(row['Email'] || row['email'] || row['Email Sekolah'] || '-');
         const rekening      = escapeHtml(row['Rekening Insentif'] || row['Rekening'] || '-');
-        const jumlahSiswa   = escapeHtml(row['Jumlah Siswa'] || row['jumlah_siswa'] || '-');
+        
 
         // === Link Maps ===
         const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null;
@@ -207,9 +208,8 @@ async function loadSekolah() {
             statusBadge = `<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;">SWASTA</span>`;
         }
 
-                return `<tr>
+        return `<tr>
             <td>${i + 1}</td>
-            <td><span class="npsn-badge">${npsn}</span></td> <!-- 👈 KOLOM NPSN -->
             <td><strong>${jenjang}</strong></td>
             <td><strong>${namaSekolah}</strong></td>
             <td>${statusBadge}</td>
@@ -224,7 +224,6 @@ async function loadSekolah() {
             <td>${emailCell}</td>
             <td>${rekening}</td>
             <td>${mapsCell}</td>
-            <td style="text-align:center;">${jumlahSiswa}</td>
         </tr>`;
     }).join('');
 
