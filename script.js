@@ -149,13 +149,13 @@ setTimeout(() => clearInterval(checkInterval), 120000);
 async function loadSekolah() {
     const tbody = document.querySelector('#tableSekolah tbody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
 
     const data = await fetchJsonData('sekolah');
     globalData.sekolah = data;
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>';
         return;
     }
 
