@@ -149,18 +149,19 @@ setTimeout(() => clearInterval(checkInterval), 120000);
 async function loadSekolah() {
     const tbody = document.querySelector('#tableSekolah tbody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
 
     const data = await fetchJsonData('sekolah');
     globalData.sekolah = data;
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>';
         return;
     }
 
     tbody.innerHTML = data.map((row, i) => {
         // === Ambil data dengan fallback ===
+        const npsn          = escapeHtml(row['NPSN'] || '-');
         const jenjang       = escapeHtml(row['Jenjang'] || row['jenjang'] || '-');
         const namaSekolah   = escapeHtml(row['Nama Sekolah'] || row['nama_sekolah'] || '-');
         const status        = escapeHtml(row['Status'] || row['Status Kepemilikan'] || row['status'] || '-');
@@ -207,8 +208,9 @@ async function loadSekolah() {
             statusBadge = `<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;">SWASTA</span>`;
         }
 
-        return `<tr>
+                return `<tr>
             <td>${i + 1}</td>
+            <td><span class="npsn-badge">${npsn}</span></td> <!-- 👈 KOLOM NPSN -->
             <td><strong>${jenjang}</strong></td>
             <td><strong>${namaSekolah}</strong></td>
             <td>${statusBadge}</td>
