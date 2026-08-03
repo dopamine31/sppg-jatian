@@ -147,19 +147,91 @@ setTimeout(() => clearInterval(checkInterval), 120000);
 
 // ===== DATA LOADERS =====
 async function loadSekolah() {
-const tbody = document.querySelector('#tableSekolah tbody'); if (!tbody) return;
-tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
-const data = await fetchJsonData('sekolah');
-globalData.sekolah = data;
-if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>'; return; }
-tbody.innerHTML = data.map((row, i) => {
-const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null;
-const waNumber = cleanWA(row['WA PIC']);
-const mapsCell = mapsLink ? `<a href="${mapsLink}" target="_blank" rel="noopener noreferrer">📍 Maps</a>` : '<span style="color:#999;">-</span>';
-const waCell = waNumber ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">💬 ${escapeHtml(row['WA PIC'])}</a>` : '<span style="color:#999;">-</span>';
-return `<tr><td>${i + 1}</td><td><strong>${escapeHtml(row['Nama Sekolah'])}</strong></td><td>${escapeHtml(row['Nama PIC'])}</td><td>${waCell}</td><td>${escapeHtml(row['Kepala Sekolah'])}</td><td>${escapeHtml(row['Rekening Insentif'])}</td><td>${mapsCell}</td><td>${escapeHtml(row['Jumlah Siswa'])}</td></tr>`;
-}).join('');
-document.getElementById('searchSekolah').addEventListener('input', (e) => filterTable(e, tbody));
+    const tbody = document.querySelector('#tableSekolah tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⏳ Memuat data...</td></tr>';
+
+    const data = await fetchJsonData('sekolah');
+    globalData.sekolah = data;
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:20px;">⚠️ Data tidak tersedia</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map((row, i) => {
+        // === Ambil data dengan fallback ===
+        const jenjang       = escapeHtml(row['Jenjang'] || row['jenjang'] || '-');
+        const namaSekolah   = escapeHtml(row['Nama Sekolah'] || row['nama_sekolah'] || '-');
+        const status        = escapeHtml(row['Status'] || row['Status Kepemilikan'] || row['status'] || '-');
+        const kecamatan     = escapeHtml(row['Kecamatan'] || row['kecamatan'] || '-');
+        const kelDesa       = escapeHtml(row['Kel/Desa'] || row['Kelurahan'] || row['Desa'] || row['kel_desa'] || '-');
+        const alamat        = escapeHtml(row['Alamat'] || row['alamat'] || '-');
+        const totalPM       = escapeHtml(row['Total PM'] || row['total_pm'] || row['Jumlah Siswa'] || '-');
+        const namaPIC       = escapeHtml(row['Nama PIC'] || row['PIC'] || '-');
+        const kepalaSekolah = escapeHtml(row['Kepala Sekolah'] || row['Kepsek'] || '-');
+        const noTelp        = escapeHtml(row['No Telp'] || row['No. Telp'] || row['No Telp Sekolah'] || row['no_telp'] || '-');
+        const email         = escapeHtml(row['Email'] || row['email'] || row['Email Sekolah'] || '-');
+        const rekening      = escapeHtml(row['Rekening Insentif'] || row['Rekening'] || '-');
+        const jumlahSiswa   = escapeHtml(row['Jumlah Siswa'] || row['jumlah_siswa'] || '-');
+
+        // === Link Maps ===
+        const mapsLink = isValidLink(row['Link Maps']) ? row['Link Maps'].trim() : null;
+        const mapsCell = mapsLink
+            ? `<a href="${mapsLink}" target="_blank" rel="noopener noreferrer">📍 Maps</a>`
+            : '<span style="color:#999;">-</span>';
+
+        // === Link WA PIC ===
+        const waNumber = cleanWA(row['WA PIC']);
+        const waCell = waNumber
+            ? `<a href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer">💬 ${escapeHtml(row['WA PIC'])}</a>`
+            : '<span style="color:#999;">-</span>';
+
+        // === Link Email ===
+        const emailCell = isValidLink(row['Email'])
+            ? `<a href="mailto:${row['Email'].trim()}" target="_blank" rel="noopener noreferrer">📧 ${email}</a>`
+            : '<span style="color:#999;">-</span>';
+
+        // === Link No Telp (WA) ===
+        const noTelpClean = cleanWA(row['No Telp'] || row['No. Telp'] || row['No Telp Sekolah']);
+        const noTelpCell = noTelpClean
+            ? `<a href="https://wa.me/${noTelpClean}" target="_blank" rel="noopener noreferrer">📞 ${noTelp}</a>`
+            : '<span style="color:#999;">-</span>';
+
+        // === Badge Status (Negeri/Swasta) ===
+        const statusLower = (row['Status'] || row['Status Kepemilikan'] || '').toString().toLowerCase();
+        let statusBadge = status;
+        if (statusLower.includes('negeri')) {
+            statusBadge = `<span style="background:linear-gradient(135deg,#22c55e,#15803d);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;">NEGERI</span>`;
+        } else if (statusLower.includes('swasta')) {
+            statusBadge = `<span style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;">SWASTA</span>`;
+        }
+
+        return `<tr>
+            <td>${i + 1}</td>
+            <td><strong>${jenjang}</strong></td>
+            <td><strong>${namaSekolah}</strong></td>
+            <td>${statusBadge}</td>
+            <td>${kecamatan}</td>
+            <td>${kelDesa}</td>
+            <td style="max-width:200px;">${alamat}</td>
+            <td style="text-align:center;"><strong>${totalPM}</strong></td>
+            <td>${namaPIC}</td>
+            <td>${waCell}</td>
+            <td>${kepalaSekolah}</td>
+            <td>${noTelpCell}</td>
+            <td>${emailCell}</td>
+            <td>${rekening}</td>
+            <td>${mapsCell}</td>
+            <td style="text-align:center;">${jumlahSiswa}</td>
+        </tr>`;
+    }).join('');
+
+    // === Search filter ===
+    const searchInput = document.getElementById('searchSekolah');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => filterTable(e, tbody));
+    }
 }
 
 async function loadRelawan() {
