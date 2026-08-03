@@ -517,3 +517,46 @@ th, td { padding: 8px 10px; font-size: 12px; }
 .ktp-modal-content { padding: 15px; max-width: 95%; }
 .ktp-modal-title { font-size: 14px; }
 }
+
+/* ===== TABEL SEKOLAH ENHANCEMENT (UPDATE NPSN) ===== */
+#tableSekolah td {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Kolom NPSN (Urutan ke-2) */
+#tableSekolah td:nth-child(2) {
+    text-align: center;
+}
+
+/* Kolom Nama Sekolah (Urutan ke-4) */
+#tableSekolah td:nth-child(4) { 
+    min-width: 180px;
+    white-space: normal;
+}
+
+/* Kolom Alamat (Urutan ke-8) */
+#tableSekolah td:nth-child(8) { 
+    white-space: normal;
+    min-width: 180px;
+    max-width: 250px;
+}
+
+/* Style Khusus Badge NPSN */
+.npsn-badge {
+    font-family: 'Courier New', Courier, monospace;
+    background: rgba(244, 114, 182, 0.1);
+    color: #f9a8d4;
+    border: 1px solid #f472b6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+#tableSekolah th {
+    white-space: nowrap;
+    font-size: 11px;
+}
