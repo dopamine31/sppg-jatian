@@ -210,6 +210,7 @@ async function loadSekolah() {
 
         return `<tr>
             <td>${i + 1}</td>
+            <td><span class="npsn-badge">${npsn}</span></td>
             <td><strong>${jenjang}</strong></td>
             <td><strong>${namaSekolah}</strong></td>
             <td>${statusBadge}</td>
