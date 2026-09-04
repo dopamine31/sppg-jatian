@@ -488,7 +488,7 @@ isAlert = !isAlert;
 // (Sistem Terpisah dari Supabase)
 // ==========================================
 
-const GOOGLE_SCRIPT_URL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYWNJtghYhHFc_PyCqkARBruNcMNQqqJsa7-ecY_uJpj_TVo8kz31V_gkTNcodoScl/exec';
 
 let streamKamera = null;
 let latKamera = "Mencari...";
