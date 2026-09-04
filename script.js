@@ -546,7 +546,7 @@ async function startKameraGPS() {
     }
 }
 
-// 2. Fungsi Ambil Foto & Beri Stempel (HD + Logo)
+// 2. Fungsi Ambil Foto & Beri Stempel (Tata Letak Mirip Contoh)
 function jepretKamera() {
     const videoEl = document.getElementById('kameraStream');
     const canvasEl = document.getElementById('kameraCanvas');
@@ -561,43 +561,71 @@ function jepretKamera() {
     // Gambar foto ke canvas
     ctx.drawImage(videoEl, 0, 0, width, height);
 
-    // Buat Stempel Hitam Transparan
-    const barHeight = Math.max(100, height * 0.15); 
+    // Skala dinamis berdasarkan ukuran foto agar di HP mana pun ukurannya proporsional
+    const scale = width / 1000; 
+
+    // --- 1. HEADER ATAS (LOGO + TEKS INSTANSI) ---
+    if (logoImg.complete && logoImg.naturalWidth !== 0) {
+        const logoSize = 100 * scale;
+        ctx.drawImage(logoImg, 30 * scale, 30 * scale, logoSize, logoSize);
+    }
+
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    ctx.shadowBlur = 6 * scale;
+    ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
+    ctx.textAlign = "left";
+    
+    // Teks Instansi di samping logo
+    ctx.fillText("SPPG JATIAN", 145 * scale, 70 * scale);
+    ctx.fillText("PAKUSARI", 145 * scale, 105 * scale);
+    ctx.fillText("JEMBER", 145 * scale, 140 * scale);
+
+
+    // --- 2. BAGIAN TENGAH (JAM BESAR & TANGGAL/HARI) ---
+    const now = new Date();
+    const jamString = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    
+    // Format Tanggal ( DD/MM/YYYY )
+    const tanggalString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+    
+    // Format Hari (Senin, Selasa, dll)
+    const hariString = now.toLocaleDateString('id-ID', { weekday: 'long' });
+
+    waktuKamera = tanggalString + ' ' + jamString;
+
+    // Jam Besar di Kiri Tengah
+    ctx.font = `900 ${110 * scale}px Nunito, sans-serif`;
+    ctx.fillText(jamString, 30 * scale, 280 * scale);
+
+    // Tanggal & Hari di Kanan Tengah
+    ctx.font = `bold ${34 * scale}px Nunito, sans-serif`;
+    ctx.textAlign = "right";
+    ctx.fillText(tanggalString, width - (30 * scale), 230 * scale);
+    ctx.fillText(hariString, width - (30 * scale), 275 * scale);
+
+
+    // --- 3. BACKGROUND HITAM TRANSMARAN UNTUK BAGIAN BAWAH ---
+    const barHeight = 160 * scale;
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.fillRect(0, height - barHeight, width, barHeight);
 
-    // --- MENGGAMBAR LOGO DI POJOK KANAN BAWAH ---
-    if (logoImg.complete && logoImg.naturalWidth !== 0) {
-        // Asumsi logo proporsional, menyesuaikan tinggi stempel
-        const logoHeight = barHeight * 0.6;
-        const rasio = logoImg.naturalWidth / logoImg.naturalHeight;
-        const logoWidth = logoHeight * rasio;
-        
-        // Posisi X di kanan, Y di tengah baris transparan
-        const logoX = width - logoWidth - 20;
-        const logoY = height - barHeight + ((barHeight - logoHeight) / 2);
-        
-        ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
-    }
-
-    // --- MENULIS TEKS ---
-    ctx.fillStyle = "#ffffff";
-    const fontSize = Math.max(16, Math.floor(barHeight * 0.18));
-    ctx.font = `bold ${fontSize}px Nunito, sans-serif`;
+    // --- 4. TEKS BAWAH (WILAYAH & KOORDINAT) ---
     ctx.textAlign = "left";
+    ctx.shadowBlur = 4 * scale;
 
-    const now = new Date();
-    waktuKamera = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+    // Baris Wilayah (Contoh statis/bisa disesuaikan)
+    ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
+    ctx.fillText("Kabupaten Jember, Jawa Timur", 30 * scale, height - (95 * scale));
 
-    // Menentukan posisi mulai teks
-    const startY = height - barHeight + (fontSize * 1.5) + 5;
-    
-    // SILAKAN UBAH TEKS "LOKASI: ..." DI BAWAH INI SESUAI KEBUTUHAN:
-    ctx.fillText(`Lokasi: SPPG JATIAN PAKUSARI`, 20, startY);
-    ctx.fillText(`Waktu : ${waktuKamera}`, 20, startY + fontSize + 8);
-    ctx.fillText(`GPS   : Lat ${latKamera}, Long ${lngKamera}`, 20, startY + (fontSize * 2) + 16);
+    // Baris Koordinat GPS
+    ctx.font = `bold ${30 * scale}px Nunito, sans-serif`;
+    ctx.fillText(`Koordinat: ${latKamera}°S, ${lngKamera}°E`, 30 * scale, height - (45 * scale));
 
-    // Ubah Tampilan UI
+    // Reset shadow agar tidak berdampak ke rendering lain
+    ctx.shadowBlur = 0;
+
+    // Ubah Tampilan UI ke Hasil Jepretan
     videoEl.style.display = 'none';
     canvasEl.style.display = 'block';
     
@@ -606,55 +634,4 @@ function jepretKamera() {
     document.getElementById('btnKirimDrive').style.display = 'inline-flex';
     
     document.getElementById('kameraStatus').innerText = "✅ Foto berhasil distempel! Siap dikirim.";
-}
-
-// 3. Fungsi Ulangi Foto
-function ulangiFoto() {
-    document.getElementById('kameraStream').style.display = 'block';
-    document.getElementById('kameraCanvas').style.display = 'none';
-    
-    document.getElementById('btnJepret').style.display = 'inline-flex';
-    document.getElementById('btnUlangi').style.display = 'none';
-    document.getElementById('btnKirimDrive').style.display = 'none';
-    
-    document.getElementById('kameraStatus').innerText = "Kamera & GPS Siap! (Menunggu difoto)";
-}
-
-// 4. Fungsi Kirim ke Google Drive (Kualitas 100%)
-function kirimKeDrive() {
-    const btnKirim = document.getElementById('btnKirimDrive');
-    const statusEl = document.getElementById('kameraStatus');
-    const canvasEl = document.getElementById('kameraCanvas');
-    
-    btnKirim.disabled = true;
-    btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
-    statusEl.innerText = "⏳ Sedang mengunggah (karena resolusi tinggi, mungkin butuh waktu sedikit lebih lama)...";
-
-    // Kualitas JPEG diatur ke maksimal 1.0 (100%)
-    const base64Image = canvasEl.toDataURL('image/jpeg', 1.0);
-
-    const payload = {
-        image: base64Image,
-        latitude: latKamera,
-        longitude: lngKamera,
-        waktu: waktuKamera
-    };
-
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        statusEl.innerText = "✅ Berhasil! Data masuk ke Google Drive & Sheets.";
-        btnKirim.style.display = 'none';
-        btnKirim.disabled = false;
-        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive';
-    })
-    .catch(err => {
-        statusEl.innerText = "❌ Gagal mengirim. Pastikan internet stabil.";
-        btnKirim.disabled = false;
-        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Coba Kirim Lagi';
-    });
 }
