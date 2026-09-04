@@ -68,6 +68,10 @@
                 <a class="sidebar-menu-btn" onclick="showSection('rute')">
                     <span class="menu-icon">🚚</span> Rute Distribusi
                 </a>
+                
+                <a class="sidebar-menu-btn" onclick="showSection('dokumentasi')">
+                    <span class="menu-icon">📸</span> Kamera Dokumentasi
+                </a>
             </div>
         </div>
 
@@ -378,6 +382,38 @@
 <div id="ruteContent">Memuat data rute...</div>
 </div>
 
+</div>
+
+<!-- DOKUMENTASI KAMERA SECTION -->
+<div class="content-section" id="section-dokumentasi" style="display:none;">
+    <div class="section-header">
+        <button class="back-btn" onclick="showHome()">← Beranda</button>
+        <h2>📸 Dokumentasi Lapangan</h2>
+    </div>
+    
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 20px; border: 2px solid #2d2d2d; text-align: center; box-shadow: 0 4px 30px rgba(236, 72, 153, 0.15);">
+        <p id="kameraStatus" style="color: #f9a8d4; font-weight: 600; margin-bottom: 15px;">Tekan tombol di bawah untuk mengaktifkan kamera & GPS.</p>
+        
+        <!-- Area Video & Canvas -->
+        <video id="kameraStream" autoplay playsinline style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></video>
+        <canvas id="kameraCanvas" style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></canvas>
+
+        <!-- Tombol Kontrol -->
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-download-rute" id="btnStartKamera" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" onclick="startKameraGPS()">
+                <i class="fas fa-video"></i> Buka Kamera
+            </button>
+            <button class="btn-download-rute" id="btnJepret" style="background: linear-gradient(135deg, #e53e3e 0%, #991b1b 100%); display: none;" onclick="jepretKamera()">
+                <i class="fas fa-camera"></i> Ambil Foto
+            </button>
+            <button class="btn-download-rute" id="btnUlangi" style="background: #6b7280; display: none; box-shadow: none;" onclick="ulangiFoto()">
+                <i class="fas fa-redo"></i> Ulangi
+            </button>
+            <button class="btn-download-rute" id="btnKirimDrive" style="display: none;" onclick="kirimKeDrive()">
+                <i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- FOOTER -->
