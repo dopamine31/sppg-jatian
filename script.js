@@ -482,3 +482,149 @@ setInterval(() => {
 if (isAlert) { document.title = 'SPPG JATIAN 🚨'; } else { document.title = 'SPPG JATIAN 💥'; }
 isAlert = !isAlert;
 }, 50);
+
+// ==========================================
+// FITUR KAMERA GPS & GOOGLE DRIVE
+// (Sistem Terpisah dari Supabase)
+// ==========================================
+
+const GOOGLE_SCRIPT_URL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
+
+let streamKamera = null;
+let latKamera = "Mencari...";
+let lngKamera = "Mencari...";
+let waktuKamera = "-";
+
+// 1. Fungsi Menyalakan Kamera & GPS
+async function startKameraGPS() {
+    const statusEl = document.getElementById('kameraStatus');
+    statusEl.innerText = "Mencari lokasi & mengakses kamera...";
+    
+    // Tarik GPS
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            (pos) => {
+                latKamera = pos.coords.latitude.toFixed(6);
+                lngKamera = pos.coords.longitude.toFixed(6);
+            },
+            (err) => { console.warn("GPS gagal:", err); },
+            { enableHighAccuracy: true }
+        );
+    }
+
+    // Nyalakan Kamera Belakang
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const videoEl = document.getElementById('kameraStream');
+        videoEl.srcObject = stream;
+        streamKamera = stream;
+        
+        videoEl.style.display = 'block';
+        document.getElementById('kameraCanvas').style.display = 'none';
+        
+        document.getElementById('btnStartKamera').style.display = 'none';
+        document.getElementById('btnJepret').style.display = 'inline-flex';
+        document.getElementById('btnUlangi').style.display = 'none';
+        document.getElementById('btnKirimDrive').style.display = 'none';
+        
+        statusEl.innerText = "Kamera & GPS Siap! (Menunggu difoto)";
+    } catch (err) {
+        statusEl.innerText = "❌ Izin kamera ditolak atau kamera tidak tersedia.";
+    }
+}
+
+// 2. Fungsi Ambil Foto & Beri Stempel
+function jepretKamera() {
+    const videoEl = document.getElementById('kameraStream');
+    const canvasEl = document.getElementById('kameraCanvas');
+    const ctx = canvasEl.getContext('2d');
+    
+    // Set ukuran canvas
+    const width = videoEl.videoWidth;
+    const height = videoEl.videoHeight;
+    canvasEl.width = width;
+    canvasEl.height = height;
+
+    // Gambar foto ke canvas
+    ctx.drawImage(videoEl, 0, 0, width, height);
+
+    // Buat Stempel Hitam Transparan
+    const barHeight = Math.max(80, height * 0.15); 
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, height - barHeight, width, barHeight);
+
+    // Tulis Teks Stempel
+    ctx.fillStyle = "#ffffff";
+    const fontSize = Math.max(14, Math.floor(barHeight * 0.20));
+    ctx.font = `bold ${fontSize}px Nunito, sans-serif`;
+    ctx.textAlign = "left";
+
+    const now = new Date();
+    waktuKamera = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+
+    const startY = height - barHeight + (fontSize * 1.5);
+    ctx.fillText(`Lokasi: SPPG JATIAN PAKUSARI`, 20, startY);
+    ctx.fillText(`Waktu : ${waktuKamera}`, 20, startY + fontSize + 6);
+    ctx.fillText(`GPS   : Lat ${latKamera}, Long ${lngKamera}`, 20, startY + (fontSize * 2) + 12);
+
+    // Ubah Tampilan UI
+    videoEl.style.display = 'none';
+    canvasEl.style.display = 'block';
+    
+    document.getElementById('btnJepret').style.display = 'none';
+    document.getElementById('btnUlangi').style.display = 'inline-flex';
+    document.getElementById('btnKirimDrive').style.display = 'inline-flex';
+    
+    document.getElementById('kameraStatus').innerText = "✅ Foto berhasil distempel! Siap dikirim.";
+}
+
+// 3. Fungsi Ulangi Foto
+function ulangiFoto() {
+    document.getElementById('kameraStream').style.display = 'block';
+    document.getElementById('kameraCanvas').style.display = 'none';
+    
+    document.getElementById('btnJepret').style.display = 'inline-flex';
+    document.getElementById('btnUlangi').style.display = 'none';
+    document.getElementById('btnKirimDrive').style.display = 'none';
+    
+    document.getElementById('kameraStatus').innerText = "Kamera & GPS Siap! (Menunggu difoto)";
+}
+
+// 4. Fungsi Kirim ke Google Drive (Fetch API)
+function kirimKeDrive() {
+    const btnKirim = document.getElementById('btnKirimDrive');
+    const statusEl = document.getElementById('kameraStatus');
+    const canvasEl = document.getElementById('kameraCanvas');
+    
+    btnKirim.disabled = true;
+    btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+    statusEl.innerText = "⏳ Sedang mengunggah ke Google Drive & Sheets...";
+
+    // Kompresi JPEG 70%
+    const base64Image = canvasEl.toDataURL('image/jpeg', 0.7);
+
+    const payload = {
+        image: base64Image,
+        latitude: latKamera,
+        longitude: lngKamera,
+        waktu: waktuKamera
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        statusEl.innerText = "✅ Berhasil! Data masuk ke Google Drive & Sheets.";
+        btnKirim.style.display = 'none';
+        btnKirim.disabled = false;
+        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive';
+    })
+    .catch(err => {
+        statusEl.innerText = "❌ Gagal mengirim. Pastikan internet stabil.";
+        btnKirim.disabled = false;
+        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Coba Kirim Lagi';
+    });
+}
