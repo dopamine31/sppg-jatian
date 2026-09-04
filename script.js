@@ -461,9 +461,18 @@ const logoImg = new Image();
 logoImg.crossOrigin = "Anonymous";
 logoImg.src = 'https://raw.githubusercontent.com/dopamine31/sppg-jatian/main/favicon.png';
 
+// Variabel Global untuk Kamera
+let cameraTrack = null;
+let availableRearCameras = [];
+let currentZoom = 1;
+let maxZoom = 10;
+
+// ===== FUNGSI KAMERA BARU (SUPPORT 0.5x, 1x, 2x, ZOOM) =====
 async function startKameraGPS() {
     const statusEl = document.getElementById('kameraStatus');
     statusEl.innerText = "Mencari lokasi & mengakses kamera...";
+    
+    // 1. GPS
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
             (pos) => { latKamera = pos.coords.latitude.toFixed(6); lngKamera = pos.coords.longitude.toFixed(6); },
@@ -471,66 +480,186 @@ async function startKameraGPS() {
             { enableHighAccuracy: true }
         );
     }
+
+    // 2. Kamera (Minta izin dulu agar label device terbaca)
     try {
-        // KUNCI KUALITAS 2K (QHD - 2560x1440)
         const constraints = {
             video: { 
-                facingMode: 'environment',
-                width: { ideal: 2560, min: 1920 },
-                height: { ideal: 1440, min: 1080 }
+                facingMode: { ideal: 'environment' },
+                width: { ideal: 2560 },
+                height: { ideal: 1440 }
             }
         };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const videoEl = document.getElementById('kameraStream');
         videoEl.srcObject = stream;
         streamKamera = stream;
+        
+        // Simpan track untuk zoom & switching lensa
+        cameraTrack = stream.getVideoTracks()[0];
+        
+        // Cek kemampuan zoom
+        const capabilities = cameraTrack.getCapabilities();
+        if (capabilities.zoom) {
+            maxZoom = capabilities.zoom.max || 10;
+            document.getElementById('zoomSlider').max = maxZoom;
+        }
+
+        // 3. Deteksi Lensa Fisik (0.5x, 1x, 2x, 3x)
+        await detectCameraLenses();
+
+        // Tampilkan UI
         videoEl.style.display = 'block';
         document.getElementById('kameraCanvas').style.display = 'none';
+        document.getElementById('cameraLensControls').style.display = 'flex';
         document.getElementById('btnStartKamera').style.display = 'none';
         document.getElementById('btnJepret').style.display = 'inline-flex';
         document.getElementById('btnUlangi').style.display = 'none';
         document.getElementById('btnKirimDrive').style.display = 'none';
-        statusEl.innerText = "Kamera & GPS Siap! (Mode 2K High-Res)";
+        statusEl.innerText = "Kamera & GPS Siap! (Pilih lensa 0.5x/1x/2x)";
+        
     } catch (err) {
         statusEl.innerText = "❌ Izin kamera ditolak atau kamera tidak tersedia.";
     }
 }
 
-function jepretKamera() {
-    const videoEl = document.getElementById('kameraStream');
-    const canvasEl = document.getElementById('kameraCanvas');
-    const ctx = canvasEl.getContext('2d');
-    const width = videoEl.videoWidth;
-    const height = videoEl.videoHeight;
-    canvasEl.width = width;
-    canvasEl.height = height;
-    
-    // Gambar frame asli dari kamera (2K High-Res)
-    ctx.drawImage(videoEl, 0, 0, width, height);
-    
-    // Skala dinamis berdasarkan lebar gambar
-    const scale = width / 1000; 
-    const padding = 40 * scale;
-    
-    // ==========================================
-    // KONFIGURASI BAYANGAN TEKS (DROP SHADOW)
-    // ==========================================
-    // Bayangan hitam pekat + offset agar teks 'pop-out' di background terang
-    ctx.shadowColor = "rgba(0, 0, 0, 0.95)"; 
-    ctx.shadowBlur = 15 * scale;        // Blur yang cukup besar untuk kontras maksimal
-    ctx.shadowOffsetX = 4 * scale;      // Geser kanan (efek 3D)
-    ctx.shadowOffsetY = 4 * scale;      // Geser bawah (efek 3D)
+async function detectCameraLenses() {
+    // Enumerate devices untuk cari lensa belakang
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    availableRearCameras = devices.filter(d => 
+        d.kind === 'videoinput' && 
+        (d.label.toLowerCase().includes('back') || 
+         d.label.toLowerCase().includes('rear') || 
+         d.label.toLowerCase().includes('environment'))
+    );
 
-    // ==========================================
-    // 1. HEADER ATAS KIRI (LOGO + TEKS INSTANSI)
-    // ==========================================
-    if (logoImg.complete && logoImg.naturalWidth !== 0) {
-        const logoSize = 100 * scale;
-        // Tambahkan bayangan pada logo juga agar kontras
-        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-        ctx.shadowBlur = 10 * scale;
-        ctx.drawImage(logoImg, padding, padding, logoSize, logoSize);
+    // Disable semua tombol lensa dulu
+    ['0.5', '1', '2', '3'].forEach(zoom => {
+        const btn = document.getElementById(`btnLens${zoom}x`);
+        btn.disabled = true;
+        btn.classList.remove('active');
+    });
+
+    // Mapping label lensa (iOS & Android)
+    const lensMap = {
+        '0.5': /0\.5|ultra wide|wide angle/i,
+        '1': /1x|wide|back camera(?!.*\d)/i, // Default main camera
+        '2': /2x|telephoto|portrait/i,
+        '3': /3x|telephoto/i
+    };
+
+    let foundLenses = [];
+    availableRearCameras.forEach(cam => {
+        for (let [zoom, regex] of Object.entries(lensMap)) {
+            if (regex.test(cam.label)) {
+                foundLenses.push({ zoom, deviceId: cam.deviceId });
+            }
+        }
+    });
+
+    // Jika tidak terdeteksi via label, fallback ke urutan device (biasanya 0=main, 1=ultra, 2=tele)
+    if (foundLenses.length === 0 && availableRearCameras.length > 1) {
+        availableRearCameras.forEach((cam, index) => {
+            if (index === 0) foundLenses.push({ zoom: '1', deviceId: cam.deviceId });
+            if (index === 1) foundLenses.push({ zoom: '0.5', deviceId: cam.deviceId });
+            if (index === 2) foundLenses.push({ zoom: '2', deviceId: cam.deviceId });
+        });
     }
+
+    // Enable tombol yang ditemukan
+    foundLenses.forEach(lens => {
+        const btn = document.getElementById(`btnLens${lens.zoom}x`);
+        if (btn) {
+            btn.disabled = false;
+            if (lens.zoom === '1') btn.classList.add('active');
+        }
+    });
+
+    // Jika hanya ada 1 kamera, aktifkan slider zoom saja
+    if (availableRearCameras.length <= 1) {
+        document.getElementById('zoomSlider').disabled = false;
+    } else {
+        // Sembunyikan slider jika lensa fisik tersedia (opsional, tapi saya biarkan untuk digital zoom)
+    }
+}
+
+async function switchLens(zoomLevel) {
+    if (!cameraTrack) return;
+    
+    // Update UI Active State
+    document.querySelectorAll('.lens-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`btnLens${zoomLevel}x`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Cari deviceId yang cocok
+    const lensMap = {
+        '0.5': /0\.5|ultra wide|wide angle/i,
+        '1': /1x|wide|back camera(?!.*\d)/i,
+        '2': /2x|telephoto|portrait/i,
+        '3': /3x|telephoto/i
+    };
+    
+    let targetDevice = null;
+    for (let cam of availableRearCameras) {
+        if (lensMap[zoomLevel].test(cam.label)) {
+            targetDevice = cam.deviceId;
+            break;
+        }
+    }
+
+    // Fallback jika tidak ketemu labelnya
+    if (!targetDevice && availableRearCameras.length > 1) {
+        const index = ['0.5', '1', '2', '3'].indexOf(zoomLevel);
+        if (index >= 0 && index < availableRearCameras.length) {
+            targetDevice = availableRearCameras[index].deviceId;
+        }
+    }
+
+    // Apply constraints (Switch Lensa Fisik)
+    if (targetDevice) {
+        try {
+            await cameraTrack.applyConstraints({ deviceId: { exact: targetDevice } });
+            currentZoom = 1;
+            document.getElementById('zoomSlider').value = 1;
+            document.getElementById('zoomValueDisplay').innerText = '1.0x';
+        } catch (e) {
+            console.warn("Gagal switch lensa fisik:", e);
+        }
+    } else {
+        // Fallback ke Digital Zoom jika lensa fisik tidak ada
+        let zoomValue = parseFloat(zoomLevel);
+        applyDigitalZoom(zoomValue);
+    }
+}
+
+function applyDigitalZoom(zoomValue) {
+    if (!cameraTrack) return;
+    zoomValue = parseFloat(zoomValue);
+    currentZoom = zoomValue;
+    document.getElementById('zoomValueDisplay').innerText = zoomValue.toFixed(1) + 'x';
+    
+    // Apply zoom constraint (Digital/Optical Zoom)
+    cameraTrack.applyConstraints({
+        advanced: [{ zoom: zoomValue }]
+    }).catch(e => console.warn("Zoom tidak didukung:", e));
+}
+
+// Update fungsi jepretKamera() agar tetap sama (tidak perlu diubah)
+// Update fungsi ulangiFoto() untuk menampilkan kembali kontrol lensa
+function ulangiFoto() {
+    document.getElementById('kameraStream').style.display = 'block';
+    document.getElementById('kameraCanvas').style.display = 'none';
+    document.getElementById('cameraLensControls').style.display = 'flex'; // Tampilkan kembali kontrol lensa
+    document.getElementById('btnJepret').style.display = 'inline-flex';
+    document.getElementById('btnUlangi').style.display = 'none';
+    document.getElementById('btnKirimDrive').style.display = 'none';
+    document.getElementById('kameraStatus').innerText = "Kamera & GPS Siap! (Pilih lensa 0.5x/1x/2x)";
+}
+
+// Sembunyikan kontrol lensa saat foto sudah diambil/dikirim
+function hideLensControls() {
+    document.getElementById('cameraLensControls').style.display = 'none';
+}
     
     ctx.fillStyle = "#ffffff"; // Teks Putih
     ctx.font = `900 ${36 * scale}px Nunito, sans-serif`;
