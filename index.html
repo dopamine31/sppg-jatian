@@ -398,6 +398,21 @@
         <video id="kameraStream" autoplay playsinline style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></video>
         <canvas id="kameraCanvas" style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></canvas>
 
+        <!-- Panel Kontrol Lensa Kamera (Floating) -->
+<div id="cameraLensControls" style="display: none;">
+    <div class="lens-buttons">
+        <button id="btnLens05x" class="lens-btn" onclick="switchLens('0.5')">0.5x</button>
+        <button id="btnLens1x" class="lens-btn active" onclick="switchLens('1')">1x</button>
+        <button id="btnLens2x" class="lens-btn" onclick="switchLens('2')">2x</button>
+        <button id="btnLens3x" class="lens-btn" onclick="switchLens('3')">3x</button>
+    </div>
+    <div class="zoom-slider-container">
+        <span style="font-size: 12px; color: #fff;">🔍</span>
+        <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1" oninput="applyDigitalZoom(this.value)">
+        <span id="zoomValueDisplay" style="font-size: 12px; color: #fbbf24; font-weight: bold;">1.0x</span>
+    </div>
+</div>
+
         <!-- Tombol Kontrol -->
         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <button class="btn-download-rute" id="btnStartKamera" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" onclick="startKameraGPS()">
