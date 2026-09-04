@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPPG JATIAN</title>
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="stylesheet" href="style.css">
+<link rel="icon" href="https://raw.githubusercontent.com/dopamine31/sppg-jatian/main/favicon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -14,481 +14,249 @@
 
 <!-- PIN MODAL -->
 <div class="pin-modal-overlay" id="pinModal">
-<div class="pin-modal">
-<div class="pin-header">
-<i class="fas fa-lock"></i>
-<h3>Akses Terbatas</h3>
-</div>
-<p>Masukkan PIN untuk mengakses fitur ini.</p>
-<input type="password" class="pin-input" id="pinInput" placeholder="••••" maxlength="10">
-<div class="pin-actions">
-<button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
-<button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
-</div>
-<p class="pin-hint">💡 PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
-</div>
+    <div class="pin-modal">
+        <div class="pin-header"><i class="fas fa-lock"></i><h3>Akses Terbatas</h3></div>
+        <p>Masukkan PIN untuk mengakses fitur ini.</p>
+        <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric">
+        <div class="pin-actions">
+            <button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
+            <button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
+        </div>
+        <p class="pin-hint">💡 PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
+    </div>
 </div>
 
 <!-- SIDEBAR -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
-
-<div class="sidebar" id="sidebar">
-
-    <div class="sidebar-header">
-        <h3>☰ Menu Utama</h3>
-        <button class="sidebar-close" onclick="toggleMenu()">✕</button>
-    </div>
-
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header"><h3>☰ Menu Utama</h3><button class="sidebar-close" onclick="toggleMenu()">✕</button></div>
     <div class="sidebar-nav">
-
-        <!-- BERANDA -->
-        <a class="sidebar-menu-btn home-btn" onclick="showHome()">
-            <span class="menu-icon">✨</span> Beranda
-        </a>
-
-        <!-- OPERASIONAL -->
+        <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">✨</span> Beranda</button>
         <div class="accordion-group">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-                <span class="accordion-title">
-                    <span class="menu-icon">🏫</span>
-                    Operasional & Logistik
-                </span>
-                <span class="accordion-icon">▼</span>
-            </button>
-
+            <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">🏫</span> Operasional & Logistik</span><span class="accordion-icon">▼</span></button>
             <div class="accordion-content">
-                <a class="sidebar-menu-btn" onclick="showSection('sekolah')">
-                    <span class="menu-icon">🏫</span> Daftar Sekolah
-                </a>
-
-                <a class="sidebar-menu-btn" onclick="showSection('menu')">
-                    <span class="menu-icon">📅</span> Menu Mingguan
-                </a>
-
-                <a class="sidebar-menu-btn" onclick="showSection('rute')">
-                    <span class="menu-icon">🚚</span> Rute Distribusi
-                </a>
-                
-                <a class="sidebar-menu-btn" onclick="showSection('dokumentasi')">
-                    <span class="menu-icon">📸</span> Kamera Dokumentasi
-                </a>
+                <button class="sidebar-menu-btn" onclick="showSection('sekolah')"><span class="menu-icon">🏫</span> Daftar Sekolah</button>
+                <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</button>
+                <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
+                <button class="sidebar-menu-btn" onclick="showSection('kamera')"><span class="menu-icon">📸</span> Kamera Dokumentasi</button>
             </div>
         </div>
-
-        <!-- MANAJEMEN TIM -->
         <div class="accordion-group">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-                <span class="accordion-title">
-                    <span class="menu-icon">👥</span>
-                    Manajemen Tim
-                </span>
-                <span class="accordion-icon">▼</span>
-            </button>
-
+            <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">👥</span> Manajemen Tim</span><span class="accordion-icon">▼</span></button>
             <div class="accordion-content">
-
-                <a class="sidebar-menu-btn" onclick="showSection('relawan')">
-                    <span class="menu-icon">👥</span> Daftar Relawan
-                </a>
-
-                <a class="sidebar-menu-btn" onclick="showSection('koordinator')">
-                    <span class="menu-icon">👔</span> Koordinator
-                </a>
-
-                <a class="sidebar-menu-btn" onclick="showSection('kontak')">
-                    <span class="menu-icon">👩‍💼📞</span> Kontak Staff
-                </a>
-
-                <a class="sidebar-menu-btn warning" onclick="checkAndShow('surat')">
-                    <span class="menu-icon">⚠️</span> Surat Peringatan
-                </a>
-
+                <button class="sidebar-menu-btn" onclick="showSection('relawan')"><span class="menu-icon">👥</span> Daftar Relawan</button>
+                <button class="sidebar-menu-btn" onclick="showSection('koordinator')"><span class="menu-icon">👔</span> Koordinator</button>
+                <button class="sidebar-menu-btn" onclick="showSection('kontak')"><span class="menu-icon">📞</span> Kontak Staff</button>
+                <button class="sidebar-menu-btn warning" onclick="checkAndShow('surat')"><span class="menu-icon">⚠️</span> Surat Peringatan</button>
             </div>
         </div>
-
-        <!-- INFORMASI -->
         <div class="accordion-group">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-                <span class="accordion-title">
-                    <span class="menu-icon">📚</span>
-                    Informasi & Dokumen
-                </span>
-                <span class="accordion-icon">▼</span>
-            </button>
-
+            <button class="accordion-header" onclick="toggleAccordion(this)"><span class="accordion-title"><span class="menu-icon">📚</span> Informasi & Dokumen</span><span class="accordion-icon">▼</span></button>
             <div class="accordion-content">
-
-                <a class="sidebar-menu-btn" onclick="checkAndShow('dokumen')">
-                    <span class="menu-icon">📚</span> Pusat Dokumen
-                </a>
-
-                <a class="sidebar-menu-btn" onclick="showSection('info')">
-                    <span class="menu-icon">📋</span> Papan Informasi
-                </a>
-
+                <button class="sidebar-menu-btn" onclick="checkAndShow('dokumen')"><span class="menu-icon">📚</span> Pusat Dokumen</button>
+                <button class="sidebar-menu-btn" onclick="showSection('info')"><span class="menu-icon">📋</span> Papan Informasi</button>
             </div>
         </div>
-
-        <!-- INSENTIF -->
-        <a href="https://dopamine31.github.io/insentif-pic/" target="_blank" class="sidebar-insentif-btn">
-            💰 Summary Insentif PIC
-        </a>
-
+        <a href="https://dopamine31.github.io/insentif-pic/" target="_blank" class="sidebar-insentif-btn">💰 Summary Insentif PIC</a>
     </div>
-
-    <div class="sidebar-footer">
-        © <span id="year"></span> ASLAP SPPG JATIAN
-    </div>
-
-</div>
+    <div class="sidebar-footer">© <span id="year"></span> ASLAP SPPG JATIAN</div>
+</nav>
 
 <!-- STICKY HEADER -->
-<div class="sticky-header">
-
+<header class="sticky-header">
     <div class="header-top">
-
         <button class="hamburger-btn" onclick="toggleMenu()">☰ Menu</button>
-
-        <div class="header-title">
-            <h1>PORTAL SPPG JATIAN</h1>
-            <p>Jatian Pakusari Jember</p>
-        </div>
-
+        <div class="header-title"><h1>PORTAL SPPG JATIAN</h1><p>Jatian Pakusari Jember</p></div>
         <div class="clock-container">
-
-            <div class="analog-clock">
-                <div class="clock-face">
-                    <div class="hour-hand" id="hourHand"></div>
-                    <div class="minute-hand" id="minuteHand"></div>
-                    <div class="second-hand" id="secondHand"></div>
-                    <div class="clock-center"></div>
-                </div>
-            </div>
-
+            <div class="analog-clock"><div class="clock-face">
+                <div class="hour-hand" id="hourHand"></div>
+                <div class="minute-hand" id="minuteHand"></div>
+                <div class="second-hand" id="secondHand"></div>
+                <div class="clock-center"></div>
+            </div></div>
             <div class="digital-clock">
                 <div class="time-display" id="digitalTime">00:00:00</div>
                 <div class="ms-display" id="msDisplay">000</div>
                 <div class="date-display" id="dateDisplay">-</div>
                 <span class="timezone-badge">WIB</span>
             </div>
-
         </div>
-
     </div>
-
-</div>
+</header>
 
 <div class="container">
 
-<!-- HOME SECTION -->
-<div class="content-section" id="section-home">
-<div class="welcome-card">
-<div class="welcome-icon">👋</div>
-<div class="welcome-content">
-<h2>Selamat Datang di Portal SPPG Jatian!</h2>
-<p>Platform resmi Satuan Pelayanan Pemenuhan Gizi (SPPG) Jatian, Pakusari, Jember untuk manajemen distribusi program Makan Bergizi Gratis (MBG).</p>
-</div>
-</div>
+<!-- HOME -->
+<section class="content-section" id="section-home">
+    <div class="welcome-card"><div class="welcome-icon">👋</div><div class="welcome-content"><h2>Selamat Datang di Portal SPPG Jatian!</h2><p>Platform resmi Satuan Pelayanan Pemenuhan Gizi (SPPG) Jatian, Pakusari, Jember untuk manajemen distribusi program Makan Bergizi Gratis (MBG).</p></div></div>
+    <div class="running-text-container"><span class="running-text-label">📢 INFORMASI</span><div class="running-text-wrapper"><span class="running-text" id="runningText">Memuat pengumuman...</span></div></div>
+    <div class="quote-card"><p id="quoteText">❝ Memuat quote... ❞</p></div>
+    <div class="birthday-card" id="birthdayCard" style="display:none;"><div class="birthday-icon">🎂</div><div class="birthday-content"><h3>🎉 Hari ini Ulang Tahun!</h3><p id="birthdayText">-</p><a href="#" id="birthdayWaLink" target="_blank" class="birthday-btn"><i class="fab fa-whatsapp"></i> Kirim Ucapan</a></div></div>
+    <div class="agenda-card"><h2>📅 Agenda Mendatang</h2><div class="agenda-list" id="agendaList">Sedang memuat...</div></div>
+</section>
 
-<div class="running-text-container">
-<div class="running-text-label">📢 INFORMASI</div>
-<div class="running-text-wrapper">
-<div class="running-text" id="runningText">Memuat pengumuman...</div>
-</div>
-</div>
+<!-- SEKOLAH -->
+<section class="content-section" id="section-sekolah" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🏫 Daftar Sekolah</h2></div>
+    <div class="search-box"><input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah..."></div>
+    <div class="table-container"><table id="tableSekolah"><thead><tr><th>No</th><th>NPSN</th><th>Jenjang</th><th>Nama Sekolah</th><th>Status</th><th>Kecamatan</th><th>Kel/Desa</th><th>Alamat</th><th>Total PM</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>📞 No Telp</th><th>📧 Email</th><th>🏦 Rekening</th><th>📍 Lokasi</th></tr></thead><tbody></tbody></table></div>
+</section>
 
-<div class="quote-card">
-<p id="quoteText">❝ Memuat quote... </p>
-</div>
+<!-- RELAWAN -->
+<section class="content-section" id="section-relawan" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>👥 Daftar Relawan</h2></div>
+    <div class="search-box"><input type="text" id="searchRelawan" placeholder="🔍 Cari relawan..."></div>
+    <div class="table-container"><table id="tableRelawan"><thead><tr><th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>Email</th><th>📌 Posisi</th><th>📷 KTP</th></tr></thead><tbody></tbody></table></div>
+</section>
 
-<div class="birthday-card" id="birthdayCard" style="display:none;">
-<div class="birthday-icon">🎂</div>
-<div class="birthday-content">
-<h3>🎉 Hari ini Ulang Tahun!</h3>
-<p id="birthdayText">-</p>
-</div>
-<a href="#" target="_blank" class="birthday-btn" id="birthdayWaLink"> Kirim Ucapan</a>
-</div>
+<!-- KOORDINATOR -->
+<section class="content-section" id="section-koordinator" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>👔 Koordinator & Kontak</h2></div>
+    <div class="card-grid" id="cardKoordinator"></div>
+</section>
 
-<div class="agenda-card">
-<h2>📅 Agenda Mendatang</h2>
-<div class="agenda-list" id="agendaList">
-<p>Sedang memuat...</p>
-</div>
-</div>
-</div>
+<!-- KONTAK -->
+<section class="content-section" id="section-kontak" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📞 Kontak Staff Internal</h2></div>
+    <div class="card-grid" id="cardKontak"></div>
+</section>
 
-<!-- SEKOLAH SECTION -->
-<div class="content-section" id="section-sekolah" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>🏫 Daftar Sekolah</h2>
-</div>
-<div class="search-box">
-<input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah...">
-</div>
-<div class="table-container">
-<table id="tableSekolah">
-<thead>
-  <tr>
-    <th>No</th>
-    <th>NPSN</th>
-    <th>Jenjang</th>
-    <th>Nama Sekolah</th>
-    <th>Status</th>
-    <th>Kecamatan</th>
-    <th>Kel/Desa</th>
-    <th>Alamat</th>
-    <th>Total PM</th>
-    <th>PIC</th>
-    <th>💬 WA PIC</th>
-    <th>👨‍💼 Kepala Sekolah</th>
-    <th>📞 No Telp</th>
-    <th>📧 Email</th>
-    <th>🏦 Rekening</th>
-    <th>📍 Lokasi</th>
-    <!-- 👇 HAPUS BARIS INI -->
-    <!-- <th>👨‍🎓 Siswa</th> -->
-  </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
+<!-- SURAT -->
+<section class="content-section" id="section-surat" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>⚠️ Surat Peringatan</h2></div>
+    <div class="search-box"><input type="text" id="searchSurat" placeholder="🔍 Cari surat..."></div>
+    <div class="card-grid" id="cardSurat"></div>
+</section>
 
-<!-- RELAWAN SECTION -->
-<div class="content-section" id="section-relawan" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>👥 Daftar Relawan</h2>
-</div>
-<div class="search-box">
-<input type="text" id="searchRelawan" placeholder="🔍 Cari relawan...">
-</div>
-<div class="table-container">
-<table id="tableRelawan">
-<thead>
-<tr>
-<th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>Email</th><th>📌 Posisi</th><th>📷 KTP</th>
-</tr>
-</thead>
-
-<tbody></tbody>
-</table>
-</div>
-</div>
-
-<!-- KOORDINATOR SECTION -->
-<div class="content-section" id="section-koordinator" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>👔 Koordinator & Kontak</h2>
-</div>
-<div class="card-grid" id="cardKoordinator"></div>
-</div>
-
-<!-- KONTAK SECTION -->
-<div class="content-section" id="section-kontak" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2> Kontak Staff Internal</h2>
-</div>
-<div class="card-grid" id="cardKontak"></div>
-</div>
-
-<!-- SURAT SECTION -->
-<div class="content-section" id="section-surat" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>⚠️ Surat Peringatan</h2>
-</div>
-<div class="search-box">
-<input type="text" id="searchSurat" placeholder="🔍 Cari surat...">
-</div>
-<div id="cardSurat"></div>
-</div>
-
-<!-- DOKUMEN SECTION -->
-<div class="content-section" id="section-dokumen" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>📚 Pusat Dokumen</h2>
-</div>
-<div class="doc-categories">
-<button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
-<button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
-<button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
-<button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
-<button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
-<button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
-</div>
-<div class="search-box">
-<input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen...">
-</div>
-<div class="doc-grid" id="docGrid"></div>
-</div>
-
-<!-- INFO SECTION -->
-<div class="content-section" id="section-info" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>📢 Papan Informasi & Memo</h2>
-</div>
-<div class="info-stats">
-<div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
-<div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
-<div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
-</div>
-<div class="info-categories">
-<button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
-<button class="info-cat-btn" onclick="filterInfo('pengumuman', this)"> Pengumuman</button>
-<button class="info-cat-btn" onclick="filterInfo('memo', this)"> Memo</button>
-<button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
-<button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
-<button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
-</div>
-<div class="search-box">
-<input type="text" id="searchInfo" placeholder="🔍 Cari informasi...">
-</div>
-<div class="info-board" id="infoBoard"></div>
-</div>
-
-<!-- MENU SECTION -->
-<div class="content-section" id="section-menu" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>🍱 Menu Mingguan</h2>
-</div>
-<div class="menu-weekly-nav">
-<button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
-<button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
-</div>
-<div class="menu-weekly-container" id="menuWeeklyContainer"></div>
-</div>
-
-<!-- RUTE SECTION -->
-<div class="content-section" id="section-rute" style="display:none;">
-<div class="section-header">
-<button class="back-btn" onclick="showHome()">← Beranda</button>
-<h2>🚚 Rute Distribusi MBG</h2>
-</div>
-<button class="btn-download-rute" id="btnDownloadRute"><i class="fas fa-download"></i> Download PNG</button>
-<div id="ruteContent">Memuat data rute...</div>
-</div>
-
-</div>
-
-<!-- DOKUMENTASI KAMERA SECTION -->
-<div class="content-section" id="section-dokumentasi" style="display:none;">
-    <div class="section-header">
-        <button class="back-btn" onclick="showHome()">← Beranda</button>
-        <h2>📸 Dokumentasi Lapangan</h2>
+<!-- DOKUMEN -->
+<section class="content-section" id="section-dokumen" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📚 Pusat Dokumen</h2></div>
+    <div class="doc-categories">
+        <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
+        <button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
+        <button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
+        <button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
+        <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
+        <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
     </div>
-    
-    <div style="background: #1a1a1a; padding: 20px; border-radius: 20px; border: 2px solid #2d2d2d; text-align: center; box-shadow: 0 4px 30px rgba(236, 72, 153, 0.15);">
-        <p id="kameraStatus" style="color: #f9a8d4; font-weight: 600; margin-bottom: 15px;">Tekan tombol di bawah untuk mengaktifkan kamera & GPS.</p>
-        
-        <!-- Area Video & Canvas -->
-        <video id="kameraStream" autoplay playsinline style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></video>
-        <canvas id="kameraCanvas" style="width: 100%; max-width: 500px; border-radius: 12px; display: none; margin: 0 auto; border: 2px solid #ec4899;"></canvas>
+    <div class="search-box"><input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen..."></div>
+    <div class="doc-grid" id="docGrid"></div>
+</section>
 
-        <!-- Panel Kontrol Lensa Kamera (Floating) -->
-<div id="cameraLensControls" style="display: none;">
-    <div class="lens-buttons">
-        <button id="btnLens05x" class="lens-btn" onclick="switchLens('0.5')">0.5x</button>
-        <button id="btnLens1x" class="lens-btn active" onclick="switchLens('1')">1x</button>
-        <button id="btnLens2x" class="lens-btn" onclick="switchLens('2')">2x</button>
-        <button id="btnLens3x" class="lens-btn" onclick="switchLens('3')">3x</button>
+<!-- INFO -->
+<section class="content-section" id="section-info" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📢 Papan Informasi & Memo</h2></div>
+    <div class="info-stats">
+        <div class="info-stat-item"><span class="info-stat-icon">📝</span><span class="info-stat-label">Total Memo</span><span class="info-stat-value" id="totalMemo">0</span></div>
+        <div class="info-stat-item"><span class="info-stat-icon">🆕</span><span class="info-stat-label">Baru</span><span class="info-stat-value" id="totalBaru">0</span></div>
+        <div class="info-stat-item"><span class="info-stat-icon">🔥</span><span class="info-stat-label">Mendesak</span><span class="info-stat-value" id="totalMendesak">0</span></div>
     </div>
-    <div class="zoom-slider-container">
-        <span style="font-size: 12px; color: #fff;">🔍</span>
-        <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1" oninput="applyDigitalZoom(this.value)">
-        <span id="zoomValueDisplay" style="font-size: 12px; color: #fbbf24; font-weight: bold;">1.0x</span>
+    <div class="info-categories">
+        <button class="info-cat-btn active" onclick="filterInfo('all', this)">📋 Semua</button>
+        <button class="info-cat-btn" onclick="filterInfo('pengumuman', this)">📢 Pengumuman</button>
+        <button class="info-cat-btn" onclick="filterInfo('memo', this)">📝 Memo</button>
+        <button class="info-cat-btn" onclick="filterInfo('catatan', this)">📒 Catatan</button>
+        <button class="info-cat-btn" onclick="filterInfo('penting', this)">⚠️ Info Penting</button>
+        <button class="info-cat-btn" onclick="filterInfo('update', this)">🔄 Update</button>
     </div>
-</div>
+    <div class="search-box"><input type="text" id="searchInfo" placeholder="🔍 Cari informasi..."></div>
+    <div class="info-board" id="infoBoard"></div>
+</section>
 
-        <!-- Tombol Kontrol -->
-        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn-download-rute" id="btnStartKamera" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" onclick="startKameraGPS()">
-                <i class="fas fa-video"></i> Buka Kamera
-            </button>
-            <button class="btn-download-rute" id="btnJepret" style="background: linear-gradient(135deg, #e53e3e 0%, #991b1b 100%); display: none;" onclick="jepretKamera()">
-                <i class="fas fa-camera"></i> Ambil Foto
-            </button>
-            <button class="btn-download-rute" id="btnUlangi" style="background: #6b7280; display: none; box-shadow: none;" onclick="ulangiFoto()">
-                <i class="fas fa-redo"></i> Ulangi
-            </button>
-            <button class="btn-download-rute" id="btnKirimDrive" style="display: none;" onclick="kirimKeDrive()">
-                <i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive
-            </button>
+<!-- MENU -->
+<section class="content-section" id="section-menu" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🍱 Menu Mingguan</h2></div>
+    <div class="menu-weekly-nav">
+        <button class="menu-week-btn active" onclick="filterMenuWeek('all', this)">Semua</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('senin', this)">Senin</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('selasa', this)">Selasa</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('rabu', this)">Rabu</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('kamis', this)">Kamis</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('jumat', this)">Jumat</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('sabtu', this)">Sabtu</button>
+        <button class="menu-week-btn" onclick="filterMenuWeek('minggu', this)">Minggu</button>
+    </div>
+    <div class="menu-weekly-container" id="menuWeeklyContainer"></div>
+</section>
+
+<!-- RUTE -->
+<section class="content-section" id="section-rute" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🚚 Rute Distribusi MBG</h2></div>
+    <button class="btn-download-rute" id="btnDownloadRute"><i class="fas fa-download"></i> Download PNG</button>
+    <div id="ruteContent">Memuat data rute...</div>
+</section>
+
+<!-- KAMERA -->
+<section class="content-section" id="section-kamera" style="display:none;">
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📸 Dokumentasi Lapangan</h2></div>
+    <p id="kameraStatus" style="color:#f9a8d4;font-weight:700;margin-bottom:15px;">Tekan tombol di bawah untuk mengaktifkan kamera & GPS.</p>
+    <div class="camera-stage">
+        <video id="kameraStream" autoplay playsinline muted style="display:none;"></video>
+        <canvas id="kameraCanvas" style="display:none;"></canvas>
+    </div>
+    <div class="camera-actions">
+        <button id="btnStartKamera" class="btn-cam start" onclick="startKameraGPS()"><i class="fas fa-camera"></i> Buka Kamera</button>
+        <button id="btnJepret" class="btn-cam jepret" onclick="jepretKamera()" style="display:none;"><i class="fas fa-camera-retro"></i> Ambil Foto</button>
+        <button id="btnUlangi" class="btn-cam ulangi" onclick="ulangiFoto()" style="display:none;"><i class="fas fa-redo"></i> Ulangi</button>
+        <button id="btnKirimDrive" class="btn-cam kirim" onclick="kirimKeDrive()" style="display:none;"><i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive</button>
+    </div>
+    <div id="cameraLensControls" style="display:none;">
+        <div class="lens-buttons">
+            <button id="btnLens05x" class="lens-btn" onclick="switchLens('0.5')">0.5x</button>
+            <button id="btnLens1x" class="lens-btn active" onclick="switchLens('1')">1x</button>
+            <button id="btnLens2x" class="lens-btn" onclick="switchLens('2')">2x</button>
+            <button id="btnLens3x" class="lens-btn" onclick="switchLens('3')">3x</button>
+        </div>
+        <div class="zoom-slider-container">
+            <span style="font-size:12px;color:#fff;">🔍</span>
+            <input type="range" id="zoomSlider" min="1" max="10" step="0.1" value="1" oninput="applyDigitalZoom(this.value)">
+            <span id="zoomValueDisplay" style="font-size:12px;color:#fbbf24;font-weight:bold;">1.0x</span>
         </div>
     </div>
+</section>
+
+<footer class="footer">
+    <p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p>
+    <p class="footer-small">📢 REDZONE ROOM ADA DI KANAN POJOK BAWAH</p>
+</footer>
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-<p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p>
-<p class="footer-small">📢 REDZONE ROOM ADA DI KANAN POJOK BAWAH</p>
-</div>
-
-<!-- REDZONE CHAT ROOM -->
-<div class="chat-widget" id="chatWidget">
-<button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()">
-🚨
-<span class="chat-badge" id="chatBadge">0</span>
-</button>
-<div class="chat-window" id="chatWindow" style="display:none;">
-<div class="chat-header">
-<div class="chat-header-info">
-<h3>🚨 REDZONE ROOM CHAT</h3>
-<div class="chat-user-label" id="chatUserLabel">Online: 0 Pengguna | Guest</div>
-</div>
-<div class="chat-header-actions">
-<button class="change-name-btn" onclick="showChangeName()" title="Ganti Nama">✏️</button>
-<button class="header-action-btn" onclick="toggleEmojiPicker()" title="Emoji">😊</button>
-<button class="header-action-btn" onclick="toggleSearchChat()" title="Cari">🔍</button>
-<button class="chat-close-btn" onclick="toggleChat()">✕</button>
-</div>
-</div>
-<div class="chat-name-form" id="chatNameForm">
-<div class="chat-name-body">
-<div class="chat-welcome-icon">🚨</div>
-<h4>REDZONE CHAT ROOM</h4>
-<p>Masukkan nama Anda untuk bergabung</p>
-<input type="text" id="chatNameInput" placeholder="Nama Anda..." maxlength="20">
-<button class="chat-start-btn" onclick="joinChat()">Masuk Room</button>
-<p class="chat-hint">💡 Nama harus unik. Admin gunakan kode khusus.</p>
-</div>
-</div>
-<div class="chat-room" id="chatRoom" style="display:none;">
-<div class="redzone-announcement" id="redzoneAnnouncement">
-<span class="announcement-text" id="announcementText">📢 Selamat datang di REDZONE!</span>
-<button class="announcement-close" onclick="closeAnnouncement()">✕</button>
-</div>
-<div class="chat-search-bar" id="chatSearchBar" style="display:none;">
-<input type="text" id="chatSearchInput" placeholder="Cari pesan..." oninput="searchChatMessages()">
-<button onclick="toggleSearchChat()">✕</button>
-</div>
-<div class="chat-messages" id="chatMessages">
-<div class="chat-loading">⏳ Menghubungkan ke REDZONE...</div>
-</div>
-<div class="chat-emoji-picker" id="emojiPicker" style="display:none;"></div>
-<div class="chat-reply-preview" id="replyPreview" style="display:none;">
-<span id="replyText"></span>
-<button onclick="cancelReply()">✕</button>
-</div>
-<div class="chat-input-area">
-<input type="text" id="chatInput" placeholder="Ketik pesan..." onkeypress="handleChatKeypress(event)">
-<button class="chat-send-btn" onclick="sendMessage()"></button>
-</div>
-</div>
-</div>
+<!-- REDZONE CHAT -->
+<div class="chat-widget">
+    <div class="chat-window" id="chatWindow" style="display:none;">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <h3>🚨 REDZONE ROOM CHAT</h3>
+                <span class="chat-user-label">Online: <span id="onlineCount">0</span> Pengguna | <span id="chatUserLabel">Guest</span></span>
+            </div>
+            <div class="chat-header-actions">
+                <button class="change-name-btn" onclick="changeChatName()" title="Ganti Nama">✏️</button>
+                <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+            </div>
+        </div>
+        <div class="chat-name-form" id="chatNameForm">
+            <div class="chat-name-body">
+                <div class="chat-welcome-icon">🚨</div>
+                <h4>REDZONE CHAT ROOM</h4>
+                <p>Masukkan nama Anda untuk bergabung</p>
+                <input type="text" id="chatNameInput" maxlength="20" placeholder="Nama Anda...">
+                <button class="chat-start-btn" onclick="joinChat()">Masuk Room</button>
+                <p class="chat-hint">💡 Nama harus unik. Admin gunakan kode khusus.</p>
+            </div>
+        </div>
+        <div class="chat-room" id="chatRoom" style="display:none;">
+            <div class="redzone-announcement" id="chatAnnouncement"><span class="announcement-text">📢 Selamat datang di REDZONE!</span><button class="announcement-close" onclick="document.getElementById('chatAnnouncement').style.display='none'">✕</button></div>
+            <div class="chat-messages" id="chatMessages"><div class="chat-loading">⏳ Menghubungkan ke REDZONE...</div></div>
+            <div class="chat-reply-preview" id="chatReplyPreview" style="display:none;"><span id="chatReplyText"></span><button onclick="cancelReply()">✕</button></div>
+            <div class="chat-emoji-picker" id="chatEmojiPicker" style="display:none;"></div>
+            <div class="chat-input-area">
+                <button class="header-action-btn" onclick="toggleEmoji()" style="flex-shrink:0;">😊</button>
+                <input type="text" id="chatInput" placeholder="Tulis pesan..." onkeypress="if(event.key==='Enter')sendChat()">
+                <button class="chat-send-btn" onclick="sendChat()">➤</button>
+            </div>
+        </div>
+    </div>
+    <button class="chat-toggle-btn" onclick="toggleChat()">🚨<span class="chat-badge" id="chatBadge">0</span></button>
 </div>
 
 <script src="script.js"></script>
