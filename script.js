@@ -484,8 +484,7 @@ isAlert = !isAlert;
 }, 50);
 
 // ==========================================
-// FITUR KAMERA GPS & GOOGLE DRIVE
-// (Sistem Terpisah dari Supabase)
+// FITUR KAMERA GPS & GOOGLE DRIVE (VERSI HIGH-RES & LOGO)
 // ==========================================
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYWNJtghYhHFc_PyCqkARBruNcMNQqqJsa7-ecY_uJpj_TVo8kz31V_gkTNcodoScl/exec';
@@ -495,7 +494,14 @@ let latKamera = "Mencari...";
 let lngKamera = "Mencari...";
 let waktuKamera = "-";
 
-// 1. Fungsi Menyalakan Kamera & GPS
+// --- PENGATURAN LOGO ---
+const logoImg = new Image();
+logoImg.crossOrigin = "Anonymous";
+// GANTI URL DI BAWAH INI DENGAN LINK LOGO PNG TRANSPARAN ANDA
+logoImg.src = 'https://raw.githubusercontent.com/dopamine31/sppg-jatian/main/favicon.png'; 
+
+
+// 1. Fungsi Menyalakan Kamera & GPS (Resolusi Tinggi)
 async function startKameraGPS() {
     const statusEl = document.getElementById('kameraStatus');
     statusEl.innerText = "Mencari lokasi & mengakses kamera...";
@@ -512,9 +518,16 @@ async function startKameraGPS() {
         );
     }
 
-    // Nyalakan Kamera Belakang
+    // Nyalakan Kamera (Paksa Resolusi Maksimal)
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const constraints = {
+            video: { 
+                facingMode: 'environment',
+                width: { ideal: 4096 },  // Meminta lebar maksimal (hingga 4K)
+                height: { ideal: 2160 }  // Meminta tinggi maksimal
+            }
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const videoEl = document.getElementById('kameraStream');
         videoEl.srcObject = stream;
         streamKamera = stream;
@@ -533,13 +546,13 @@ async function startKameraGPS() {
     }
 }
 
-// 2. Fungsi Ambil Foto & Beri Stempel
+// 2. Fungsi Ambil Foto & Beri Stempel (HD + Logo)
 function jepretKamera() {
     const videoEl = document.getElementById('kameraStream');
     const canvasEl = document.getElementById('kameraCanvas');
     const ctx = canvasEl.getContext('2d');
     
-    // Set ukuran canvas
+    // Set ukuran canvas sesuai resolusi asli lensa kamera
     const width = videoEl.videoWidth;
     const height = videoEl.videoHeight;
     canvasEl.width = width;
@@ -549,23 +562,40 @@ function jepretKamera() {
     ctx.drawImage(videoEl, 0, 0, width, height);
 
     // Buat Stempel Hitam Transparan
-    const barHeight = Math.max(80, height * 0.15); 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    const barHeight = Math.max(100, height * 0.15); 
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.fillRect(0, height - barHeight, width, barHeight);
 
-    // Tulis Teks Stempel
+    // --- MENGGAMBAR LOGO DI POJOK KANAN BAWAH ---
+    if (logoImg.complete && logoImg.naturalWidth !== 0) {
+        // Asumsi logo proporsional, menyesuaikan tinggi stempel
+        const logoHeight = barHeight * 0.6;
+        const rasio = logoImg.naturalWidth / logoImg.naturalHeight;
+        const logoWidth = logoHeight * rasio;
+        
+        // Posisi X di kanan, Y di tengah baris transparan
+        const logoX = width - logoWidth - 20;
+        const logoY = height - barHeight + ((barHeight - logoHeight) / 2);
+        
+        ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+    }
+
+    // --- MENULIS TEKS ---
     ctx.fillStyle = "#ffffff";
-    const fontSize = Math.max(14, Math.floor(barHeight * 0.20));
+    const fontSize = Math.max(16, Math.floor(barHeight * 0.18));
     ctx.font = `bold ${fontSize}px Nunito, sans-serif`;
     ctx.textAlign = "left";
 
     const now = new Date();
     waktuKamera = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
 
-    const startY = height - barHeight + (fontSize * 1.5);
+    // Menentukan posisi mulai teks
+    const startY = height - barHeight + (fontSize * 1.5) + 5;
+    
+    // SILAKAN UBAH TEKS "LOKASI: ..." DI BAWAH INI SESUAI KEBUTUHAN:
     ctx.fillText(`Lokasi: SPPG JATIAN PAKUSARI`, 20, startY);
-    ctx.fillText(`Waktu : ${waktuKamera}`, 20, startY + fontSize + 6);
-    ctx.fillText(`GPS   : Lat ${latKamera}, Long ${lngKamera}`, 20, startY + (fontSize * 2) + 12);
+    ctx.fillText(`Waktu : ${waktuKamera}`, 20, startY + fontSize + 8);
+    ctx.fillText(`GPS   : Lat ${latKamera}, Long ${lngKamera}`, 20, startY + (fontSize * 2) + 16);
 
     // Ubah Tampilan UI
     videoEl.style.display = 'none';
@@ -590,7 +620,7 @@ function ulangiFoto() {
     document.getElementById('kameraStatus').innerText = "Kamera & GPS Siap! (Menunggu difoto)";
 }
 
-// 4. Fungsi Kirim ke Google Drive (Fetch API)
+// 4. Fungsi Kirim ke Google Drive (Kualitas 100%)
 function kirimKeDrive() {
     const btnKirim = document.getElementById('btnKirimDrive');
     const statusEl = document.getElementById('kameraStatus');
@@ -598,10 +628,10 @@ function kirimKeDrive() {
     
     btnKirim.disabled = true;
     btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
-    statusEl.innerText = "⏳ Sedang mengunggah ke Google Drive & Sheets...";
+    statusEl.innerText = "⏳ Sedang mengunggah (karena resolusi tinggi, mungkin butuh waktu sedikit lebih lama)...";
 
-    // Kompresi JPEG 70%
-    const base64Image = canvasEl.toDataURL('image/jpeg', 0.7);
+    // Kualitas JPEG diatur ke maksimal 1.0 (100%)
+    const base64Image = canvasEl.toDataURL('image/jpeg', 1.0);
 
     const payload = {
         image: base64Image,
