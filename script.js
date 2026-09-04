@@ -505,27 +505,30 @@ function jepretKamera() {
     canvasEl.width = width;
     canvasEl.height = height;
     
-    // Gambar frame asli dari kamera
+    // Gambar frame asli dari kamera (2K High-Res)
     ctx.drawImage(videoEl, 0, 0, width, height);
     
-    // Skala dinamis untuk resolusi 2K
+    // Skala dinamis berdasarkan lebar gambar
     const scale = width / 1000; 
     const padding = 40 * scale;
     
     // ==========================================
     // KONFIGURASI BAYANGAN TEKS (DROP SHADOW)
     // ==========================================
-    // Ini kuncinya! Bayangan hitam pekat + offset agar teks 'pop-out' di background terang
+    // Bayangan hitam pekat + offset agar teks 'pop-out' di background terang
     ctx.shadowColor = "rgba(0, 0, 0, 0.95)"; 
-    ctx.shadowBlur = 12 * scale;      // Efek blur halus
-    ctx.shadowOffsetX = 3 * scale;    // Geser kanan sedikit (efek 3D)
-    ctx.shadowOffsetY = 3 * scale;    // Geser bawah sedikit (efek 3D)
+    ctx.shadowBlur = 15 * scale;        // Blur yang cukup besar untuk kontras maksimal
+    ctx.shadowOffsetX = 4 * scale;      // Geser kanan (efek 3D)
+    ctx.shadowOffsetY = 4 * scale;      // Geser bawah (efek 3D)
 
     // ==========================================
-    // 1. HEADER ATAS (LOGO + TEKS INSTANSI)
+    // 1. HEADER ATAS KIRI (LOGO + TEKS INSTANSI)
     // ==========================================
     if (logoImg.complete && logoImg.naturalWidth !== 0) {
         const logoSize = 100 * scale;
+        // Tambahkan bayangan pada logo juga agar kontras
+        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+        ctx.shadowBlur = 10 * scale;
         ctx.drawImage(logoImg, padding, padding, logoSize, logoSize);
     }
     
@@ -541,7 +544,7 @@ function jepretKamera() {
     ctx.fillText("JEMBER", textX, padding + (115 * scale));
 
     // ==========================================
-    // 2. TANGGAL & HARI (POJOK KANAN ATAS)
+    // 2. HEADER ATAS KANAN (TANGGAL & HARI)
     // ==========================================
     const now = new Date();
     const jamString = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
@@ -556,7 +559,7 @@ function jepretKamera() {
     ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
     ctx.fillText(tanggalString, width - padding, padding + (40 * scale));
     
-    ctx.fillStyle = "#fbbf24"; // Hari Kuning Emas
+    ctx.fillStyle = "#fbbf24"; // Hari Kuning Emas (lebih menonjol)
     ctx.font = `bold ${28 * scale}px Nunito, sans-serif`;
     ctx.fillText(hariString, width - padding, padding + (85 * scale));
 
@@ -566,17 +569,17 @@ function jepretKamera() {
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     
-    // JAM BESAR (Kiri Bawah)
+    // JAM BESAR (Kiri Bawah) - Putih
     ctx.fillStyle = "#ffffff"; 
     ctx.font = `900 ${120 * scale}px Nunito, sans-serif`;
     ctx.fillText(jamString, padding, height - (120 * scale));
     
-    // WILAYAH
+    // WILAYAH - Putih
     ctx.fillStyle = "#ffffff"; 
     ctx.font = `bold ${34 * scale}px Nunito, sans-serif`;
     ctx.fillText("Kabupaten Jember, Jawa Timur", padding, height - (65 * scale));
     
-    // KOORDINAT (Kuning Emas)
+    // KOORDINAT - Kuning Emas (eye-catching)
     ctx.fillStyle = "#fbbf24"; 
     ctx.font = `bold ${30 * scale}px Nunito, sans-serif`;
     ctx.fillText(`📍 Koordinat: ${latKamera}°S, ${lngKamera}°E`, padding, height - (25 * scale));
