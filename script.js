@@ -500,59 +500,107 @@ function jepretKamera() {
     const videoEl = document.getElementById('kameraStream');
     const canvasEl = document.getElementById('kameraCanvas');
     const ctx = canvasEl.getContext('2d');
-    
-    // Ambil resolusi ASLI dari stream kamera (2K)
     const width = videoEl.videoWidth;
     const height = videoEl.videoHeight;
     canvasEl.width = width;
     canvasEl.height = height;
     
-    // Gambar frame dari video ke canvas (High-Res)
+    // Gambar frame asli dari kamera
     ctx.drawImage(videoEl, 0, 0, width, height);
     
-    // Skala otomatis agar teks proporsional di resolusi 2K apapun
+    // Skala dinamis berdasarkan lebar gambar (Aman untuk resolusi 2K)
     const scale = width / 1000; 
+    const padding = 40 * scale;
     
-    // --- 1. HEADER ATAS (LOGO + TEKS INSTANSI) ---
+    // ==========================================
+    // 1. HEADER ATAS (LOGO + TEKS INSTANSI)
+    // ==========================================
+    const headerHeight = 160 * scale;
+    // [FIX] Tambah Background Box Hitam Transparan agar teks pasti terbaca di foto terang
+    ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+    ctx.fillRect(0, 0, width * 0.65, headerHeight + padding);
+    
     if (logoImg.complete && logoImg.naturalWidth !== 0) {
         const logoSize = 100 * scale;
-        ctx.drawImage(logoImg, 30 * scale, 30 * scale, logoSize, logoSize);
+        ctx.drawImage(logoImg, padding, padding, logoSize, logoSize);
     }
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-    ctx.shadowBlur = 6 * scale;
-    ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
-    ctx.textAlign = "left";
-    ctx.fillText("SPPG JATIAN", 145 * scale, 70 * scale);
-    ctx.fillText("PAKUSARI", 145 * scale, 105 * scale);
-    ctx.fillText("JEMBER", 145 * scale, 140 * scale);
     
-    // --- 2. BAGIAN TENGAH (JAM BESAR & TANGGAL/HARI) ---
+    ctx.fillStyle = "#ffffff"; // WARNA PUTIH TEGAS
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 4 * scale;
+    ctx.font = `900 ${36 * scale}px Nunito, sans-serif`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle"; // Rata tengah vertikal
+    
+    const textX = padding + (120 * scale);
+    ctx.fillText("SPPG JATIAN", textX, padding + (30 * scale));
+    ctx.font = `bold ${28 * scale}px Nunito, sans-serif`;
+    ctx.fillText("PAKUSARI", textX, padding + (75 * scale));
+    ctx.fillText("JEMBER", textX, padding + (115 * scale));
+    ctx.shadowBlur = 0;
+
+    // ==========================================
+    // 2. TANGGAL & HARI (POJOK KANAN ATAS)
+    // ==========================================
     const now = new Date();
     const jamString = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
     const tanggalString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
     const hariString = now.toLocaleDateString('id-ID', { weekday: 'long' });
     waktuKamera = tanggalString + ' ' + jamString;
     
-    ctx.font = `900 ${110 * scale}px Nunito, sans-serif`;
-    ctx.fillText(jamString, 30 * scale, 280 * scale);
-    ctx.font = `bold ${34 * scale}px Nunito, sans-serif`;
-    ctx.textAlign = "right";
-    ctx.fillText(tanggalString, width - (30 * scale), 230 * scale);
-    ctx.fillText(hariString, width - (30 * scale), 275 * scale);
+    const dateBoxWidth = 400 * scale;
+    const dateBoxHeight = 120 * scale;
+    const dateBoxX = width - dateBoxWidth;
+    const dateBoxY = 0;
     
-    // --- 3. BACKGROUND HITAM TRANSPARAN UNTUK BAGIAN BAWAH ---
-    const barHeight = 160 * scale;
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(0, height - barHeight, width, barHeight);
+    // [FIX] Background Box Kanan Atas
+    ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+    ctx.fillRect(dateBoxX, dateBoxY, dateBoxWidth, dateBoxHeight + padding);
     
-    // --- 4. TEKS BAWAH (WILAYAH & KOORDINAT) ---
-    ctx.textAlign = "left";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
     ctx.shadowBlur = 4 * scale;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    
+    ctx.fillStyle = "#ffffff"; // WARNA PUTIH TEGAS
     ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
-    ctx.fillText("Kabupaten Jember, Jawa Timur", 30 * scale, height - (95 * scale));
+    ctx.fillText(tanggalString, width - padding, padding + (40 * scale));
+    
+    ctx.fillStyle = "#fbbf24"; // Kuning terang untuk Hari agar lebih menonjol
+    ctx.font = `bold ${28 * scale}px Nunito, sans-serif`;
+    ctx.fillText(hariString, width - padding, padding + (85 * scale));
+    ctx.shadowBlur = 0;
+
+    // ==========================================
+    // 3. BAR BAWAH (BACKGROUND HITAM TRANSPARAN)
+    // ==========================================
+    const barHeight = 280 * scale; // Diperbesar sedikit agar muat di 2K
+    ctx.fillStyle = "rgba(0, 0, 0, 0.85)"; // Lebih gelap agar kontras maksimal
+    ctx.fillRect(0, height - barHeight, width, barHeight);
+
+    // ==========================================
+    // 4. TEKS BAWAH (JAM BESAR, WILAYAH & KOORDINAT)
+    // ==========================================
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 4 * scale;
+    
+    // JAM BESAR (Kiri Bawah)
+    ctx.fillStyle = "#ffffff"; // [FIX] PASTIKAN WARNA PUTIH SEBELUM FILLTEXT
+    ctx.font = `900 ${120 * scale}px Nunito, sans-serif`;
+    ctx.fillText(jamString, padding, height - (120 * scale));
+    
+    // WILAYAH
+    ctx.fillStyle = "#ffffff"; // [FIX] PASTIKAN WARNA PUTIH
+    ctx.font = `bold ${34 * scale}px Nunito, sans-serif`;
+    ctx.fillText("Kabupaten Jember, Jawa Timur", padding, height - (65 * scale));
+    
+    // KOORDINAT (Dibuat Kuning agar Eye-Catching)
+    ctx.fillStyle = "#fbbf24"; // Kuning terang
     ctx.font = `bold ${30 * scale}px Nunito, sans-serif`;
-    ctx.fillText(`Koordinat: ${latKamera}°S, ${lngKamera}°E`, 30 * scale, height - (45 * scale));
+    ctx.fillText(`📍 Koordinat: ${latKamera}°S, ${lngKamera}°E`, padding, height - (25 * scale));
+    
     ctx.shadowBlur = 0;
     
     videoEl.style.display = 'none';
@@ -560,7 +608,7 @@ function jepretKamera() {
     document.getElementById('btnJepret').style.display = 'none';
     document.getElementById('btnUlangi').style.display = 'inline-flex';
     document.getElementById('btnKirimDrive').style.display = 'inline-flex';
-    document.getElementById('kameraStatus').innerText = `✅ Foto 2K (${width}x${height}) berhasil distempel! Siap dikirim.`;
+    document.getElementById('kameraStatus').innerText = "✅ Foto 2K berhasil distempel! Siap dikirim.";
 }
 
 function ulangiFoto() {
