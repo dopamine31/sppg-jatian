@@ -494,19 +494,14 @@ let latKamera = "Mencari...";
 let lngKamera = "Mencari...";
 let waktuKamera = "-";
 
-// --- PENGATURAN LOGO ---
 const logoImg = new Image();
 logoImg.crossOrigin = "Anonymous";
-// GANTI URL DI BAWAH INI DENGAN LINK LOGO PNG TRANSPARAN ANDA
 logoImg.src = 'https://raw.githubusercontent.com/dopamine31/sppg-jatian/main/favicon.png'; 
 
-
-// 1. Fungsi Menyalakan Kamera & GPS (Resolusi Tinggi)
 async function startKameraGPS() {
     const statusEl = document.getElementById('kameraStatus');
     statusEl.innerText = "Mencari lokasi & mengakses kamera...";
     
-    // Tarik GPS
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
             (pos) => {
@@ -518,13 +513,12 @@ async function startKameraGPS() {
         );
     }
 
-    // Nyalakan Kamera (Paksa Resolusi Maksimal)
     try {
         const constraints = {
             video: { 
                 facingMode: 'environment',
-                width: { ideal: 4096 },  // Meminta lebar maksimal (hingga 4K)
-                height: { ideal: 2160 }  // Meminta tinggi maksimal
+                width: { ideal: 4096 },
+                height: { ideal: 2160 }
             }
         };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -546,22 +540,18 @@ async function startKameraGPS() {
     }
 }
 
-// 2. Fungsi Ambil Foto & Beri Stempel (Tata Letak Mirip Contoh)
 function jepretKamera() {
     const videoEl = document.getElementById('kameraStream');
     const canvasEl = document.getElementById('kameraCanvas');
     const ctx = canvasEl.getContext('2d');
     
-    // Set ukuran canvas sesuai resolusi asli lensa kamera
     const width = videoEl.videoWidth;
     const height = videoEl.videoHeight;
     canvasEl.width = width;
     canvasEl.height = height;
 
-    // Gambar foto ke canvas
     ctx.drawImage(videoEl, 0, 0, width, height);
 
-    // Skala dinamis berdasarkan ukuran foto agar di HP mana pun ukurannya proporsional
     const scale = width / 1000; 
 
     // --- 1. HEADER ATAS (LOGO + TEKS INSTANSI) ---
@@ -576,36 +566,27 @@ function jepretKamera() {
     ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
     ctx.textAlign = "left";
     
-    // Teks Instansi di samping logo
     ctx.fillText("SPPG JATIAN", 145 * scale, 70 * scale);
     ctx.fillText("PAKUSARI", 145 * scale, 105 * scale);
     ctx.fillText("JEMBER", 145 * scale, 140 * scale);
 
-
     // --- 2. BAGIAN TENGAH (JAM BESAR & TANGGAL/HARI) ---
     const now = new Date();
     const jamString = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-    
-    // Format Tanggal ( DD/MM/YYYY )
     const tanggalString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-    
-    // Format Hari (Senin, Selasa, dll)
     const hariString = now.toLocaleDateString('id-ID', { weekday: 'long' });
 
     waktuKamera = tanggalString + ' ' + jamString;
 
-    // Jam Besar di Kiri Tengah
     ctx.font = `900 ${110 * scale}px Nunito, sans-serif`;
     ctx.fillText(jamString, 30 * scale, 280 * scale);
 
-    // Tanggal & Hari di Kanan Tengah
     ctx.font = `bold ${34 * scale}px Nunito, sans-serif`;
     ctx.textAlign = "right";
     ctx.fillText(tanggalString, width - (30 * scale), 230 * scale);
     ctx.fillText(hariString, width - (30 * scale), 275 * scale);
 
-
-    // --- 3. BACKGROUND HITAM TRANSMARAN UNTUK BAGIAN BAWAH ---
+    // --- 3. BACKGROUND HITAM TRANSPARAN UNTUK BAGIAN BAWAH ---
     const barHeight = 160 * scale;
     ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.fillRect(0, height - barHeight, width, barHeight);
@@ -614,18 +595,14 @@ function jepretKamera() {
     ctx.textAlign = "left";
     ctx.shadowBlur = 4 * scale;
 
-    // Baris Wilayah (Contoh statis/bisa disesuaikan)
     ctx.font = `bold ${32 * scale}px Nunito, sans-serif`;
     ctx.fillText("Kabupaten Jember, Jawa Timur", 30 * scale, height - (95 * scale));
 
-    // Baris Koordinat GPS
     ctx.font = `bold ${30 * scale}px Nunito, sans-serif`;
     ctx.fillText(`Koordinat: ${latKamera}°S, ${lngKamera}°E`, 30 * scale, height - (45 * scale));
 
-    // Reset shadow agar tidak berdampak ke rendering lain
     ctx.shadowBlur = 0;
 
-    // Ubah Tampilan UI ke Hasil Jepretan
     videoEl.style.display = 'none';
     canvasEl.style.display = 'block';
     
@@ -633,5 +610,55 @@ function jepretKamera() {
     document.getElementById('btnUlangi').style.display = 'inline-flex';
     document.getElementById('btnKirimDrive').style.display = 'inline-flex';
     
+    document.getElementById('kameraStatus').innerText = "✅ Foto berhasil distempel! Siap dikirim.";
+}
+
+function ulangiFoto() {
+    document.getElementById('kameraStream').style.display = 'block';
+    document.getElementById('kameraCanvas').style.display = 'none';
+    
+    document.getElementById('btnJepret').style.display = 'inline-flex';
+    document.getElementById('btnUlangi').style.display = 'none';
+    document.getElementById('btnKirimDrive').style.display = 'none';
+    
+    document.getElementById('kameraStatus').innerText = "Kamera & GPS Siap! (Menunggu difoto)";
+}
+
+function kirimKeDrive() {
+    const btnKirim = document.getElementById('btnKirimDrive');
+    const statusEl = document.getElementById('kameraStatus');
+    const canvasEl = document.getElementById('kameraCanvas');
+    
+    btnKirim.disabled = true;
+    btnKirim.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+    statusEl.innerText = "⏳ Sedang mengunggah ke Google Drive & Sheets...";
+
+    const base64Image = canvasEl.toDataURL('image/jpeg', 1.0);
+
+    const payload = {
+        image: base64Image,
+        latitude: latKamera,
+        longitude: lngKamera,
+        waktu: waktuKamera
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        statusEl.innerText = "✅ Berhasil! Data masuk ke Google Drive & Sheets.";
+        btnKirim.style.display = 'none';
+        btnKirim.disabled = false;
+        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Kirim ke Drive';
+    })
+    .catch(err => {
+        statusEl.innerText = "❌ Gagal mengirim. Pastikan internet stabil.";
+        btnKirim.disabled = false;
+        btnKirim.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Coba Kirim Lagi';
+    });
+}
     document.getElementById('kameraStatus').innerText = "✅ Foto berhasil distempel! Siap dikirim.";
 }
