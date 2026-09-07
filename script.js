@@ -13,7 +13,20 @@ let currentMenuFilter = 'all';
 function checkAuth() { return sessionStorage.getItem('isAuthenticated') === 'true'; }
 function showPINModal() { document.getElementById('pinModal').classList.add('active'); document.getElementById('pinInput').value = ''; document.getElementById('pinInput').focus(); }
 function hidePINModal() { document.getElementById('pinModal').classList.remove('active'); }
-function verifyPIN() { const input = document.getElementById('pinInput').value; if (input === '2024') { sessionStorage.setItem('isAuthenticated', 'true'); hidePINModal(); alert('✅ Akses diberikan! Fitur terkunci telah dibuka.'); loadRelawan(); loadSekolah(); } else { alert('❌ PIN salah! Silakan coba lagi.'); document.getElementById('pinInput').value = ''; document.getElementById('pinInput').focus(); } }
+async function verifyPIN() {
+  const input = document.getElementById('pinInput').value;
+  const { data, error } = await supabaseClient.rpc('verify_pin', { input: input });
+  if (!error && data === true) {
+    sessionStorage.setItem('isAuthenticated', 'true');
+    hidePINModal();
+    alert('✅ Akses diberikan! Fitur terkunci telah dibuka.');
+    loadRelawan(); loadSekolah();
+  } else {
+    alert('❌ PIN salah! Silakan coba lagi.');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
 function maskNIK(nik) { if (!nik) return '-'; if (!checkAuth()) { const str = String(nik).trim(); if (str.length > 4) return str.substring(0, 4) + '•'.repeat(str.length - 4); return '•'.repeat(str.length); } return nik; }
 function checkAndShow(sectionName) { const lockedSections = ['surat', 'dokumen']; if (lockedSections.includes(sectionName) && !checkAuth()) { showPINModal(); return; } showSection(sectionName); }
 // ===== SIDEBAR & ACCORDION =====
