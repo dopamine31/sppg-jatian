@@ -560,3 +560,15 @@ th, td { padding: 8px; font-size: 11px; }
 .time-display { font-size: 14px; }
 .header-title h1 { font-size: 14px; }
 }
+
+/* ===== TOAST NOTIFICATION (pengganti alert Chrome) ===== */
+#toastContainer { position: fixed; top: 20px; right: 20px; z-index: 12000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 340px; max-width: 90vw; }
+.toast-item { display: flex; align-items: flex-start; gap: 10px; background: #1a1a1a; border: 2px solid #ec4899; border-radius: 14px; padding: 12px 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); opacity: 0; transform: translateX(120%); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: auto; cursor: pointer; }
+.toast-item.show { opacity: 1; transform: translateX(0); }
+.toast-icon { font-size: 18px; line-height: 1.2; }
+.toast-msg { font-size: 13px; font-weight: 700; color: #fce7f3; line-height: 1.4; word-break: break-word; }
+.toast-item.success { border-color: #22c55e; box-shadow: 0 8px 30px rgba(34,197,94,0.25); }
+.toast-item.error { border-color: #e53e3e; box-shadow: 0 8px 30px rgba(229,62,62,0.25); }
+.toast-item.warning { border-color: #f97316; box-shadow: 0 8px 30px rgba(249,115,22,0.25); }
+.toast-item.info { border-color: #0ea5e9; box-shadow: 0 8px 30px rgba(14,165,233,0.25); }
+@media (max-width: 480px) { #toastContainer { top: 12px; right: 12px; left: 12px; width: auto; } }
