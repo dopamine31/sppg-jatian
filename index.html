@@ -39,6 +39,7 @@
                 <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</button>
                 <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
                 <button class="sidebar-menu-btn" onclick="showSection('kamera')"><span class="menu-icon">📸</span> Kamera Dokumentasi</button>
+                <button class="sidebar-menu-btn" onclick="showSection('stok')"><span class="menu-icon">📦</span> Stok Barang</button>
             </div>
         </div>
         <div class="accordion-group">
@@ -214,6 +215,82 @@
         </div>
     </div>
 </section>
+
+    <!-- ===== STOK BARANG (1 barang = 1 kartu stock) ===== -->
+<div class="content-section" id="section-stok" style="display:none;">
+  <div class="section-header">
+    <button class="back-btn" onclick="showHome()">← Beranda</button>
+    <h2>📦 Stok Barang Gudang</h2>
+  </div>
+
+  <!-- TAMPILAN DAFTAR -->
+  <div id="stokListView">
+    <div class="info-stats" id="stokStats"></div>
+
+    <div class="stok-actions">
+      <button class="btn-cam start" onclick="toggleFormBarang()">➕ Tambah Barang Baru</button>
+      <button class="btn-cam kirim" onclick="toggleFormMutasi()">🔄 Catat Masuk / Keluar</button>
+    </div>
+
+    <!-- Form tambah barang baru -->
+    <form class="stok-form" id="formBarang" style="display:none;" onsubmit="simpanBarang(event)">
+      <label>Kode Barang<input type="text" id="inputKode" placeholder="BRG005" required></label>
+      <label>Nama Barang<input type="text" id="inputNama" placeholder="Contoh: Kecap Manis" required></label>
+      <label>Satuan<input type="text" id="inputSatuan" placeholder="Kg / Liter / Pcs / Botol"></label>
+      <label>Stok Minimum<input type="number" id="inputMin" min="0" value="0"></label>
+      <label>Lokasi Rak<input type="text" id="inputLokasi" placeholder="Rak C1"></label>
+      <div class="form-full">
+        <button type="button" class="btn-batal" onclick="toggleFormBarang()">Batal</button>
+        <button type="submit" class="btn-simpan">💾 Simpan Barang</button>
+      </div>
+    </form>
+
+    <!-- Form catat masuk / keluar -->
+    <form class="stok-form" id="formMutasi" style="display:none;" onsubmit="simpanMutasi(event)">
+      <label>Tanggal<input type="date" id="inputTanggal" required></label>
+      <label>Pilih Barang<select id="inputMutasiKode" required></select></label>
+      <label>Jenis<select id="inputJenis" required><option value="masuk">📥 Masuk</option><option value="keluar">📤 Keluar</option></select></label>
+      <label>Jumlah<input type="number" id="inputJumlah" min="1" required></label>
+      <label>No. Nota<input type="text" id="inputNota" placeholder="PO-001 / DO-112"></label>
+      <label>Petugas<input type="text" id="inputPetugas" placeholder="Nama petugas"></label>
+      <label style="grid-column:1/-1;">Keterangan<input type="text" id="inputKet" placeholder="Beli dari Toko A / Pemakaian dapur"></label>
+      <div class="form-full">
+        <button type="button" class="btn-batal" onclick="toggleFormMutasi()">Batal</button>
+        <button type="submit" class="btn-simpan">💾 Simpan Transaksi</button>
+      </div>
+    </form>
+
+    <div class="search-box"><input type="text" id="searchStok" placeholder="🔍 Cari nama / kode barang..."></div>
+    <div class="card-grid" id="stokGrid"></div>
+  </div>
+
+  <!-- TAMPILAN KARTU STOCK (buku digital per barang) -->
+  <div id="kartuStokView" style="display:none;">
+    <div class="section-header">
+      <button class="back-btn" onclick="tutupKartuStok()">← Kembali ke Daftar</button>
+      <h2 id="kartuStokJudul">📇 Kartu Stock</h2>
+    </div>
+    <div class="kartu-stock">
+      <div class="kartu-stock-title">KARTU STOCK</div>
+      <div class="kartu-header">
+        <div><span class="kh-label">Nama Barang</span><span id="ksNama">-</span></div>
+        <div><span class="kh-label">Kode</span><span id="ksKode">-</span></div>
+        <div><span class="kh-label">Satuan</span><span id="ksSatuan">-</span></div>
+        <div><span class="kh-label">Lokasi</span><span id="ksLokasi">-</span></div>
+        <div><span class="kh-label">Stok Min</span><span id="ksMin">-</span></div>
+        <div><span class="kh-label">Sisa Stok</span><strong id="ksSisa">-</strong></div>
+      </div>
+      <div class="table-container">
+        <table id="tableKartuStok">
+          <thead>
+            <tr><th>Tgl</th><th>No. Nota</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th><th>Sisa</th><th>Petugas</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer class="footer">
     <p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p>
