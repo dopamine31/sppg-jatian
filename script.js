@@ -143,3 +143,67 @@ function showToast(message, type) {
 
 // Ambil alih alert() bawaan browser -> tampilkan sebagai toast di web
 window.alert = function(message) { showToast(message); };
+
+// ==========================================
+// CUSTOM CONFIRM MODAL - PENGGANTI CONFIRM CHROME
+// ==========================================
+function showConfirm(message, options) {
+  options = options || {};
+  return new Promise(function(resolve) {
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.innerHTML = '<div class="confirm-modal">' +
+      '<div class="confirm-icon">' + (options.danger === false ? '❓' : '⚠️') + '</div>' +
+      '<h3>' + (options.title || 'Konfirmasi') + '</h3>' +
+      '<p class="confirm-text"></p>' +
+      '<div class="confirm-actions">' +
+      '<button class="confirm-btn cancel">' + (options.cancelText || 'Batal') + '</button>' +
+      '<button class="confirm-btn ok' + (options.danger === false ? '' : ' danger') + '">' + (options.confirmText || 'Ya, Lanjutkan') + '</button>' +
+      '</div></div>';
+    overlay.querySelector('.confirm-text').textContent = message;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.classList.add('active'); });
+    function close(result) {
+      overlay.classList.remove('active');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(function() { overlay.remove(); }, 300);
+      resolve(result);
+    }
+    function onKey(e) { if (e.key === 'Escape') close(false); }
+    document.addEventListener('keydown', onKey);
+    overlay.querySelector('.confirm-btn.cancel').onclick = function() { close(false); };
+    overlay.querySelector('.confirm-btn.ok').onclick = function() { close(true); };
+    overlay.onclick = function(e) { if (e.target === overlay) close(false); };
+  });
+}
+
+async function hapusBarang(kode) {
+  if (!checkAuth()) { showToast('🔒 Fitur hapus terkunci! Masukkan PIN terlebih dahulu.', 'warning'); showPINModal(); return; }
+  const b = globalStok.barang.find(x => x.kode_barang === kode);
+  if (!b) return;
+  const { count } = await supabaseClient.from('mutasi_stok').select('id', { count: 'exact', head: true }).eq('kode_barang', kode);
+  const pesan = count > 0
+    ? 'Barang "' + b.nama_barang + '" memiliki ' + count + ' riwayat transaksi.\nSemua riwayat akan IKUT TERHAPUS permanen.\n\nLanjutkan?'
+    : 'Hapus barang "' + b.nama_barang + '" dari daftar?';
+  const yakin1 = await showConfirm(pesan, { title: 'Hapus Barang', confirmText: 'Ya, Hapus' });
+  if (!yakin1) return;
+  const yakin2 = await showConfirm('KONFIRMASI FINAL:\nBarang benar-benar akan dihapus permanen dan tidak bisa dikembalikan.', { title: 'Sekali Lagi!', confirmText: 'Hapus Permanen' });
+  if (!yakin2) return;
+  const { error: e1 } = await supabaseClient.from('mutasi_stok').delete().eq('kode_barang', kode);
+  if (e1) { showToast('❌ Gagal hapus riwayat: ' + e1.message); return; }
+  const { error: e2 } = await supabaseClient.from('master_barang').delete().eq('kode_barang', kode);
+  if (e2) { showToast('❌ Gagal hapus barang: ' + e2.message); return; }
+  showToast('✅ Barang beserta riwayatnya berhasil dihapus.');
+  loadStok();
+}
+
+async function hapusMutasi(id, kode) {
+  if (!checkAuth()) { showToast('🔒 Fitur hapus terkunci! Masukkan PIN terlebih dahulu.', 'warning'); showPINModal(); return; }
+  const yakin = await showConfirm('Hapus baris transaksi ini?\nSisa stok akan dihitung ulang otomatis.', { title: 'Hapus Transaksi', confirmText: 'Ya, Hapus' });
+  if (!yakin) return;
+  const { error } = await supabaseClient.from('mutasi_stok').delete().eq('id', id);
+  if (error) { showToast('❌ Gagal hapus transaksi: ' + error.message); return; }
+  showToast('✅ Transaksi dihapus. Sisa stok dihitung ulang.');
+  await loadStok();
+  openKartuStok(kode);
+}
