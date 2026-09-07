@@ -436,3 +436,7 @@ th,td { padding: 8px 10px; font-size: 12px; }
   .btn-simpan, .btn-batal { width: 100%; }
   .kartu-header { grid-template-columns: 1fr 1fr; }
 }
+
+/* ===== TOMBOL HAPUS STOK ===== */
+.btn-hapus-stok { background: linear-gradient(135deg,#e53e3e 0%,#991b1b 100%); color: #fff; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; transition: all 0.3s; box-shadow: 0 2px 8px rgba(229,62,62,0.3); }
+.btn-hapus-stok:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229,62,62,0.5); }
