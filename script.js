@@ -21,7 +21,7 @@ function toggleMenu() { const sidebar = document.getElementById('sidebar'); cons
 function toggleAccordion(header) { const group = header.parentElement; const content = group.querySelector('.accordion-content'); const icon = header.querySelector('.accordion-icon'); const isOpen = group.classList.contains('active'); document.querySelectorAll('.accordion-group').forEach(g => { g.classList.remove('active'); const c = g.querySelector('.accordion-content'); const i = g.querySelector('.accordion-icon'); if (c) c.style.maxHeight = null; if (i) i.style.transform = 'rotate(0deg)'; }); if (!isOpen) { group.classList.add('active'); content.style.maxHeight = content.scrollHeight + 50 + 'px'; icon.style.transform = 'rotate(180deg)'; } }
 // ===== NAVIGATION =====
 function showHome() { document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none'); const home = document.getElementById('section-home'); if (home) { home.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); } if (sidebarOpen) toggleMenu(); }
-function showSection(sectionName) { document.getElementById('section-home').style.display = 'none'; document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none'); const section = document.getElementById('section-' + sectionName); if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); } if (sidebarOpen) toggleMenu(); const loaders = { sekolah: loadSekolah, relawan: loadRelawan, koordinator: loadKoordinator, kontak: loadKontak, surat: loadSurat, dokumen: loadDokumen, info: loadInfo, menu: loadMenuWeekly, rute: loadRuteDistribusi }; if (loaders[sectionName]) loaders[sectionName](); }
+function showSection(sectionName) { document.getElementById('section-home').style.display = 'none'; document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none'); const section = document.getElementById('section-' + sectionName); if (section) { section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); } if (sidebarOpen) toggleMenu();    const loaders = { sekolah: loadSekolah, relawan: loadRelawan, koordinator: loadKoordinator, kontak: loadKontak, surat: loadSurat, dokumen: loadDokumen, info: loadInfo, menu: loadMenuWeekly, rute: loadRuteDistribusi, stok: loadStok }; if (loaders[sectionName]) loaders[sectionName](); }
 // ===== CLOCK =====
 function updateClock() { const now = new Date(); const utc = now.getTime() + (now.getTimezoneOffset() * 60000); const wibTime = new Date(utc + (3600000 * 7)); document.getElementById('digitalTime').textContent = `${String(wibTime.getHours()).padStart(2, '0')}:${String(wibTime.getMinutes()).padStart(2, '0')}:${String(wibTime.getSeconds()).padStart(2, '0')}`; document.getElementById('msDisplay').textContent = String(wibTime.getMilliseconds()).padStart(3, '0'); document.getElementById('dateDisplay').textContent = wibTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); document.getElementById('secondHand').style.transform = `rotate(${(wibTime.getSeconds() / 60) * 360}deg)`; document.getElementById('minuteHand').style.transform = `rotate(${((wibTime.getMinutes() + wibTime.getSeconds() / 60) / 60) * 360}deg)`; document.getElementById('hourHand').style.transform = `rotate(${((wibTime.getHours() % 12 + wibTime.getMinutes() / 60) / 12) * 360}deg)`; }
 setInterval(updateClock, 10);
@@ -91,3 +91,178 @@ function setReply(name) { replyTo = name; document.getElementById('chatReplyPrev
 function cancelReply() { replyTo = null; document.getElementById('chatReplyPreview').style.display = 'none'; }
 async function sendChat() { const input = document.getElementById('chatInput'); const msg = input.value.trim(); if (!msg || !chatUser) return; await supabaseClient.from(CHAT_TABLE).insert([{ sender: chatUser, message: msg, reply_to: replyTo, is_admin: chatIsAdmin }]); input.value = ''; cancelReply(); }
 function toggleEmoji() { const picker = document.getElementById('chatEmojiPicker'); if (picker.style.display === 'grid') { picker.style.display = 'none'; return; } const emojis = ['😀','😂','🤣','😊','😍','😘','👍','🙏','🔥','💪','🎉','❤️','😢','😡','👏','🤝','😎','🥳','😭','💖','🚨','⚠️','✅','❌']; picker.innerHTML = emojis.map(e => `<button class="emoji-btn" onclick="document.getElementById('chatInput').value+='${e}'">${e}</button>`).join(''); picker.style.display = 'grid'; }
+
+// ==========================================
+// STOK BARANG (Master + Mutasi = 1 barang 1 kartu stock)
+// ==========================================
+let globalStok = { barang: [], totalTransaksi: 0 };
+
+async function loadStok() {
+  const grid = document.getElementById('stokGrid');
+  if (!grid) return;
+  document.getElementById('kartuStokView').style.display = 'none';
+  document.getElementById('stokListView').style.display = 'block';
+  grid.innerHTML = '<p style="text-align:center;padding:40px;grid-column:1/-1;">⏳ Memuat data stok...</p>';
+  const [barang, countRes] = await Promise.all([
+    fetchJsonData('v_stok_saat_ini'),
+    supabaseClient.from('mutasi_stok').select('id', { count: 'exact', head: true })
+  ]);
+  globalStok.barang = barang || [];
+  globalStok.totalTransaksi = countRes.count || 0;
+  renderStokStats();
+  renderStokGrid();
+  populateSelectBarang();
+  const s = document.getElementById('searchStok');
+  if (s) s.oninput = () => renderStokGrid();
+}
+
+function renderStokStats() {
+  const el = document.getElementById('stokStats');
+  if (!el) return;
+  let aman = 0, menipis = 0, habis = 0;
+  globalStok.barang.forEach(b => {
+    const sisa = Number(b.stok_saat_ini) || 0;
+    if (sisa <= 0) habis++;
+    else if (sisa <= (Number(b.stok_minimum) || 0)) menipis++;
+    else aman++;
+  });
+  el.innerHTML = `
+    <div class="info-stat-item"><span class="info-stat-icon">📦</span><span class="info-stat-label">Jenis Barang</span><span class="info-stat-value">${globalStok.barang.length}</span></div>
+    <div class="info-stat-item"><span class="info-stat-icon">🟢</span><span class="info-stat-label">Stok Aman</span><span class="info-stat-value">${aman}</span></div>
+    <div class="info-stat-item"><span class="info-stat-icon">🟠</span><span class="info-stat-label">Stok Menipis</span><span class="info-stat-value">${menipis}</span></div>
+    <div class="info-stat-item"><span class="info-stat-icon">🔴</span><span class="info-stat-label">Stok Habis</span><span class="info-stat-value">${habis}</span></div>
+    <div class="info-stat-item"><span class="info-stat-icon">🔄</span><span class="info-stat-label">Total Transaksi</span><span class="info-stat-value">${globalStok.totalTransaksi}</span></div>`;
+}
+
+function renderStokGrid() {
+  const grid = document.getElementById('stokGrid');
+  if (!grid) return;
+  const q = (document.getElementById('searchStok')?.value || '').toLowerCase();
+  const data = globalStok.barang.filter(b => (b.nama_barang || '').toLowerCase().includes(q) || (b.kode_barang || '').toLowerCase().includes(q));
+  if (data.length === 0) {
+    grid.innerHTML = '<div class="doc-empty"><div class="doc-empty-icon">📦</div><h3>Belum ada barang</h3><p>Klik "➕ Tambah Barang Baru" untuk mulai mencatat.</p></div>';
+    return;
+  }
+  grid.innerHTML = data.map(b => {
+    const sisa = Number(b.stok_saat_ini) || 0;
+    const min = Number(b.stok_minimum) || 0;
+    const status = sisa <= 0 ? 'habis' : (sisa <= min ? 'menipis' : 'aman');
+    const label = { habis: '🔴 HABIS', menipis: '🟠 MENIPIS', aman: '🟢 AMAN' }[status];
+    return `<div class="info-card stok-card ${status}" onclick="openKartuStok('${escapeHtml(b.kode_barang)}')">
+      <span class="stok-badge ${status}">${label}</span>
+      <h3>📦 ${escapeHtml(b.nama_barang)}</h3>
+      <p><span class="npsn-badge">${escapeHtml(b.kode_barang)}</span></p>
+      <div class="info-row"><div class="info-label">Sisa Stok</div><div class="info-value stok-sisa">${sisa} ${escapeHtml(b.satuan || '')}</div></div>
+      <div class="info-row"><div class="info-label">Stok Minimum</div><div class="info-value">${min} ${escapeHtml(b.satuan || '')}</div></div>
+      <div class="info-row"><div class="info-label">Lokasi Rak</div><div class="info-value">${escapeHtml(b.lokasi_rak || '-')}</div></div>
+      <button class="info-toggle-btn" style="margin-top:12px;width:100%;">📇 Lihat Kartu Stock</button>
+    </div>`;
+  }).join('');
+}
+
+function populateSelectBarang() {
+  const sel = document.getElementById('inputMutasiKode');
+  if (!sel) return;
+  sel.innerHTML = globalStok.barang.map(b => `<option value="${escapeHtml(b.kode_barang)}">${escapeHtml(b.kode_barang)} - ${escapeHtml(b.nama_barang)}</option>`).join('');
+}
+
+async function openKartuStok(kode) {
+  const b = globalStok.barang.find(x => x.kode_barang === kode);
+  if (!b) return;
+  document.getElementById('stokListView').style.display = 'none';
+  document.getElementById('kartuStokView').style.display = 'block';
+  document.getElementById('kartuStokJudul').textContent = '📇 Kartu Stock: ' + b.nama_barang;
+  document.getElementById('ksNama').textContent = b.nama_barang || '-';
+  document.getElementById('ksKode').textContent = b.kode_barang || '-';
+  document.getElementById('ksSatuan').textContent = b.satuan || '-';
+  document.getElementById('ksLokasi').textContent = b.lokasi_rak || '-';
+  document.getElementById('ksMin').textContent = b.stok_minimum || 0;
+  document.getElementById('ksSisa').textContent = (Number(b.stok_saat_ini) || 0) + ' ' + (b.satuan || '');
+  const tbody = document.querySelector('#tableKartuStok tbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">⏳ Memuat riwayat...</td></tr>';
+  const { data: rows } = await supabaseClient
+    .from('mutasi_stok')
+    .select('tanggal,no_nota,keterangan,jenis,jumlah,petugas')
+    .eq('kode_barang', kode)
+    .order('tanggal', { ascending: true })
+    .order('created_at', { ascending: true });
+  let sisa = 0;
+  tbody.innerHTML = (rows || []).map(m => {
+    const masuk = m.jenis === 'masuk' ? Number(m.jumlah) : 0;
+    const keluar = m.jenis === 'keluar' ? Number(m.jumlah) : 0;
+    sisa += masuk - keluar;
+    const tgl = m.tanggal ? new Date(m.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-';
+    return `<tr><td>${tgl}</td><td>${escapeHtml(m.no_nota)}</td><td>${escapeHtml(m.keterangan)}</td><td class="masuk" style="text-align:center;">${masuk || '-'}</td><td class="keluar" style="text-align:center;">${keluar || '-'}</td><td style="text-align:center;"><strong>${sisa}</strong></td><td>${escapeHtml(m.petugas)}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:20px;">Belum ada transaksi untuk barang ini</td></tr>';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function tutupKartuStok() {
+  document.getElementById('kartuStokView').style.display = 'none';
+  document.getElementById('stokListView').style.display = 'block';
+}
+
+function toggleFormBarang() {
+  const f = document.getElementById('formBarang');
+  const buka = (f.style.display === 'none' || f.style.display === '');
+  f.style.display = buka ? 'grid' : 'none';
+  document.getElementById('formMutasi').style.display = 'none';
+}
+
+function toggleFormMutasi() {
+  const f = document.getElementById('formMutasi');
+  const buka = (f.style.display === 'none' || f.style.display === '');
+  f.style.display = buka ? 'grid' : 'none';
+  document.getElementById('formBarang').style.display = 'none';
+  if (buka) {
+    document.getElementById('inputTanggal').value = new Date().toISOString().slice(0, 10);
+    populateSelectBarang();
+  }
+}
+
+async function simpanBarang(e) {
+  e.preventDefault();
+  if (!checkAuth()) { alert('🔒 Input stok terkunci! Masukkan PIN terlebih dahulu.'); showPINModal(); return; }
+  const payload = {
+    kode_barang: document.getElementById('inputKode').value.trim().toUpperCase(),
+    nama_barang: document.getElementById('inputNama').value.trim(),
+    satuan: document.getElementById('inputSatuan').value.trim() || 'pcs',
+    stok_minimum: Number(document.getElementById('inputMin').value) || 0,
+    lokasi_rak: document.getElementById('inputLokasi').value.trim()
+  };
+  const { error } = await supabaseClient.from('master_barang').insert([payload]);
+  if (error) { alert('❌ Gagal simpan barang: ' + error.message + ' (cek apakah kode barang sudah dipakai)'); return; }
+  alert('✅ Barang baru berhasil ditambahkan!');
+  e.target.reset();
+  document.getElementById('formBarang').style.display = 'none';
+  loadStok();
+}
+
+async function simpanMutasi(e) {
+  e.preventDefault();
+  if (!checkAuth()) { alert('🔒 Input stok terkunci! Masukkan PIN terlebih dahulu.'); showPINModal(); return; }
+  const kode = document.getElementById('inputMutasiKode').value;
+  const jenis = document.getElementById('inputJenis').value;
+  const jumlah = Number(document.getElementById('inputJumlah').value);
+  if (!kode || !jumlah || jumlah <= 0) { alert('⚠️ Lengkapi pilihan barang dan jumlah!'); return; }
+  if (jenis === 'keluar') {
+    const { data: rowStok } = await supabaseClient.from('v_stok_saat_ini').select('stok_saat_ini').eq('kode_barang', kode).single();
+    const sisa = Number(rowStok?.stok_saat_ini || 0);
+    if (jumlah > sisa) { alert(`❌ Stok tidak cukup! Sisa saat ini: ${sisa}`); return; }
+  }
+  const payload = {
+    tanggal: document.getElementById('inputTanggal').value || new Date().toISOString().slice(0, 10),
+    kode_barang: kode,
+    jenis: jenis,
+    jumlah: jumlah,
+    no_nota: document.getElementById('inputNota').value.trim(),
+    keterangan: document.getElementById('inputKet').value.trim(),
+    petugas: document.getElementById('inputPetugas').value.trim()
+  };
+  const { error } = await supabaseClient.from('mutasi_stok').insert([payload]);
+  if (error) { alert('❌ Gagal simpan transaksi: ' + error.message); return; }
+  alert('✅ Transaksi stok berhasil dicatat!');
+  e.target.reset();
+  document.getElementById('formMutasi').style.display = 'none';
+  loadStok();
+}
