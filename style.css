@@ -440,3 +440,103 @@ th,td { padding: 8px 10px; font-size: 12px; }
 /* ===== TOMBOL HAPUS STOK ===== */
 .btn-hapus-stok { background: linear-gradient(135deg,#e53e3e 0%,#991b1b 100%); color: #fff; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; transition: all 0.3s; box-shadow: 0 2px 8px rgba(229,62,62,0.3); }
 .btn-hapus-stok:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229,62,62,0.5); }
+
+/* ===== OPTIMASI MOBILE - HEMAT RUANG ===== */
+@media (max-width: 480px) {
+  /* Header lebih compact */
+  .sticky-header { padding: 10px 12px; }
+  .header-title h1 { font-size: 16px; }
+  .header-title p { font-size: 11px; }
+  
+  /* Clock widget lebih kecil */
+  .clock-container { 
+    padding: 8px 10px; 
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+  .analog-clock { width: 35px; height: 35px; }
+  .hour-hand { height: 10px; }
+  .minute-hand { height: 13px; }
+  .second-hand { height: 16px; }
+  .time-display { font-size: 16px; }
+  .date-display { font-size: 9px; }
+  .ms-display { display: none; } /* Sembunyikan milidetik di mobile */
+  
+  /* Stats grid 2 kolom di mobile */
+  .info-stats { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  .info-stat-item { padding: 10px; }
+  .info-stat-icon { font-size: 18px; }
+  .info-stat-label { font-size: 10px; }
+  .info-stat-value { font-size: 18px; }
+  
+  /* Welcome card lebih compact */
+  .welcome-card { 
+    flex-direction: column; 
+    padding: 15px; 
+    gap: 10px;
+  }
+  .welcome-icon { font-size: 35px; }
+  .welcome-content h2 { font-size: 16px; }
+  .welcome-content p { font-size: 12px; }
+  
+  /* Running text lebih kecil */
+  .running-text-container { padding: 8px 12px; }
+  .running-text-label { font-size: 10px; padding: 3px 8px; }
+  .running-text { font-size: 12px; }
+  
+  /* Quote & birthday card */
+  .quote-card { padding: 15px; }
+  .quote-card p { font-size: 14px; }
+  .birthday-card { 
+    flex-direction: column; 
+    padding: 15px; 
+    gap: 10px;
+  }
+  .birthday-icon { font-size: 35px; }
+  .birthday-content h3 { font-size: 16px; }
+  
+  /* Agenda */
+  .agenda-card { padding: 15px; }
+  .agenda-card h2 { font-size: 16px; }
+  .agenda-item { padding: 10px; gap: 10px; }
+  .agenda-date { padding: 6px 10px; min-width: 50px; }
+  .agenda-date .day { font-size: 16px; }
+  .agenda-date .month { font-size: 10px; }
+  .agenda-info h4 { font-size: 13px; }
+  .agenda-info p { font-size: 11px; }
+  
+  /* Section header */
+  .section-header { margin-bottom: 15px; gap: 10px; }
+  .section-header h2 { font-size: 16px; }
+  .back-btn { padding: 8px 15px; font-size: 12px; }
+  
+  /* Content section */
+  .content-section { padding: 15px; }
+  
+  /* Table - hide less important columns */
+  th, td { padding: 8px; font-size: 11px; }
+  
+  /* Cards */
+  .info-card { padding: 15px; }
+  .info-card h3 { font-size: 15px; }
+  .info-card p { font-size: 12px; }
+  
+  /* Search box */
+  .search-box input { padding: 10px 12px; font-size: 13px; }
+  
+  /* Hamburger menu */
+  .hamburger-btn { padding: 8px 14px; font-size: 12px; }
+}
+
+/* Mobile sangat kecil (iPhone SE, dll) */
+@media (max-width: 375px) {
+  .info-stats { grid-template-columns: 1fr; }
+  .clock-container { flex-direction: column; }
+  .time-display { font-size: 14px; }
+  .header-title h1 { font-size: 14px; }
+}
