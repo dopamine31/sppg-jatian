@@ -372,3 +372,63 @@ async function hapusMutasi(id, kode) {
   await loadStok();
   openKartuStok(kode);
 }
+
+// ==========================================
+// FITUR RINGKASAN STOK
+// ==========================================
+function toggleStokSummary() {
+  const listView = document.getElementById('stokListView');
+  const summaryView = document.getElementById('stokSummaryView');
+  const kartuView = document.getElementById('kartuStokView');
+
+  if (summaryView.style.display === 'none' || summaryView.style.display === '') {
+    // Buka ringkasan
+    listView.style.display = 'none';
+    kartuView.style.display = 'none';
+    summaryView.style.display = 'block';
+    renderStokSummary();
+  } else {
+    // Kembali ke daftar
+    summaryView.style.display = 'none';
+    listView.style.display = 'block';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderStokSummary() {
+  const tbody = document.getElementById('tbodyRingkasanStok');
+  if (!tbody || globalStok.barang.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;">Belum ada data barang</td></tr>';
+    return;
+  }
+
+  // Urutkan berdasarkan Kode Barang agar rapi
+  const sortedBarang = [...globalStok.barang].sort((a, b) => a.kode_barang.localeCompare(b.kode_barang));
+
+  tbody.innerHTML = sortedBarang.map((b, index) => {
+    const sisa = Number(b.stok_saat_ini) || 0;
+    const min = Number(b.stok_minimum) || 0;
+    
+    let status = 'AMAN';
+    let statusClass = 'status-aman';
+
+    if (sisa <= 0) {
+      status = 'HABIS';
+      statusClass = 'status-habis';
+    } else if (sisa <= min) {
+      status = 'MENIPIS';
+      statusClass = 'status-menipis';
+    }
+
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td><span class="npsn-badge">${escapeHtml(b.kode_barang)}</span></td>
+        <td><strong>${escapeHtml(b.nama_barang)}</strong></td>
+        <td style="text-align:center; font-size:16px; font-weight:900;">${sisa}</td>
+        <td style="text-align:center;">${escapeHtml(b.satuan || 'pcs')}</td>
+        <td style="text-align:center;"><span class="${statusClass}">${status}</span></td
+      </tr>
+    `;
+  }).join('');
+}
