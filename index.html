@@ -22,14 +22,14 @@
             <button class="pin-btn cancel" onclick="hidePINModal()">Batal</button>
             <button class="pin-btn submit" onclick="verifyPIN()">Buka Akses</button>
         </div>
-        <p class="pin-hint"> PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
+        <p class="pin-hint">💡 PIN rahasia sudah disiapkan. Kalau tahu berarti orang dalam.</p>
     </div>
 </div>
 
 <!-- SIDEBAR -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 <nav class="sidebar" id="sidebar">
-    <div class="sidebar-header"><h3> Menu Utama</h3><button class="sidebar-close" onclick="toggleMenu()">✕</button></div>
+    <div class="sidebar-header"><h3>☰ Menu Utama</h3><button class="sidebar-close" onclick="toggleMenu()">✕</button></div>
     <div class="sidebar-nav">
         <button class="sidebar-menu-btn home-btn" onclick="showHome()"><span class="menu-icon">✨</span> Beranda</button>
         <div class="accordion-group">
@@ -39,7 +39,7 @@
                 <button class="sidebar-menu-btn" onclick="showSection('menu')"><span class="menu-icon">📅</span> Menu Mingguan</button>
                 <button class="sidebar-menu-btn" onclick="showSection('rute')"><span class="menu-icon">🚚</span> Rute Distribusi</button>
                 <button class="sidebar-menu-btn" onclick="showSection('kamera')"><span class="menu-icon">📸</span> Kamera Dokumentasi</button>
-                <button class="sidebar-menu-btn" onclick="showSection('stok')"><span class="menu-icon"></span> Stok Barang</button>
+                <button class="sidebar-menu-btn" onclick="showSection('stok')"><span class="menu-icon">📦</span> Stok Barang</button>
             </div>
         </div>
         <div class="accordion-group">
@@ -89,10 +89,10 @@
 
 <!-- HOME -->
 <section class="content-section" id="section-home">
-    <div class="welcome-card"><div class="welcome-icon"></div><div class="welcome-content"><h2>Selamat Datang di Portal SPPG Jatian!</h2><p>Platform resmi Satuan Pelayanan Pemenuhan Gizi (SPPG) Jatian, Pakusari, Jember untuk manajemen distribusi program Makan Bergizi Gratis (MBG).</p></div></div>
+    <div class="welcome-card"><div class="welcome-icon">👋</div><div class="welcome-content"><h2>Selamat Datang di Portal SPPG Jatian!</h2><p>Platform resmi Satuan Pelayanan Pemenuhan Gizi (SPPG) Jatian, Pakusari, Jember untuk manajemen distribusi program Makan Bergizi Gratis (MBG).</p></div></div>
     <div class="running-text-container"><span class="running-text-label">📢 INFORMASI</span><div class="running-text-wrapper"><span class="running-text" id="runningText">Memuat pengumuman...</span></div></div>
     <div class="quote-card"><p id="quoteText">❝ Memuat quote... ❞</p></div>
-    <div class="birthday-card" id="birthdayCard" style="display:none;"><div class="birthday-icon"></div><div class="birthday-content"><h3>🎉 Hari ini Ulang Tahun!</h3><p id="birthdayText">-</p><a href="#" id="birthdayWaLink" target="_blank" class="birthday-btn"><i class="fab fa-whatsapp"></i> Kirim Ucapan</a></div></div>
+    <div class="birthday-card" id="birthdayCard" style="display:none;"><div class="birthday-icon">🎂</div><div class="birthday-content"><h3>🎉 Hari ini Ulang Tahun!</h3><p id="birthdayText">-</p><a href="#" id="birthdayWaLink" target="_blank" class="birthday-btn"><i class="fab fa-whatsapp"></i> Kirim Ucapan</a></div></div>
     <div class="agenda-card"><h2>📅 Agenda Mendatang</h2><div class="agenda-list" id="agendaList">Sedang memuat...</div></div>
 </section>
 
@@ -100,12 +100,12 @@
 <section class="content-section" id="section-sekolah" style="display:none;">
     <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>🏫 Daftar Sekolah</h2></div>
     <div class="search-box"><input type="text" id="searchSekolah" placeholder="🔍 Cari sekolah..."></div>
-    <div class="table-container"><table id="tableSekolah"><thead><tr><th>No</th><th>NPSN</th><th>Jenjang</th><th>Nama Sekolah</th><th>Status</th><th>Kecamatan</th><th>Kel/Desa</th><th>Alamat</th><th>Total PM</th><th>PIC</th><th>💬 WA PIC</th><th>‍💼 Kepala Sekolah</th><th>📞 No Telp</th><th>📧 Email</th><th>🏦 Rekening</th><th>📍 Lokasi</th></tr></thead><tbody></tbody></table></div>
+    <div class="table-container"><table id="tableSekolah"><thead><tr><th>No</th><th>NPSN</th><th>Jenjang</th><th>Nama Sekolah</th><th>Status</th><th>Kecamatan</th><th>Kel/Desa</th><th>Alamat</th><th>Total PM</th><th>PIC</th><th>💬 WA PIC</th><th>👨‍💼 Kepala Sekolah</th><th>📞 No Telp</th><th>📧 Email</th><th>🏦 Rekening</th><th>📍 Lokasi</th></tr></thead><tbody></tbody></table></div>
 </section>
 
 <!-- RELAWAN -->
 <section class="content-section" id="section-relawan" style="display:none;">
-    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2> Daftar Relawan</h2></div>
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>👥 Daftar Relawan</h2></div>
     <div class="search-box"><input type="text" id="searchRelawan" placeholder="🔍 Cari relawan..."></div>
     <div class="table-container"><table id="tableRelawan"><thead><tr><th>No</th><th>Nama</th><th>🆔 NIK</th><th>💬 Nomor WA</th><th>Email</th><th>📌 Posisi</th><th>📷 KTP</th></tr></thead><tbody></tbody></table></div>
 </section>
@@ -118,7 +118,7 @@
 
 <!-- KONTAK -->
 <section class="content-section" id="section-kontak" style="display:none;">
-    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2> Kontak Staff Internal</h2></div>
+    <div class="section-header"><button class="back-btn" onclick="showHome()">← Beranda</button><h2>📞 Kontak Staff Internal</h2></div>
     <div class="card-grid" id="cardKontak"></div>
 </section>
 
@@ -135,12 +135,12 @@
     <div class="doc-categories">
         <button class="category-btn active" onclick="filterDokumen('all', this)">Semua</button>
         <button class="category-btn" onclick="filterDokumen('sop', this)">📋 SOP</button>
-        <button class="category-btn" onclick="filterDokumen('template', this)"> Template</button>
+        <button class="category-btn" onclick="filterDokumen('template', this)">📝 Template</button>
         <button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
         <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
-        <button class="category-btn" onclick="filterDokumen('panduan', this)"> Panduan</button>
+        <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
     </div>
-    <div class="search-box"><input type="text" id="searchDokumen" placeholder=" Cari dokumen..."></div>
+    <div class="search-box"><input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen..."></div>
     <div class="doc-grid" id="docGrid"></div>
 </section>
 
@@ -199,7 +199,7 @@
         <button id="btnStartKamera" class="btn-cam start" onclick="startKameraGPS()"><i class="fas fa-camera"></i> Buka Kamera</button>
         <button id="btnJepret" class="btn-cam jepret" onclick="jepretKamera()" style="display:none;"><i class="fas fa-camera-retro"></i> Ambil Foto</button>
         <button id="btnUlangi" class="btn-cam ulangi" onclick="ulangiFoto()" style="display:none;"><i class="fas fa-redo"></i> Ulangi</button>
-        <button id="btnKirimDrive" class="btn-cam kirim" onclick="kirimKeDrive()" style="display:none;"><i class="fas fa-cloud-upload-alt"></i> Upload </button>
+        <button id="btnKirimDrive" class="btn-cam kirim" onclick="kirimKeDrive()" style="display:none;"><i class="fas fa-cloud-upload-alt"></i> Upload</button>
     </div>
     <div id="cameraLensControls" style="display:none;">
         <div class="lens-buttons">
@@ -216,7 +216,7 @@
     </div>
 </section>
 
-<!-- ===== STOK BARANG ===== -->
+<!-- ===== STOK BARANG (1 barang = 1 kartu stock) ===== -->
 <section class="content-section" id="section-stok" style="display:none;">
   <div class="section-header">
     <button class="back-btn" onclick="showHome()">← Beranda</button>
@@ -233,6 +233,7 @@
       <button class="btn-cam ulangi" onclick="toggleStokSummary()"><i class="fas fa-list"></i> Ringkasan</button>
     </div>
 
+    <!-- Form tambah barang baru -->
     <form class="stok-form" id="formBarang" style="display:none;" onsubmit="simpanBarang(event)">
       <label>Kode Barang<input type="text" id="inputKode" placeholder="BRG005" required></label>
       <label>Nama Barang<input type="text" id="inputNama" placeholder="Contoh: Kecap Manis" required></label>
@@ -245,6 +246,7 @@
       </div>
     </form>
 
+    <!-- Form catat masuk / keluar -->
     <form class="stok-form" id="formMutasi" style="display:none;" onsubmit="simpanMutasi(event)">
       <label>Tanggal<input type="date" id="inputTanggal" required></label>
       <label>Pilih Barang<select id="inputMutasiKode" required></select></label>
@@ -259,7 +261,7 @@
       </div>
     </form>
 
-    <div class="search-box"><input type="text" id="searchStok" placeholder=" Cari nama / kode barang..."></div>
+    <div class="search-box"><input type="text" id="searchStok" placeholder="🔍 Cari nama / kode barang..."></div>
     <div class="card-grid" id="stokGrid"></div>
   </div>
 
@@ -282,13 +284,13 @@
           </tr>
         </thead>
         <tbody id="tbodyRingkasanStok">
-          <!-- Diisi otomatis oleh JavaScript dengan data-label -->
+          <!-- Diisi otomatis oleh JavaScript -->
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- TAMPILAN KARTU STOCK -->
+  <!-- TAMPILAN KARTU STOCK (buku digital per barang) -->
   <div id="kartuStokView" style="display:none;">
     <div class="section-header">
       <button class="back-btn" onclick="tutupKartuStok()">← Kembali</button>
@@ -318,7 +320,7 @@
 
 <footer class="footer">
     <p>© <span id="footerYear"></span> SATUAN PELAYANAN PEMENUHAN GIZI - Badan Gizi Nasional</p>
-    <p class="footer-small"> REDZONE ROOM ADA DI KANAN POJOK BAWAH</p>
+    <p class="footer-small">📢 REDZONE ROOM ADA DI KANAN POJOK BAWAH</p>
 </footer>
 </div>
 
@@ -328,7 +330,7 @@
         <div class="chat-header">
             <div class="chat-header-info">
                 <h3>🚨 REDZONE ROOM CHAT</h3>
-                <span class="chat-user-label">Online: <span id="onlineCount">0</span> | <span id="chatUserLabel">Guest</span></span>
+                <span class="chat-user-label">Online: <span id="onlineCount">0</span> Pengguna | <span id="chatUserLabel">Guest</span></span>
             </div>
             <div class="chat-header-actions">
                 <button class="change-name-btn" onclick="changeChatName()" title="Ganti Nama">✏️</button>
