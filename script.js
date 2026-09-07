@@ -103,3 +103,43 @@ async function hapusBarang(kode) { if (!checkAuth()) { alert('🔒 Fitur hapus t
 async function hapusMutasi(id, kode) { if (!checkAuth()) { alert('🔒 Fitur hapus terkunci! Masukkan PIN terlebih dahulu.'); showPINModal(); return; } if (!confirm('Hapus baris transaksi ini?\nSisa stok akan dihitung ulang otomatis.')) return; const { error } = await supabaseClient.from('mutasi_stok').delete().eq('id', id); if (error) { alert('❌ Gagal hapus transaksi: ' + error.message); return; } alert('✅ Transaksi dihapus. Sisa stok dihitung ulang.'); await loadStok(); openKartuStok(kode); }
 function toggleStokSummary() { const listView = document.getElementById('stokListView'); const summaryView = document.getElementById('stokSummaryView'); const kartuView = document.getElementById('kartuStokView'); if (summaryView.style.display === 'none' || summaryView.style.display === '') { listView.style.display = 'none'; kartuView.style.display = 'none'; summaryView.style.display = 'block'; renderStokSummary(); } else { summaryView.style.display = 'none'; listView.style.display = 'block'; } window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function renderStokSummary() { const tbody = document.getElementById('tbodyRingkasanStok'); if (!tbody || globalStok.barang.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">Belum ada data barang</td></tr>'; return; } const sortedBarang = [...globalStok.barang].sort((a, b) => a.kode_barang.localeCompare(b.kode_barang)); tbody.innerHTML = sortedBarang.map((b, index) => { const sisa = Number(b.stok_saat_ini) || 0; const min = Number(b.stok_minimum) || 0; let status = 'AMAN'; let statusClass = 'status-aman'; if (sisa <= 0) { status = 'HABIS'; statusClass = 'status-habis'; } else if (sisa <= min) { status = 'MENIPIS'; statusClass = 'status-menipis'; } return `<tr><td data-label="No">${index + 1}</td><td data-label="Kode"><span class="npsn-badge">${escapeHtml(b.kode_barang)}</span></td><td data-label="Nama Barang"><strong>${escapeHtml(b.nama_barang)}</strong></td><td data-label="Sisa Stok" class="${statusClass}" style="text-align:center;">${sisa}</td><td data-label="Satuan">${escapeHtml(b.satuan || 'pcs')}</td></tr>`; }).join(''); }
+
+// ==========================================
+// TOAST NOTIFICATION - PENGGANTI ALERT CHROME
+// ==========================================
+function showToast(message, type) {
+  let container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    document.body.appendChild(container);
+  }
+  message = String(message);
+  if (!type) {
+    if (message.indexOf('✅') === 0) type = 'success';
+    else if (message.indexOf('❌') === 0) type = 'error';
+    else if (message.indexOf('⚠️') === 0 || message.indexOf('🔒') === 0 || message.indexOf('🔴') === 0) type = 'warning';
+    else type = 'info';
+  }
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: '📢' };
+  const toast = document.createElement('div');
+  toast.className = 'toast-item ' + type;
+  const icon = document.createElement('span');
+  icon.className = 'toast-icon';
+  icon.textContent = icons[type];
+  const msg = document.createElement('span');
+  msg.className = 'toast-msg';
+  msg.textContent = message.replace(/^[✅❌⚠️🔴📢]\s*/, '');
+  toast.appendChild(icon);
+  toast.appendChild(msg);
+  toast.onclick = function() { toast.classList.remove('show'); setTimeout(function() { toast.remove(); }, 400); };
+  container.appendChild(toast);
+  requestAnimationFrame(function() { toast.classList.add('show'); });
+  setTimeout(function() {
+    toast.classList.remove('show');
+    setTimeout(function() { toast.remove(); }, 400);
+  }, 3500);
+}
+
+// Ambil alih alert() bawaan browser -> tampilkan sebagai toast di web
+window.alert = function(message) { showToast(message); };
