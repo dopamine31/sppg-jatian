@@ -427,7 +427,7 @@ function renderStokSummary() {
         <td><strong>${escapeHtml(b.nama_barang)}</strong></td>
         <td style="text-align:center; font-size:16px; font-weight:900;">${sisa}</td>
         <td style="text-align:center;">${escapeHtml(b.satuan || 'pcs')}</td>
-        <td style="text-align:center;"><span class="${statusClass}">${status}</span></td
+        <td style="text-align:center;"><span class="${statusClass}">${status}</span></td>
       </tr>
     `;
   }).join('');
