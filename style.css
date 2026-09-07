@@ -572,3 +572,19 @@ th, td { padding: 8px; font-size: 11px; }
 .toast-item.warning { border-color: #f97316; box-shadow: 0 8px 30px rgba(249,115,22,0.25); }
 .toast-item.info { border-color: #0ea5e9; box-shadow: 0 8px 30px rgba(14,165,233,0.25); }
 @media (max-width: 480px) { #toastContainer { top: 12px; right: 12px; left: 12px; width: auto; } }
+
+/* ===== CUSTOM CONFIRM MODAL (pengganti confirm Chrome) ===== */
+.confirm-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 12500; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
+.confirm-overlay.active { opacity: 1; visibility: visible; }
+.confirm-modal { background: linear-gradient(135deg,#1a1a1a 0%,#2d1a2d 100%); border: 2px solid #ec4899; border-radius: 20px; padding: 28px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 40px rgba(236,72,153,0.4); transform: scale(0.9); transition: transform 0.3s ease; }
+.confirm-overlay.active .confirm-modal { transform: scale(1); }
+.confirm-icon { font-size: 44px; margin-bottom: 10px; }
+.confirm-modal h3 { color: #f472b6; font-size: 20px; font-weight: 900; margin-bottom: 12px; }
+.confirm-text { color: #f9a8d4; font-size: 14px; font-weight: 600; line-height: 1.6; white-space: pre-line; margin-bottom: 22px; }
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.3s; font-family: inherit; }
+.confirm-btn.cancel { background: #2d2d2d; color: #f9a8d4; }
+.confirm-btn.cancel:hover { background: #3d3d3d; }
+.confirm-btn.ok { background: linear-gradient(135deg,#22c55e 0%,#15803d 100%); color: #fff; box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
+.confirm-btn.ok.danger { background: linear-gradient(135deg,#e53e3e 0%,#991b1b 100%); box-shadow: 0 4px 15px rgba(229,62,62,0.4); }
+.confirm-btn.ok:hover { transform: translateY(-2px); }
