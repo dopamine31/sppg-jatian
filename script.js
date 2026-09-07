@@ -279,3 +279,96 @@ async function simpanMutasi(e) {
   document.getElementById('formMutasi').style.display = 'none';
   loadStok();
 }
+
+// ==========================================
+// FITUR HAPUS (Barang & Transaksi) + Override Tampilan
+// ==========================================
+function renderStokGrid() {
+  const grid = document.getElementById('stokGrid');
+  if (!grid) return;
+  const q = (document.getElementById('searchStok')?.value || '').toLowerCase();
+  const data = globalStok.barang.filter(b => (b.nama_barang || '').toLowerCase().includes(q) || (b.kode_barang || '').toLowerCase().includes(q));
+  if (data.length === 0) {
+    grid.innerHTML = '<div class="doc-empty"><div class="doc-empty-icon">📦</div><h3>Belum ada barang</h3><p>Klik "➕ Tambah Barang Baru" untuk mulai mencatat.</p></div>';
+    return;
+  }
+  grid.innerHTML = data.map(b => {
+    const sisa = Number(b.stok_saat_ini) || 0;
+    const min = Number(b.stok_minimum) || 0;
+    const status = sisa <= 0 ? 'habis' : (sisa <= min ? 'menipis' : 'aman');
+    const label = { habis: '🔴 HABIS', menipis: '🟠 MENIPIS', aman: '🟢 AMAN' }[status];
+    const kodeSafe = escapeHtml(b.kode_barang);
+    return `<div class="info-card stok-card ${status}">
+      <span class="stok-badge ${status}">${label}</span>
+      <h3>📦 ${escapeHtml(b.nama_barang)}</h3>
+      <p><span class="npsn-badge">${kodeSafe}</span></p>
+      <div class="info-row"><div class="info-label">Sisa Stok</div><div class="info-value stok-sisa">${sisa} ${escapeHtml(b.satuan || '')}</div></div>
+      <div class="info-row"><div class="info-label">Stok Minimum</div><div class="info-value">${min} ${escapeHtml(b.satuan || '')}</div></div>
+      <div class="info-row"><div class="info-label">Lokasi Rak</div><div class="info-value">${escapeHtml(b.lokasi_rak || '-')}</div></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="info-toggle-btn" style="flex:1;margin-top:0;" onclick="openKartuStok('${kodeSafe}')">📇 Kartu Stock</button>
+        <button class="btn-hapus-stok" onclick="hapusBarang('${kodeSafe}')" title="Hapus barang ini">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function openKartuStok(kode) {
+  const b = globalStok.barang.find(x => x.kode_barang === kode);
+  if (!b) return;
+  document.getElementById('stokListView').style.display = 'none';
+  document.getElementById('kartuStokView').style.display = 'block';
+  document.getElementById('kartuStokJudul').textContent = '📇 Kartu Stock: ' + b.nama_barang;
+  document.getElementById('ksNama').textContent = b.nama_barang || '-';
+  document.getElementById('ksKode').textContent = b.kode_barang || '-';
+  document.getElementById('ksSatuan').textContent = b.satuan || '-';
+  document.getElementById('ksLokasi').textContent = b.lokasi_rak || '-';
+  document.getElementById('ksMin').textContent = b.stok_minimum || 0;
+  document.getElementById('ksSisa').textContent = (Number(b.stok_saat_ini) || 0) + ' ' + (b.satuan || '');
+  document.querySelector('#tableKartuStok thead').innerHTML = '<tr><th>Tgl</th><th>No. Nota</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th><th>Sisa</th><th>Petugas</th><th>Aksi</th></tr>';
+  const tbody = document.querySelector('#tableKartuStok tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">⏳ Memuat riwayat...</td></tr>';
+  const { data: rows } = await supabaseClient
+    .from('mutasi_stok')
+    .select('id,tanggal,no_nota,keterangan,jenis,jumlah,petugas')
+    .eq('kode_barang', kode)
+    .order('tanggal', { ascending: true })
+    .order('created_at', { ascending: true });
+  let sisa = 0;
+  tbody.innerHTML = (rows || []).map(m => {
+    const masuk = m.jenis === 'masuk' ? Number(m.jumlah) : 0;
+    const keluar = m.jenis === 'keluar' ? Number(m.jumlah) : 0;
+    sisa += masuk - keluar;
+    const tgl = m.tanggal ? new Date(m.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-';
+    return `<tr><td>${tgl}</td><td>${escapeHtml(m.no_nota)}</td><td>${escapeHtml(m.keterangan)}</td><td class="masuk" style="text-align:center;">${masuk || '-'}</td><td class="keluar" style="text-align:center;">${keluar || '-'}</td><td style="text-align:center;"><strong>${sisa}</strong></td><td>${escapeHtml(m.petugas)}</td><td style="text-align:center;"><button class="btn-hapus-stok" onclick="hapusMutasi(${m.id},'${escapeHtml(kode)}')" title="Hapus baris transaksi ini">🗑️</button></td></tr>`;
+  }).join('') || '<tr><td colspan="8" style="text-align:center;padding:20px;">Belum ada transaksi untuk barang ini</td></tr>';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function hapusBarang(kode) {
+  if (!checkAuth()) { alert('🔒 Fitur hapus terkunci! Masukkan PIN terlebih dahulu.'); showPINModal(); return; }
+  const b = globalStok.barang.find(x => x.kode_barang === kode);
+  if (!b) return;
+  const { count } = await supabaseClient.from('mutasi_stok').select('id', { count: 'exact', head: true }).eq('kode_barang', kode);
+  const pesan = count > 0
+    ? `⚠️ PERHATIAN!\nBarang "${b.nama_barang}" memiliki ${count} riwayat transaksi.\nSemua riwayat akan IKUT TERHAPUS permanen.\n\nLanjutkan?`
+    : `Hapus barang "${b.nama_barang}" dari daftar?`;
+  if (!confirm(pesan)) return;
+  if (!confirm('🔴 KONFIRMASI FINAL: Barang benar-benar akan dihapus permanen. Klik OK untuk melanjutkan.')) return;
+  const { error: e1 } = await supabaseClient.from('mutasi_stok').delete().eq('kode_barang', kode);
+  if (e1) { alert('❌ Gagal hapus riwayat: ' + e1.message); return; }
+  const { error: e2 } = await supabaseClient.from('master_barang').delete().eq('kode_barang', kode);
+  if (e2) { alert('❌ Gagal hapus barang: ' + e2.message); return; }
+  alert('✅ Barang beserta riwayatnya berhasil dihapus.');
+  loadStok();
+}
+
+async function hapusMutasi(id, kode) {
+  if (!checkAuth()) { alert('🔒 Fitur hapus terkunci! Masukkan PIN terlebih dahulu.'); showPINModal(); return; }
+  if (!confirm('Hapus baris transaksi ini?\nSisa stok akan dihitung ulang otomatis.')) return;
+  const { error } = await supabaseClient.from('mutasi_stok').delete().eq('id', id);
+  if (error) { alert('❌ Gagal hapus transaksi: ' + error.message); return; }
+  alert('✅ Transaksi dihapus. Sisa stok dihitung ulang.');
+  await loadStok();
+  openKartuStok(kode);
+}
