@@ -2,16 +2,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body { 
-  font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif; 
-  background: #0f0f0f; 
-  background-image: radial-gradient(circle at 20% 30%, rgba(236,72,153,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(244,114,182,0.12) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(190,24,93,0.08) 0%, transparent 70%); 
-  min-height: 100vh; 
-  padding: 0; 
-  position: relative; 
-  overflow-x: hidden; 
-  color: #fce7f3; 
-}
+body { font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif; background: #0f0f0f; background-image: radial-gradient(circle at 20% 30%, rgba(236,72,153,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(244,114,182,0.12) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(190,24,93,0.08) 0%, transparent 70%); min-height: 100vh; padding: 0; position: relative; overflow-x: hidden; color: #fce7f3; }
 
 /* PIN MODAL */
 .pin-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
@@ -404,29 +395,31 @@ td a:hover { text-decoration: underline; color: #ec4899; }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .container { padding: 15px; }
-  .sticky-header { padding: 12px 15px; }
-  .header-top { flex-direction: column; text-align: center; gap: 10px; }
-  .hamburger-btn { order: 0; align-self: flex-start; }
-  .header-title h1 { font-size: 18px; }
-  .clock-container { width: 100%; justify-content: center; padding: 8px 12px; }
-  .time-display { font-size: 18px; }
-  .analog-clock { width: 45px; height: 45px; }
-  .hour-hand { height: 11px; } .minute-hand { height: 15px; } .second-hand { height: 18px; }
-  th,td { padding: 8px 10px; font-size: 12px; }
-  .ktp-thumbnail { width: 60px; height: 40px; }
-  .welcome-card { flex-direction: column; text-align: center; padding: 20px; }
-  .birthday-card { flex-direction: column; text-align: center; }
-  .rute-tables-grid { grid-template-columns: 1fr; }
-  .rute-total-stats { grid-template-columns: 1fr; }
-  .rute-summary-stats { grid-template-columns: 1fr; }
-  .section-header h2 { font-size: 18px; }
-  .doc-actions-grid { grid-template-columns: 1fr; }
-  .btn-download-rute { width: 100%; justify-content: center; }
-  .chat-widget { bottom: 15px; right: 15px; }
-  .chat-toggle-btn { width: 60px; height: 60px; font-size: 24px; }
-  .chat-window { width: 100%; height: 85vh; position: fixed; bottom: 0; right: 0; left: 0; border-radius: 15px 15px 0 0; max-width: 100vw; }
-  .ktp-modal-content { padding: 15px; max-width: 95%; }
+.container { padding: 15px; }
+.sticky-header { padding: 12px 15px; }
+.header-top { flex-direction: column; text-align: center; gap: 10px; }
+.hamburger-btn { order: 0; align-self: flex-start; }
+.header-title h1 { font-size: 18px; }
+.clock-container { width: 100%; justify-content: center; padding: 8px 12px; }
+.time-display { font-size: 18px; }
+.analog-clock { width: 45px; height: 45px; }
+.hour-hand { height: 11px; }
+.minute-hand { height: 15px; }
+.second-hand { height: 18px; }
+th,td { padding: 8px 10px; font-size: 12px; }
+.ktp-thumbnail { width: 60px; height: 40px; }
+.welcome-card { flex-direction: column; text-align: center; padding: 20px; }
+.birthday-card { flex-direction: column; text-align: center; }
+.rute-tables-grid { grid-template-columns: 1fr; }
+.rute-total-stats { grid-template-columns: 1fr; }
+.rute-summary-stats { grid-template-columns: 1fr; }
+.section-header h2 { font-size: 18px; }
+.doc-actions-grid { grid-template-columns: 1fr; }
+.btn-download-rute { width: 100%; justify-content: center; }
+.chat-widget { bottom: 15px; right: 15px; }
+.chat-toggle-btn { width: 60px; height: 60px; font-size: 24px; }
+.chat-window { width: 100%; height: 85vh; position: fixed; bottom: 0; right: 0; left: 0; border-radius: 15px 15px 0 0; max-width: 100vw; }
+.ktp-modal-content { padding: 15px; max-width: 95%; }
 }
 
 /* ==========================================
@@ -464,240 +457,106 @@ td a:hover { text-decoration: underline; color: #ec4899; }
 .kartu-stock td.keluar { color: #991b1b; font-weight: 800; }
 
 @media (max-width: 768px) {
-  .stok-form { grid-template-columns: 1fr; }
-  .form-full { flex-direction: column; }
-  .btn-simpan, .btn-batal { width: 100%; }
-  .kartu-header { grid-template-columns: 1fr 1fr; }
+.stok-form { grid-template-columns: 1fr; }
+.form-full { flex-direction: column; }
+.btn-simpan, .btn-batal { width: 100%; }
+.kartu-header { grid-template-columns: 1fr 1fr; }
 }
 
 /* ===== TOMBOL HAPUS STOK ===== */
 .btn-hapus-stok { background: linear-gradient(135deg,#e53e3e 0%,#991b1b 100%); color: #fff; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 800; transition: all 0.3s; box-shadow: 0 2px 8px rgba(229,62,62,0.3); }
 .btn-hapus-stok:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(229,62,62,0.5); }
 
-/* ===== RINGKASAN STOK - MOBILE FRIENDLY ===== */
-#tableRingkasanStok {
-  font-size: 14px;
-}
+/* ===== RINGKASAN STOK (Mobile Friendly) ===== */
+#tableRingkasanStok { font-size: 14px; }
+#tableRingkasanStok th { background: linear-gradient(135deg, #be185d, #831843); color: #fff; padding: 10px 8px; text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+#tableRingkasanStok td { padding: 12px 8px; border-bottom: 1px solid #2d2d2d; color: #fce7f3; font-size: 13px; vertical-align: middle; }
+#tableRingkasanStok tr:hover { background: #2d1a2d; }
+.status-aman { color: #22c55e; font-weight: 800; font-size: 15px; }
+.status-menipis { color: #f97316; font-weight: 800; font-size: 15px; }
+.status-habis { color: #e53e3e; font-weight: 800; font-size: 15px; animation: pulseWarning 2s infinite; }
 
-#tableRingkasanStok th {
-  background: linear-gradient(135deg, #be185d, #831843);
-  color: #fff;
-  padding: 10px 8px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-#tableRingkasanStok td {
-  padding: 12px 8px;
-  border-bottom: 1px solid #2d2d2d;
-  color: #fce7f3;
-  font-size: 13px;
-  vertical-align: middle;
-}
-
-#tableRingkasanStok tr:hover {
-  background: #2d1a2d;
-}
-
-/* Perbaikan khusus mobile */
 @media (max-width: 768px) {
-  #tableRingkasanStok {
-    font-size: 12px;
-  }
-  
-  #tableRingkasanStok th {
-    padding: 8px 5px;
-    font-size: 10px;
-  }
-  
-  #tableRingkasanStok td {
-    padding: 10px 5px;
-    font-size: 12px;
-  }
-  
-  /* Perkecil badge kode barang */
-  .npsn-badge {
-    font-size: 9px !important;
-    padding: 2px 4px !important;
-  }
+#tableRingkasanStok { font-size: 12px; }
+#tableRingkasanStok th { padding: 8px 5px; font-size: 10px; }
+#tableRingkasanStok td { padding: 10px 5px; font-size: 12px; }
+.npsn-badge { font-size: 9px !important; padding: 2px 4px !important; }
 }
 
-/* Untuk layar sangat kecil (HP kecil) */
-@media (max-width: 375px) {
-  #tableRingkasanStok th {
-    font-size: 9px;
-    padding: 6px 3px;
-  }
-  
-  #tableRingkasanStok td {
-    font-size: 11px;
-    padding: 8px 3px;
-  }
-  
-  .npsn-badge {
-    font-size: 8px !important;
-    padding: 1px 3px !important;
-  }
-}
-
-/* Alternatif: Card View untuk Mobile (lebih friendly) */
+/* Card View untuk HP kecil */
 @media (max-width: 640px) {
-  #tableRingkasanStok thead {
-    display: none;
-  }
-  
-  #tableRingkasanStok,
-  #tableRingkasanStok tbody,
-  #tableRingkasanStok tr,
-  #tableRingkasanStok td {
-    display: block;
-    width: 100%;
-  }
-  
-  #tableRingkasanStok tr {
-    background: #1a1a1a;
-    border: 2px solid #2d2d2d;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    padding: 12px;
-  }
-  
-  #tableRingkasanStok td {
-    text-align: left !important;
-    padding: 8px 0;
-    border: none;
-    position: relative;
-    padding-left: 45%;
-  }
-  
-  #tableRingkasanStok td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 0;
-    width: 40%;
-    font-weight: 700;
-    color: #f9a8d4;
-    font-size: 11px;
-  }
-  
-  /* Highlight stok 0 dengan warna warning */
-  #tableRingkasanStok tr td:nth-child(4) {
-    font-weight: 900;
-    font-size: 16px;
-  }
-  
-  #tableRingkasanStok tr td:nth-child(4).stok-habis {
-    color: #e53e3e;
-  }
-  
-  #tableRingkasanStok tr td:nth-child(4).stok-aman {
-    color: #22c55e;
-  }
+#tableRingkasanStok thead { display: none; }
+#tableRingkasanStok, #tableRingkasanStok tbody, #tableRingkasanStok tr, #tableRingkasanStok td { display: block; width: 100%; }
+#tableRingkasanStok tr { background: #1a1a1a; border: 2px solid #2d2d2d; border-radius: 12px; margin-bottom: 12px; padding: 12px; }
+#tableRingkasanStok td { text-align: left !important; padding: 8px 0; border: none; position: relative; padding-left: 45%; }
+#tableRingkasanStok td::before { content: attr(data-label); position: absolute; left: 0; width: 40%; font-weight: 700; color: #f9a8d4; font-size: 11px; }
+#tableRingkasanStok tr td:nth-child(4) { font-weight: 900; font-size: 16px; }
 }
 
-/* Status warna untuk stok */
-.status-aman { 
-  color: #22c55e; 
-  font-weight: 800;
-  font-size: 15px;
-}
-
-.status-menipis { 
-  color: #f97316; 
-  font-weight: 800;
-  font-size: 15px;
-}
-
-.status-habis { 
-  color: #e53e3e; 
-  font-weight: 800;
-  font-size: 15px;
-  animation: pulseWarning 2s infinite;
+/* Mode Cetak (Ctrl+P) */
+@media print {
+body * { visibility: hidden; }
+#stokSummaryView, #stokSummaryView * { visibility: visible; }
+#stokSummaryView { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; color: #000 !important; padding: 20px; }
+#tableRingkasanStok th { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#tableRingkasanStok td { color: #000 !important; border-bottom: 1px solid #ccc !important; }
+.back-btn, .btn-cam { display: none !important; }
+.section-header h2 { color: #000 !important; }
 }
 
 /* ===== OPTIMASI MOBILE - HEMAT RUANG ===== */
 @media (max-width: 480px) {
-  .sticky-header { padding: 10px 12px; }
-  .header-title h1 { font-size: 16px; }
-  .header-title p { font-size: 11px; }
-  
-  .clock-container { 
-    padding: 8px 10px; 
-    flex-direction: row;
-    justify-content: center;
-    gap: 10px;
-  }
-  .analog-clock { width: 35px; height: 35px; }
-  .hour-hand { height: 10px; }
-  .minute-hand { height: 13px; }
-  .second-hand { height: 16px; }
-  .time-display { font-size: 16px; }
-  .date-display { font-size: 9px; }
-  .ms-display { display: none; }
-  
-  .info-stats { 
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  .info-stat-item { padding: 10px; }
-  .info-stat-icon { font-size: 18px; }
-  .info-stat-label { font-size: 10px; }
-  .info-stat-value { font-size: 18px; }
-  
-  .welcome-card { 
-    flex-direction: column; 
-    padding: 15px; 
-    gap: 10px;
-  }
-  .welcome-icon { font-size: 35px; }
-  .welcome-content h2 { font-size: 16px; }
-  .welcome-content p { font-size: 12px; }
-  
-  .running-text-container { padding: 8px 12px; }
-  .running-text-label { font-size: 10px; padding: 3px 8px; }
-  .running-text { font-size: 12px; }
-  
-  .quote-card { padding: 15px; }
-  .quote-card p { font-size: 14px; }
-  .birthday-card { 
-    flex-direction: column; 
-    padding: 15px; 
-    gap: 10px;
-  }
-  .birthday-icon { font-size: 35px; }
-  .birthday-content h3 { font-size: 16px; }
-  
-  .agenda-card { padding: 15px; }
-  .agenda-card h2 { font-size: 16px; }
-  .agenda-item { padding: 10px; gap: 10px; }
-  .agenda-date { padding: 6px 10px; min-width: 50px; }
-  .agenda-date .day { font-size: 16px; }
-  .agenda-date .month { font-size: 10px; }
-  .agenda-info h4 { font-size: 13px; }
-  .agenda-info p { font-size: 11px; }
-  
-  .section-header { margin-bottom: 15px; gap: 10px; }
-  .section-header h2 { font-size: 16px; }
-  .back-btn { padding: 8px 15px; font-size: 12px; }
-  
-  .content-section { padding: 15px; }
-  th, td { padding: 8px; font-size: 11px; }
-  
-  .info-card { padding: 15px; }
-  .info-card h3 { font-size: 15px; }
-  .info-card p { font-size: 12px; }
-  
-  .search-box input { padding: 10px 12px; font-size: 13px; }
-  .hamburger-btn { padding: 8px 14px; font-size: 12px; }
+.sticky-header { padding: 10px 12px; }
+.header-title h1 { font-size: 16px; }
+.header-title p { font-size: 11px; }
+.clock-container { padding: 8px 10px; flex-direction: row; justify-content: center; gap: 10px; }
+.analog-clock { width: 35px; height: 35px; }
+.hour-hand { height: 10px; }
+.minute-hand { height: 13px; }
+.second-hand { height: 16px; }
+.time-display { font-size: 16px; }
+.date-display { font-size: 9px; }
+.ms-display { display: none; }
+.info-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; }
+.info-stat-item { padding: 10px; }
+.info-stat-icon { font-size: 18px; }
+.info-stat-label { font-size: 10px; }
+.info-stat-value { font-size: 18px; }
+.welcome-card { flex-direction: column; padding: 15px; gap: 10px; }
+.welcome-icon { font-size: 35px; }
+.welcome-content h2 { font-size: 16px; }
+.welcome-content p { font-size: 12px; }
+.running-text-container { padding: 8px 12px; }
+.running-text-label { font-size: 10px; padding: 3px 8px; }
+.running-text { font-size: 12px; }
+.quote-card { padding: 15px; }
+.quote-card p { font-size: 14px; }
+.birthday-card { flex-direction: column; padding: 15px; gap: 10px; }
+.birthday-icon { font-size: 35px; }
+.birthday-content h3 { font-size: 16px; }
+.agenda-card { padding: 15px; }
+.agenda-card h2 { font-size: 16px; }
+.agenda-item { padding: 10px; gap: 10px; }
+.agenda-date { padding: 6px 10px; min-width: 50px; }
+.agenda-date .day { font-size: 16px; }
+.agenda-date .month { font-size: 10px; }
+.agenda-info h4 { font-size: 13px; }
+.agenda-info p { font-size: 11px; }
+.section-header { margin-bottom: 15px; gap: 10px; }
+.section-header h2 { font-size: 16px; }
+.back-btn { padding: 8px 15px; font-size: 12px; }
+.content-section { padding: 15px; }
+th, td { padding: 8px; font-size: 11px; }
+.info-card { padding: 15px; }
+.info-card h3 { font-size: 15px; }
+.info-card p { font-size: 12px; }
+.search-box input { padding: 10px 12px; font-size: 13px; }
+.hamburger-btn { padding: 8px 14px; font-size: 12px; }
 }
 
 @media (max-width: 375px) {
-  .info-stats { grid-template-columns: 1fr; }
-  .clock-container { flex-direction: column; }
-  .time-display { font-size: 14px; }
-  .header-title h1 { font-size: 14px; }
+.info-stats { grid-template-columns: 1fr; }
+.clock-container { flex-direction: column; }
+.time-display { font-size: 14px; }
+.header-title h1 { font-size: 14px; }
 }
