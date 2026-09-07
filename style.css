@@ -559,3 +559,44 @@ td a:hover { text-decoration: underline; color: #ec4899; }
   .time-display { font-size: 14px; }
   .header-title h1 { font-size: 14px; }
 }
+
+/* ===== RINGKASAN STOK ===== */
+#tableRingkasanStok th { 
+  background: linear-gradient(135deg, #be185d, #831843); 
+  color: #fff; 
+  padding: 12px; 
+  text-align: left; 
+  font-size: 13px; 
+  font-weight: 800;
+}
+#tableRingkasanStok td { 
+  padding: 12px; 
+  border-bottom: 1px solid #2d2d2d; 
+  color: #fce7f3; 
+  font-size: 14px; 
+}
+#tableRingkasanStok tr:hover { 
+  background: #2d1a2d; 
+}
+.status-aman { color: #22c55e; font-weight: 800; }
+.status-menipis { color: #f97316; font-weight: 800; }
+.status-habis { color: #e53e3e; font-weight: 800; }
+
+/* Agar saat di-print (Ctrl+P) hanya tabel ringkasan yang muncul, rapi dan putih */
+@media print {
+  body * { visibility: hidden; }
+  #stokSummaryView, #stokSummaryView * { visibility: visible; }
+  #stokSummaryView { 
+    position: absolute; left: 0; top: 0; width: 100%; 
+    background: #fff !important; color: #000 !important; padding: 20px;
+  }
+  #tableRingkasanStok th { 
+    background: #eee !important; color: #000 !important; 
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  #tableRingkasanStok td { 
+    color: #000 !important; border-bottom: 1px solid #ccc !important; 
+  }
+  .back-btn, .btn-cam { display: none !important; }
+  .section-header h2 { color: #000 !important; }
+}
