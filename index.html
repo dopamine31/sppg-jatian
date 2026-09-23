@@ -139,6 +139,7 @@
         <button class="category-btn" onclick="filterDokumen('form', this)">📊 Form</button>
         <button class="category-btn" onclick="filterDokumen('sk', this)">📜 SK</button>
         <button class="category-btn" onclick="filterDokumen('panduan', this)">📖 Panduan</button>
+         <button class="category-btn" onclick="filterDokumen('mou', this)">🤝 MOU</button>
     </div>
     <div class="search-box"><input type="text" id="searchDokumen" placeholder="🔍 Cari dokumen..."></div>
     <div class="doc-grid" id="docGrid"></div>
@@ -360,6 +361,16 @@
         </div>
     </div>
     <button class="chat-toggle-btn" onclick="toggleChat()">🚨<span class="chat-badge" id="chatBadge">0</span></button>
+</div>
+    <!-- PDF PREVIEW MODAL -->
+<div id="pdfModalOverlay" class="ktp-modal-overlay" onclick="if(event.target===this) closePdfModal()">
+    <div class="ktp-modal-content" style="max-width: 95%; width: 900px; height: 90vh; padding: 15px; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; width: 100%;">
+            <h3 class="ktp-modal-title" style="margin: 0; padding-right: 0; color: #f472b6; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;" id="pdfModalTitle">Preview Dokumen</h3>
+            <button class="ktp-modal-close" onclick="closePdfModal()" style="position: static; flex-shrink: 0; margin-left: 10px;">✕</button>
+        </div>
+        <iframe id="pdfModalFrame" src="" style="flex: 1; width: 100%; border: 2px solid #2d2d2d; border-radius: 12px; background: #fff;" frameborder="0"></iframe>
+    </div>
 </div>
 
 <script src="script.js"></script>
